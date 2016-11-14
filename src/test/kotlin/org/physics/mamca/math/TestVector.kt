@@ -4,6 +4,8 @@ import org.junit.Test
 import org.physics.mamca.DELTA
 import org.physics.mamca.PI
 import org.physics.mamca.math.Vector
+import org.physics.mamca.math.Vector
+import org.physics.mamca.math.times
 import org.physics.mamca.math.times
 import kotlin.test.assertEquals
 

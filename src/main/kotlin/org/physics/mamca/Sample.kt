@@ -157,7 +157,7 @@ class Sample : Serializable {
     }
 
     fun dumpToJsonFile(path: String) {
-        // записывает `Sample` в json файл
+        // записывает `org.physics.mamca.Sample` в json файл
         File(path).printWriter().use { out ->
             val json = toJsonString()
             out.write(json)
