@@ -12,7 +12,9 @@ apply plugin: 'kotlin'
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.8.4"
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.8.0"
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
     testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
@@ -21,3 +23,4 @@ sourceSets {
     main.kotlin.srcDirs += 'src/main'
     test.kotlin.srcDirs += 'src/test'
 }
+//org.apache.directory.studio:
