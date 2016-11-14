@@ -4,7 +4,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import org.apache.commons.io.FileUtils
 import java.io.File
-import java.io.PrintWriter
 import java.io.Serializable
 import java.lang.Math.cos
 import java.lang.Math.sin
@@ -213,21 +212,27 @@ class Sample : Serializable {
     }
 
     fun saveState(outFolder: String = "", filename: String = "momenta.txt") {
+        // записывает в файл текущее состояние моментов
+
         TODO()
     }
 
     fun toJsonString(): String {
+        // возвращает сериализованную json строку
         val gson = GsonBuilder().registerTypeAdapter(this.javaClass, SampleSerializer()).setPrettyPrinting().create()
         val json = gson.toJson(this, getType())
         return json
     }
 
     fun dumpToJsonFile(path: String) {
-        val printWriter = PrintWriter(path)
-        val json = toJsonString()
-        printWriter.write(json)
-        printWriter.flush()
-        printWriter.close()
+        // записывает `Sample` в json файл
+        File(path).printWriter().use { out ->
+            val json = toJsonString()
+            out.write(json)
+            out.flush()
+            out.close()
+        }
+
     }
 
     fun getType(): Type {
