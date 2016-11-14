@@ -1,6 +1,7 @@
 package org.physics.mamca
 
 import org.junit.Test
+import org.physics.mamca.math.Vector
 import kotlin.test.assertEquals
 
 class TestJson {

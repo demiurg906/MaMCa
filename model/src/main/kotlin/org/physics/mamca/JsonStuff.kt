@@ -2,6 +2,7 @@ package org.physics.mamca
 
 
 import com.google.gson.*
+import org.physics.mamca.math.Vector
 import java.lang.reflect.Type
 
 class ParticleSerializer : JsonSerializer<Particle> {

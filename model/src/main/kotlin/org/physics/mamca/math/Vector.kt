@@ -1,6 +1,7 @@
-package org.physics.mamca
+package org.physics.mamca.math
 
 import com.google.gson.Gson
+import org.physics.mamca.util.equalsDouble
 
 class Vector {
     var x: Double = 0.0

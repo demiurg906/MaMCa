@@ -1,5 +1,7 @@
-package org.physics.mamca
+package org.physics.mamca.util
 
+import org.physics.mamca.DELTA
+import org.physics.mamca.PI2
 import java.io.File
 import java.lang.Math.acos
 import java.nio.file.Files

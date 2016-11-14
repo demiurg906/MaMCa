@@ -1,6 +1,10 @@
-package org.physics.mamca
+package org.physics.mamca.math
 
 import org.junit.Test
+import org.physics.mamca.DELTA
+import org.physics.mamca.PI
+import org.physics.mamca.math.Vector
+import org.physics.mamca.math.times
 import kotlin.test.assertEquals
 
 class TestVector {
@@ -83,7 +87,7 @@ class TestVector {
         testDataWithFun(oneVectorData(), testUnaryMinus)
     }
     
-    @Test 
+    @Test
     fun testPlus() {
         val testPlus = {x1: Double, y1: Double, z1: Double,
                         x2: Double, y2: Double, z2: Double ->

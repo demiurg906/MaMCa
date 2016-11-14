@@ -1,6 +1,7 @@
 package org.physics.mamca
 
 import org.junit.Test
+import org.physics.mamca.util.deleteFile
 import java.io.File
 import java.nio.file.Files
 import kotlin.test.assertEquals
