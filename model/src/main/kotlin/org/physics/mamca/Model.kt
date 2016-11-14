@@ -211,10 +211,32 @@ class Sample : Serializable {
         TODO()
     }
 
-    fun saveState(outFolder: String = "", filename: String = "momenta.txt") {
+    fun saveState(outFolder: String = ".", filename: String = "momenta.txt") {
         // записывает в файл текущее состояние моментов
+        val path = outFolder + File.separator + filename
+        File(path).printWriter().use {out ->
+            // TODO: move magic number to constants?
+            // масштаб  для моментов импульсов
+            // нужен, чтобы стрелочки не были слишком большие
+            val scale = 0.25
+            for (p in particles) {
+                val x = p.loc.x
+                val y = p.loc.y
+                val z = p.loc.z
 
-        TODO()
+                val mx = p.m.x * scale
+                val my = p.m.y * scale
+                val mz = p.m.z * scale
+                
+                val x1 = x - mx
+                val x2 = x + mx
+                val y1 = y - my
+                val y2 = y + my
+                val z1 = z - mz
+                val z2 = z + mz
+                out.write("$x1 $y1 $z1 $x2 $y2 $z2 $x $y $z \n")
+            }
+        }
     }
 
     fun toJsonString(): String {
@@ -229,8 +251,6 @@ class Sample : Serializable {
         File(path).printWriter().use { out ->
             val json = toJsonString()
             out.write(json)
-            out.flush()
-            out.close()
         }
 
     }
