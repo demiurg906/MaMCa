@@ -32,8 +32,9 @@ def pre_clean(func):
             os.mkdir(out)
         _clear_out_folder(out)
         func(*args, **kwargs)
-        os.remove(out + '/ParticlesState.bin')
-
+        dumpedState = '{}/sample.json'.format(out)
+        if os.path.exists(dumpedState):
+            os.remove(dumpedState)
     return inner
 
 
@@ -47,7 +48,7 @@ def single_run(settings_fname=None, out_folder=None, mamca_path=None):
     """
     print('Single run just started')
     subprocess.run(
-        '{} -s {} -o {}'.format(mamca_path, settings_fname, out_folder),
+        'java -jar {} {} {}'.format(mamca_path, settings_fname, out_folder),
         stdout=sys.stdout, stderr=sys.stderr)
     print('Single run has finished')
 

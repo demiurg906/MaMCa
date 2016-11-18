@@ -37,7 +37,7 @@ data class Settings(val x: Int, // количество клеток по x
                     var jsonPath: String
 ) : Serializable
 
-fun getSettingsFromJson(filename: String): Settings {
+fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()
     val settings: Settings = mapper.readValue(File(filename))
     return settings

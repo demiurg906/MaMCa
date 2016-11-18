@@ -10,6 +10,8 @@ import org.physics.mamca.util.randomPhi
 import org.physics.mamca.util.randomTheta
 import java.io.File
 import java.io.Serializable
+import java.lang.Math.cos
+import java.lang.Math.sin
 import java.lang.reflect.Type
 
 class Sample : Serializable {

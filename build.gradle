@@ -14,6 +14,10 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
+apply plugin: 'application'
+
+mainClassName = "org.physics.mamca.MainKt"
+
 apply plugin: 'com.jetbrains.python.envs'
 
 envs {
@@ -57,9 +61,17 @@ task create_and_draw(type:Exec) {
     commandLine pythonPath, 'create_and_draw.py'
 }
 
-task test_py(type:Exec) {
+task test_py(type: Exec, dependsOn: 'jar') {
     group = 'python tasks'
-    workingDir './coordinator'
+    workingDir './'
 
-    commandLine pythonPath, 'test.py'
+    commandLine pythonPath, 'coordinator/test.py'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': "org.physics.mamca.MainKt"
+    }
+
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }

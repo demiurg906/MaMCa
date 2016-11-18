@@ -1,3 +1,4 @@
+import json
 import math
 from collections import OrderedDict
 
@@ -5,86 +6,48 @@ from collections import OrderedDict
 class Settings:
     def __init__(self, filename=None):
         self._d = OrderedDict()
-        if filename is None:
-            self._d['x'] = 4        # количество клеток по x
-            self._d['y'] = 4        # количество клеток по y
-            self._d['z'] = 1        # количество клеток по z
-            self._d['n'] = 4        # число частиц в кольце
 
-            self._d['d'] = 10       # диаметр кольца
-            self._d['r'] = 1        # радиус частицы
-            self._d['off'] = 0      # расстояние между клетками
+        self._d['x'] = 4        # количество клеток по x
+        self._d['y'] = 4        # количество клеток по y
+        self._d['z'] = 1        # количество клеток по z
+        self._d['r'] = 1        # число частиц в кольце
 
-            self._d['ms'] = 4.53e5  # константа диполь-диполь
-            self._d['kan'] = 8e4    # константа анизотропии
-            self._d['jex'] = 0.1    # константа обмена
-            self._d['m'] = 1        # значение момента
+        self._d['n'] = 4       # диаметр кольца
+        self._d['d'] = 10        # радиус частицы
+        self._d['offset'] = 0      # расстояние между клетками
 
-            self._d['t'] = 0.01     # температура
-            self._d['ot'] = 0       # расположение осей анизотропии
-            # 0 -- рандом в 3D, 1 -- рандом в 2D, 2 -- заданная ось
-            # отклонение оси анизотропии от оси z и оси x соответственно
-            self._d['ot_theta'] = math.pi / 2
-            self._d['ot_phi'] = 0
+        self._d['ms'] = 4.53e5  # константа диполь-диполь
+        self._d['kan'] = 8e4    # константа анизотропии
+        self._d['jex'] = 0.1    # константа обмена
+        self._d['m'] = 1        # значение момента
 
-            self._d['b_x'] = 0      # поле по x
-            self._d['b_y'] = 0      # поле по y
-            self._d['b_z'] = 0      # поле по z
+        self._d['t'] = 0.01     # температура
+        self._d['ot'] = 0       # расположение осей анизотропии
+        # 0 -- рандом в 3D, 1 -- рандом в 2D, 2 -- заданная ось
+        # отклонение оси анизотропии от оси z и оси x соответственно
+        self._d['ot_theta'] = math.pi / 2
+        self._d['ot_phi'] = 0
 
-            self._d['prec'] = 7
-            self._d['load'] = False
-        else:
-            with open(filename, mode='r') as f:
-                def next_int():
-                    s = f.readline()
-                    while s == '\n':
-                        s = f.readline()
-                    return int(s.split()[2])
+        self._d['b_x'] = 0      # поле по x
+        self._d['b_y'] = 0      # поле по y
+        self._d['b_z'] = 0      # поле по z
 
-                def next_float():
-                    s = f.readline()
-                    while s == '\n':
-                        s = f.readline()
-                    return float(s.split()[2])
-
-                def next_bool():
-                    s = f.readline()
-                    while s == '\n':
-                        s = f.readline()
-                    b = s.split()[2]
-                    return b == 'True' or b == 'true'
-
-                self._d['x'] = next_int()  # количество клеток по x
-                self._d['y'] = next_int()  # количество клеток по y
-                self._d['z'] = next_int()  # количество клеток по z
-                self._d['n'] = next_int()  # число частиц в кольце
-
-                self._d['d'] = next_float()  # диаметр кольца
-                self._d['r'] = next_float()  # радиус частицы
-                self._d['off'] = next_float()  # расстояние между клетками
-
-                self._d['ms'] = next_float()  # константа диполь-диполь
-                self._d['kan'] = next_float()  # константа анизотропии
-                self._d['jex'] = next_float()  # константа обмена
-                self._d['m'] = next_float()  # значение момента
-
-                self._d['t'] = next_float()  # температура
-                self._d['ot'] = next_int()  # расположение осей анизотропии
-                # 0 -- рандом в 3D, 1 -- рандом в 2D, 2 -- заданная ось
-                # отклонение оси анизотропии от оси z и оси x соответственно
-                self._d['ot_theta'] = next_float()
-                self._d['ot_phi'] = next_float()
-
-                self._d['b_x'] = next_float()  # поле по x
-                self._d['b_y'] = next_float()  # поле по y
-                self._d['b_z'] = next_float()  # поле по z
-
-                self._d['prec'] = next_int()
-                self._d['load'] = next_bool()
+        self._d['precision'] = 7
+        self._d['load'] = False
+        self._d['jsonPath'] = 'sample.json'
+        if filename is not None:
+            with open(filename) as f:
+                d = json.load(f)
+                for key, value in d.items():
+                    self._d[key] = value
 
     @property
     def x(self):
         return self._d['x']
+
+    @x.setter
+    def x(self, value):
+        self._d['x'] = value
 
     @property
     def y(self):
@@ -107,8 +70,8 @@ class Settings:
         return self._d['r']
 
     @property
-    def off(self):
-        return self._d['off']
+    def offset(self):
+        return self._d['offset']
 
     @property
     def ms(self):
@@ -162,6 +125,10 @@ class Settings:
     def load(self):
         return self._d['load']
 
+    @property
+    def jsonPath(self):
+        return self._d['jsonPath']
+
     def save_settings(self, filename):
         # проверка на то, что все частицы помещаются в окружность
         if self.n * 2 * self.r > self.d * math.pi:
@@ -169,8 +136,7 @@ class Settings:
                              'on the ring of '
                              '{} diameter'.format(self.n, self.r, self.d))
         with open(filename, mode='w') as f:
-            for key, value in self._d.items():
-                f.write('{} = {}\n'.format(key, value))
+            json.dump(self._d, f)
 
     def __getitem__(self, key):
         return self._d[key]

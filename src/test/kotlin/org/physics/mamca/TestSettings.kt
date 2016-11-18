@@ -4,7 +4,7 @@ import org.junit.Test
 import org.physics.mamca.createSettingsJson
 import org.physics.mamca.util.deleteFile
 import org.physics.mamca.getDefaultSettings
-import org.physics.mamca.getSettingsFromJson
+import org.physics.mamca.loadSettingsFromJson
 import org.physics.mamca.util.deleteFile
 import java.io.File
 import java.nio.file.Files
@@ -16,7 +16,7 @@ class TestSettings {
         val jsonName = "testedSettings.json"
         val defaultSettings = getDefaultSettings()
         createSettingsJson(jsonName, defaultSettings)
-        val importedSettings = getSettingsFromJson(jsonName)
+        val importedSettings = loadSettingsFromJson(jsonName)
         deleteFile(jsonName)
         assertEquals(defaultSettings, importedSettings)
     }
