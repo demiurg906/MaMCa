@@ -123,6 +123,10 @@ class Sample : Serializable {
         TODO()
     }
 
+    fun optimizeEnergy() {
+        particles.forEach { it.optimizeEnergy() }
+    }
+
     fun saveState(outFolder: String = ".", filename: String = "momenta.txt") {
         // записывает в файл текущее состояние моментов
         val path = outFolder + File.separator + filename

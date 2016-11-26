@@ -17,9 +17,11 @@ class Vector {
     var phi: Double = 0.0
         private set
 
-    constructor(x: Double, y: Double, z: Double, polar: Boolean = false) {
-        // конструирует вектор по координатам (декартовым или полярным)
 
+    /**
+     * конструирует вектор по координатам (декартовым или полярным)
+     */
+    constructor(x: Double, y: Double, z: Double, polar: Boolean = false) {
         if (polar) {
             this.r = x
             this.theta = y
@@ -33,9 +35,18 @@ class Vector {
         }
     }
 
-    constructor(json: String) {
-        // десериализует вектор из json строки
+    /**
+     * конструирует нулевой вектор
+     */
+    constructor(): this(0.0, 0.0, 0.0, false)
 
+    constructor(other: Vector): this(other.x, other.y, other.z, false)
+
+
+    /**
+     * десериализует вектор из json строки
+     */
+    constructor(json: String) {
         val gson = Gson()
         val vector: Vector = gson.fromJson(json, this.javaClass)
         this.x = vector.x
@@ -62,6 +73,12 @@ class Vector {
     fun normalize() {
         r = 1.0
         updateDecardCoordinates()
+    }
+
+    fun direction(): Vector {
+        val res = Vector(this)
+        res.normalize()
+        return res
     }
 
     operator fun unaryPlus(): Vector {
@@ -98,33 +115,44 @@ class Vector {
                 this.x * other.y - this.y * other.x)
     }
 
-    operator fun plusAssign(other: Vector) {
-        x += other.x
-        y += other.y
-        z += other.z
-        updatePolarCoordinates()
+    /**
+     * возвращает значение угла между двумя векторами
+     */
+    fun angleTo(other: Vector, eZ: Vector): Double {
+        val eX = other.direction()
+        val eY = (eZ % eX).direction()
+        val thisTan = this * eX
+        val thisNorm = this * eY
+        return Math.atan2(thisNorm, thisTan)
     }
 
-    operator fun minusAssign(other: Vector) {
-        x -= other.x
-        y -= other.y
-        z -= other.z
-        updatePolarCoordinates()
-    }
-
-    operator fun timesAssign(c: Double) {
-        x *= c
-        y *= c
-        z *= c
-        updatePolarCoordinates()
-    }
-
-    operator fun divAssign(c: Double) {
-        x /= c
-        y /= c
-        z /= c
-        updatePolarCoordinates()
-    }
+//    operator fun plusAssign(other: Vector) {
+//        x += other.x
+//        y += other.y
+//        z += other.z
+//        updatePolarCoordinates()
+//    }
+//
+//    operator fun minusAssign(other: Vector) {
+//        x -= other.x
+//        y -= other.y
+//        z -= other.z
+//        updatePolarCoordinates()
+//    }
+//
+//    operator fun timesAssign(c: Double) {
+//        x *= c
+//        y *= c
+//        z *= c
+//        updatePolarCoordinates()
+//    }
+//
+//    operator fun divAssign(c: Double) {
+//        x /= c
+//        y /= c
+//        z /= c
+//        updatePolarCoordinates()
+//    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -163,10 +191,4 @@ class Vector {
     }
 
 
-}
-
-fun abs(vector: Vector): Double = vector.r
-
-operator fun Double.times(v: Vector): Vector {
-    return v * this
 }

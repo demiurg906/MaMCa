@@ -3,12 +3,23 @@ package org.physics.mamca
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import org.physics.mamca.math.Vector
+import org.physics.mamca.math.abs
+import org.physics.mamca.math.norm
+import org.physics.mamca.math.sqr
+import org.physics.mamca.util.equalsDouble
+import java.lang.Math.*
 import java.lang.reflect.Type
 
 class Particle {
+    // положение частицы в пространстве
     val loc: Vector
-    val m: Vector
+
+    // значение магнитного момента
+    var m: Vector
+
+    // ось анизотропии
     val lma: Vector
+
     val sample: Sample
 
     private var neighborsInitialized = false
@@ -44,13 +55,109 @@ class Particle {
         neighborsInitialized = true
     }
 
-
+    /**
+     * расчет эффективного магнитного поля
+     */
     fun effectiveField(): Vector {
-        TODO()
+        var field = Vector()
+
+        // фоновое магнитное поле
+        field += sample.b
+
+        // вклад диполь-дипольного взаимодействия
+        var dipols = Vector()
+        dipolParticles.forEach { dipols += it.m }
+        field += dipols * sample.settings.ms
+
+        // вклад обменного взаимодействия
+        var exchange = Vector()
+        exchangeParticles.forEach { exchange += it.m }
+        field += exchange * sample.settings.jex
+
+        return field
     }
 
     fun optimizeEnergy() {
-        TODO()
+        // эффективное поле
+        val bEff = effectiveField()
+//        val bEff = Vector(1.0, 0.0,0.0) / 1e6
+
+        // нормаль к плоскости
+        val eZ = norm(bEff, lma)
+
+        // TODO: добавить проверку на параллельность
+
+        // поворот момента в плоскость
+        m -= eZ * (m * eZ)
+        m.normalize()
+
+        val theta = lma.angleTo(bEff, eZ)
+
+        // значение энергии в зависимости от угла
+        fun energy(phi: Double): Double =
+                sample.settings.kan * sqr(sin(phi)) - abs(bEff) * sample.settings.m * cos(phi - theta)
+
+        fun diffEnergy(phi: Double): Double =
+                sample.settings.kan * 2 * sin(phi) * cos(phi) + abs(bEff) * sample.settings.m * sin(phi - theta)
+
+        val a = 4 * sample.settings.kan
+        val b = abs(bEff) * sample.settings.m * sin(theta)
+        val c = 2 * abs(bEff) * sample.settings.m * cos(theta)
+
+        // корни уравнения от phi
+        val roots: List<Double>
+        if (!equalsDouble(b, 0.0)) {
+//            // уравнение четвертой степени
+            val alpha = sqr(a) - 4 * sqr(b) - sqr(c)
+            val beta = a * b * c
+            val tau = (c - a) / b
+            val delta = sqr(tau) / 2
+            val epsilon = pow(sqrt(11664 * sqr(beta) - 108 * pow(alpha, 3.0)) + 108 * beta, 1.0 / 3.0) / (3 * pow(2.0, 1.0 / 3.0) * b)
+            val mu = epsilon + alpha / epsilon
+            val gamma = sqrt(mu + delta / 2)
+            val nu = (pow(tau, 3.0) + 8 * (a + c) / b) / (4 * gamma)
+            val psi = tau / 2
+            val lambda = - mu + delta
+
+            val nu1 = - gamma / 2 - psi
+            val nu2 = gamma / 2 - psi
+            val chi1 = sqrt(lambda + nu) / 2
+            val chi2 = sqrt(lambda - nu) / 2
+
+            // массив значений угла phi, в которых достигаются экстремумы энергии
+            roots = listOf(nu1 - chi1, nu1 + chi1, nu2 - chi2, nu2 + chi2).map { 2 * atan(it) }.filter { it != Double.NaN }
+            println(roots)
+            val energies = roots.map(::energy)
+            println(energies)
+            val diffEnergies = roots.map(::diffEnergy)
+            println(diffEnergies)
+
+
+            fun diffWithX(x: Double): Double = b * pow(x, 4.0) + (c - a) * pow(x, 3.0) + (c + a) * x - b
+            println(listOf(nu1 - chi1, nu1 + chi1, nu2 - chi2, nu2 + chi2).map(::diffWithX))
+            println()
+//            val t = 27 * (sqr(D) - sqr(E))
+//            val q = (D * E - 4)
+//            val epsilon = pow((sqrt(sqr(t)-108*pow(q, 3.0)) - t) / 2.0, 1.0/3.0)
+//            val gamma = -epsilon / 3 - q / epsilon
+//            val delta = sqrt(-gamma + sqr(D) / 4.0)
+//            val lambda = (8*E - pow(D, 3.0)) / (4*delta)
+//            val mu = gamma + sqr(D) / 2
+//
+//            val nu1 = -(delta / 2.0 + D / 4.0)
+//            val nu2 = delta / 2.0 - D / 4.0
+//
+//            val p1 = sqrt(mu - lambda) / 2.0
+//            val p2 = sqrt(mu + lambda) / 2.0
+        } else {
+            // уравнение третьей степени
+            println("lol")
+            roots = arrayListOf()
+        }
+        // минимумы
+//        val mins = roots.filter{ it < 0}
+
+
     }
 
     fun computeEnergy(): Double {
@@ -96,3 +203,4 @@ class Particle {
     }
 
 }
+
