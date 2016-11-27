@@ -14,5 +14,6 @@ fun main(args: Array<String>) {
     val outFolder = args[1]
     val settings = loadSettingsFromJson(args[0])
     val sample = Sample(settings)
+    sample.optimizeEnergy()
     sample.saveState(outFolder = outFolder)
 }

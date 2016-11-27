@@ -181,7 +181,7 @@ class Vector {
     }
 
     override fun toString(): String {
-        return "org.physics.mamca.math.Vector(x=$x, y=$y, z=$z)"
+        return "($x, $y, $z)"
     }
 
     fun toJsonString(): String {
