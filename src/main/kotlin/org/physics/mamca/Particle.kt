@@ -2,10 +2,7 @@ package org.physics.mamca
 
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import org.physics.mamca.math.Vector
-import org.physics.mamca.math.abs
-import org.physics.mamca.math.norm
-import org.physics.mamca.math.sqr
+import org.physics.mamca.math.*
 import org.physics.mamca.util.equalsDouble
 import java.lang.Math.*
 import java.lang.reflect.Type
@@ -80,12 +77,14 @@ class Particle {
     fun optimizeEnergy() {
         // эффективное поле
         val bEff = effectiveField()
-//        val bEff = Vector(1.0, 0.0,0.0) / 1e6
+
+        if (isKollinear(bEff, lma)) {
+            // поле параллельно оси анизотропии
+            TODO()
+        }
 
         // нормаль к плоскости
         val eZ = norm(bEff, lma)
-
-        // TODO: добавить проверку на параллельность
 
         // поворот момента в плоскость
         m -= eZ * (m * eZ)
@@ -136,19 +135,6 @@ class Particle {
             fun diffWithX(x: Double): Double = b * pow(x, 4.0) + (c - a) * pow(x, 3.0) + (c + a) * x - b
             println(listOf(nu1 - chi1, nu1 + chi1, nu2 - chi2, nu2 + chi2).map(::diffWithX))
             println()
-//            val t = 27 * (sqr(D) - sqr(E))
-//            val q = (D * E - 4)
-//            val epsilon = pow((sqrt(sqr(t)-108*pow(q, 3.0)) - t) / 2.0, 1.0/3.0)
-//            val gamma = -epsilon / 3 - q / epsilon
-//            val delta = sqrt(-gamma + sqr(D) / 4.0)
-//            val lambda = (8*E - pow(D, 3.0)) / (4*delta)
-//            val mu = gamma + sqr(D) / 2
-//
-//            val nu1 = -(delta / 2.0 + D / 4.0)
-//            val nu2 = delta / 2.0 - D / 4.0
-//
-//            val p1 = sqrt(mu - lambda) / 2.0
-//            val p2 = sqrt(mu + lambda) / 2.0
         } else {
             // уравнение третьей степени
             println("lol")
@@ -156,8 +142,6 @@ class Particle {
         }
         // минимумы
 //        val mins = roots.filter{ it < 0}
-
-
     }
 
     fun computeEnergy(): Double {

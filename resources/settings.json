@@ -1,0 +1,23 @@
+{
+  "x":1,
+  "y":1,
+  "z":1,
+  "r":1.0,
+  "n":5,
+  "d":10.0,
+  "offset":2.0,
+  "ms":453.0,
+  "kan":80.0,
+  "jex":0.0001,
+  "m":1.0,
+  "t":0.1,
+  "ot":0,
+  "ot_theta":1.5707963267948966,
+  "ot_phi":0.0,
+  "b_x":0.0,
+  "b_y":0.0,
+  "b_z":0.0,
+  "precision":7,
+  "load":false,
+  "jsonPath":"./resources/out/sample.json"
+}
