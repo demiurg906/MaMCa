@@ -1,10 +1,6 @@
 package org.physics.mamca
 
 import org.junit.Test
-import org.physics.mamca.Particle
-import org.physics.mamca.Sample
-import org.physics.mamca.math.Vector
-import org.physics.mamca.getDefaultSettings
 import org.physics.mamca.math.Vector
 import kotlin.test.assertEquals
 
