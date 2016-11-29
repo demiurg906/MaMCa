@@ -20,6 +20,7 @@ data class Settings(val x: Int, // количество клеток по x
                     val jex: Double, // константа обмена
 
                     val m: Double, // значение момента
+                    val viscosity: Double, // коэффициент вязкости, 0 <= viscosity <= 1
                     val t: Double, // температура
 
                     val ot: Int, // расположение осей анизотропии
@@ -52,7 +53,7 @@ fun getDefaultSettings(): Settings =
         Settings(
             4, 4, 1, 1.0,
             4, 10.0, 0.0,
-            4.53e5, 8e4, 0.1,
+            4.53e5, 8e4, 0.1, 1.0,
             1.0, 0.1,
             0, PI / 2, 0.0,
             0.0, 0.0, 0.0,
