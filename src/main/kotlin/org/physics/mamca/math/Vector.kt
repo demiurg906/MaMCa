@@ -21,6 +21,10 @@ class Vector {
     /**
      * конструирует вектор по координатам (декартовым или полярным)
      */
+    /*
+    да, по хорошему надо из этого конструктора вызывать конструктор со списком,
+    но это ухудшает быстродействие
+     */
     constructor(x: Double, y: Double, z: Double, polar: Boolean = false) {
         if (polar) {
             this.r = x
@@ -35,13 +39,36 @@ class Vector {
         }
     }
 
+    constructor(x: Int, y: Int, z: Int, polar: Boolean = false): this(x.toDouble(), y.toDouble(), z.toDouble(), polar)
+
     /**
      * конструирует нулевой вектор
      */
     constructor(): this(0.0, 0.0, 0.0, false)
 
+    /**
+     * конструироет копию вектора
+     */
     constructor(other: Vector): this(other.x, other.y, other.z, false)
 
+    /**
+     * конструирует вектор по списку координат
+     */
+    constructor(coords: List<Double>, polar: Boolean = false): this(coords[0], coords[1], coords[2], polar) {
+        if (coords.size != 3)
+            throw IllegalArgumentException("coords must contains only 3 coordinates")
+        if (polar) {
+            this.r = coords[0]
+            this.theta = coords[1]
+            this.phi = coords[2]
+            updateDecardCoordinates()
+        } else {
+            this.x = coords[0]
+            this.y = coords[1]
+            this.z = coords[2]
+            updatePolarCoordinates()
+        }
+    }
 
     /**
      * десериализует вектор из json строки
@@ -57,6 +84,9 @@ class Vector {
         this.phi = vector.phi
     }
 
+    /**
+     * пересчет декартовых координат
+     */
     private fun updateDecardCoordinates() {
         val sinTheta = Math.sin(theta)
         x = r * sinTheta * Math.cos(phi)
@@ -64,17 +94,27 @@ class Vector {
         z = r * Math.cos(theta)
     }
 
+
+    /**
+     * пересчет полярных координат
+     */
     private fun updatePolarCoordinates() {
         r = Math.sqrt(x * x + y * y + z * z)
         theta = Math.atan2(Math.sqrt(x * x + y * y), z)
         phi = Math.atan2(y, x)
     }
 
+    /**
+     * нормировка на единицу
+     */
     fun normalize() {
         r = 1.0
         updateDecardCoordinates()
     }
 
+    /**
+     * вовращает вектор, нормированный на единицу
+     */
     fun direction(): Vector {
         val res = Vector(this)
         res.normalize()
@@ -97,6 +137,9 @@ class Vector {
         return Vector(this.x - other.x, this.y - other.y, this.z - other.z)
     }
 
+    /**
+     * скалярное произведение векторов
+     */
     operator fun times(other: Vector): Double {
         return this.x * other.x + this.y * other.y + this.z * other.z
     }
@@ -105,10 +148,14 @@ class Vector {
         return Vector(x * c, y * c, z * c)
     }
 
+
     operator fun div(c: Double): Vector {
         return Vector(x / c, y / c, z / c)
     }
 
+    /**
+     * векторное произведение веторов
+     */
     operator fun mod(other: Vector): Vector {
         return Vector(this.y * other.z - this.z * other.y,
                 this.z * other.x - this.x * other.z,
@@ -126,33 +173,10 @@ class Vector {
         return Math.atan2(thisNorm, thisTan)
     }
 
-//    operator fun plusAssign(other: Vector) {
-//        x += other.x
-//        y += other.y
-//        z += other.z
-//        updatePolarCoordinates()
-//    }
-//
-//    operator fun minusAssign(other: Vector) {
-//        x -= other.x
-//        y -= other.y
-//        z -= other.z
-//        updatePolarCoordinates()
-//    }
-//
-//    operator fun timesAssign(c: Double) {
-//        x *= c
-//        y *= c
-//        z *= c
-//        updatePolarCoordinates()
-//    }
-//
-//    operator fun divAssign(c: Double) {
-//        x /= c
-//        y /= c
-//        z /= c
-//        updatePolarCoordinates()
-//    }
+    /**
+     * возвращает декартовы координаты в виде списка
+     */
+    fun asList(): List<Double> = listOf(x, y, z)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -184,11 +208,12 @@ class Vector {
         return "($x, $y, $z)"
     }
 
+    /**
+     * сериализация вектора в json строку
+     */
     fun toJsonString(): String {
         val gson = Gson()
         val json = gson.toJson(this)
         return json
     }
-
-
 }
