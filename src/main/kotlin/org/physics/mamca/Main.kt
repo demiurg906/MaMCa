@@ -20,6 +20,9 @@ fun main(args: Array<String>) {
     val settings = loadSettingsFromJson(settingsFile)
     val sample = Sample(settings)
     sample.dumpToJsonFile("$outFolder/sample.json")
+
+    val midTime = System.currentTimeMillis()
+
     sample.optimizeEnergy()
     sample.saveState(outFolder = outFolder)
 
@@ -27,6 +30,7 @@ fun main(args: Array<String>) {
     val delimiter = "---------------------------------------------------"
     println("\n$delimiter")
     println("time of working is ${(endTime - startTime) / 1000.0} seconds")
+    println("time of computation is ${(endTime - midTime) / 1000.0} seconds")
     println("sample size is ${settings.x}x${settings.y}x${settings.z} with ${settings.n} particles per ring")
     println("total number of particles is ${settings.x * settings.y * settings.z * settings.n}")
     println("number of \"two minimums\" situations is ${sample.twoMinimums}")
