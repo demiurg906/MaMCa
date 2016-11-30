@@ -37,4 +37,13 @@ class TestJson {
         val newSample = Sample(newSettings)
         assertEquals(sample, newSample)
     }
+
+    @Test
+    fun testSettings() {
+        val settings = getDefaultSettings()
+        val filename = "src/test/resources/settings.json"
+        createSettingsJson(filename, settings)
+        val newSettings = loadSettingsFromJson(filename)
+        assertEquals(settings, newSettings)
+    }
 }
