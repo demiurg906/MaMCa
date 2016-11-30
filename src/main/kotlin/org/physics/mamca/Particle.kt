@@ -3,6 +3,7 @@ package org.physics.mamca
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import org.physics.mamca.math.*
+import org.physics.mamca.util.Mathematica
 import org.physics.mamca.util.equalsDouble
 import java.lang.Math.*
 import java.lang.reflect.Type
@@ -18,6 +19,8 @@ class Particle {
     val lma: Vector
 
     val sample: Sample
+
+    private var bEff: Vector = Vector()
 
     private var neighborsInitialized = false
     private var dipolParticles: Set<Particle> = setOf()
@@ -55,29 +58,25 @@ class Particle {
     /**
      * расчет эффективного магнитного поля
      */
-    fun effectiveField(): Vector {
-        var field = Vector()
+    fun computeEffectiveField() {
+        bEff = Vector()
 
         // фоновое магнитное поле
-        field += sample.b
+        bEff += sample.b
 
         // вклад диполь-дипольного взаимодействия
         var dipols = Vector()
         dipolParticles.forEach { dipols += it.m }
-        field += dipols * sample.settings.ms
+        bEff += dipols * sample.settings.ms
 
         // вклад обменного взаимодействия
         var exchange = Vector()
         exchangeParticles.forEach { exchange += it.m }
-        field += exchange * sample.settings.jex
-
-        return field
+        bEff += exchange * sample.settings.jex
     }
 
     fun optimizeEnergy() {
         // эффективное поле
-        val bEff = effectiveField()
-
         if (isKollinear(bEff, lma)) {
             // поле параллельно оси анизотропии
             TODO()
@@ -92,13 +91,6 @@ class Particle {
 
         val theta = lma.angleTo(bEff, eZ)
 
-        // значение энергии в зависимости от угла
-        fun energy(phi: Double): Double =
-                sample.settings.kan * sqr(sin(phi)) - abs(bEff) * sample.settings.m * cos(phi - theta)
-
-        fun diffEnergy(phi: Double): Double =
-                sample.settings.kan * 2 * sin(phi) * cos(phi) + abs(bEff) * sample.settings.m * sin(phi - theta)
-
         val a = 4 * sample.settings.kan
         val b = abs(bEff) * sample.settings.m * sin(theta)
         val c = 2 * abs(bEff) * sample.settings.m * cos(theta)
@@ -106,7 +98,8 @@ class Particle {
         // корни уравнения от phi
         val roots: List<Double>
         if (!equalsDouble(b, 0.0)) {
-//            // уравнение четвертой степени
+            // уравнение четвертой степени
+            /* решаем уравнение ручками
             val alpha = sqr(a) - 4 * sqr(b) - sqr(c)
             val beta = a * b * c
             val tau = (c - a) / b
@@ -123,30 +116,82 @@ class Particle {
             val chi1 = sqrt(lambda + nu) / 2
             val chi2 = sqrt(lambda - nu) / 2
 
-            // массив значений угла phi, в которых достигаются экстремумы энергии
-            roots = listOf(nu1 - chi1, nu1 + chi1, nu2 - chi2, nu2 + chi2).map { 2 * atan(it) }.filter { it != Double.NaN }
-            println(roots)
-            val energies = roots.map(::energy)
-            println(energies)
-            val diffEnergies = roots.map(::diffEnergy)
-            println(diffEnergies)
-
+             массив значений угла phi, в которых достигаются экстремумы энергии
+            roots = listOf(nu1 - chi1, nu1 + chi1, nu2 - chi2, nu2 + chi2).map { 2 * atan(it) }
+                    .map {if (it == Double.NaN) Double.POSITIVE_INFINITY else it}*/
+            val expr = "$b x^4 + ${c-a} x^3 + ${c+a} x - $b == 0"
+            val xRoots = Mathematica.findRoots(expr)
+//            println("x roots: $xRoots")
 
             fun diffWithX(x: Double): Double = b * pow(x, 4.0) + (c - a) * pow(x, 3.0) + (c + a) * x - b
-            println(listOf(nu1 - chi1, nu1 + chi1, nu2 - chi2, nu2 + chi2).map(::diffWithX))
-            println()
+            xRoots.map(::diffWithX).map { assert(equalsDouble(it, 0.0)) }
+//            println("expr': ${xRoots.map(::diffWithX)}")
+
+            roots = xRoots.map { 2 * atan(it) }
+//            val energies = roots.map { computeEnergy(it, theta)}
+//            println("energies: $energies")
+
+            //значение производной энергии
+            fun diffEnergy(phi: Double): Double =
+                sample.settings.kan * 2 * sin(phi) * cos(phi) + abs(bEff) * sample.settings.m * sin(phi - theta)
+            val diffEnergies = roots.map(::diffEnergy)
+            diffEnergies.map { assert(equalsDouble(it, 0.0)) }
+//            println("diffEnergies: $diffEnergies")
+
+//            println()
         } else {
             // уравнение третьей степени
-            println("lol")
-            roots = arrayListOf()
+            val x = sqrt((a + c) / (a - c))
+            roots = arrayListOf(0.0, x, -x).filter { it != Double.NaN }.map { 2 * atan(it) }
         }
-        // минимумы
-//        val mins = roots.filter{ it < 0}
+        // энергия в экстремумах
+        val energies = roots.map { computeEnergy(it, theta)}
+
+        // минимумы (пары (энергия, угол))
+        val mins = (energies zip roots).filter { it.first < 0 }
+        // максимумы (пары (энергия, угол))
+        val maxs = (energies zip roots).filter { it.first > 0 }
+        if (mins.size == 1) {
+            rotateMomenta(mins[0].second, eZ)
+            // проверка, что повернулось хорошо
+            val currentPhi = lma.angleTo(m , eZ)
+//            println("phi: ${mins[0].second.format()}, ${currentPhi.format()}")
+//            println("energy: ${mins[0].first.format()}, ${computeEnergy(currentPhi, theta).format()}")
+        } else if (mins.size > 1) {
+            // TODO: нужно определять, в какой мминимум падать
+            sample.saveState()
+            TODO()
+        } else {
+            // TODO: ну а вдруг?
+            TODO()
+        }
+    }
+
+    /**
+     * поворачивает момент к положению минимума
+     * @param minPhi положение минимума
+     * @param eZ нормаль к плоскости, в которой все происходит
+     */
+    fun rotateMomenta(minPhi: Double, eZ: Vector) {
+        val currentPhi = lma.angleTo(m, eZ)
+        val deltaPhi = (currentPhi - minPhi) * sample.settings.viscosity
+        m = Matrix(eZ, deltaPhi) * m
     }
 
     fun computeEnergy(): Double {
-        TODO()
+        val eZ = norm(bEff, lma)
+        val phi = lma.angleTo(m , eZ)
+        val theta = lma.angleTo(bEff, eZ)
+        return computeEnergy(phi, theta)
     }
+
+    /**
+     * расчитывает энергию момента, отклоненного от оси анизотропии на угол phi
+     * @param phi угол между осью анизотропии и моментом
+     * @param theta угол между осью анизотропии и эффективным полем
+     */
+    fun computeEnergy(phi: Double, theta: Double): Double =
+            sample.settings.kan * sqr(sin(phi)) - abs(bEff) * sample.settings.m * cos(phi - theta)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

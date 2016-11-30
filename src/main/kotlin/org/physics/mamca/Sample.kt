@@ -124,6 +124,7 @@ class Sample : Serializable {
     }
 
     fun optimizeEnergy() {
+        particles.forEach { it.computeEffectiveField() }
         particles.forEach { it.optimizeEnergy() }
     }
 
