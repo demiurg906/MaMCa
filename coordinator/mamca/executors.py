@@ -32,9 +32,9 @@ def pre_clean(func):
             os.mkdir(out)
         _clear_out_folder(out)
         func(*args, **kwargs)
-        dumpedState = '{}/sample.json'.format(out)
-        if os.path.exists(dumpedState):
-            os.remove(dumpedState)
+        # dumpedState = '{}/sample.json'.format(out)
+        # if os.path.exists(dumpedState):
+        #     os.remove(dumpedState)
     return inner
 
 
