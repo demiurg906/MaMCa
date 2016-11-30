@@ -1,7 +1,6 @@
 package org.physics.mamca.math
 
 import com.google.gson.Gson
-import org.physics.mamca.PI2
 import org.physics.mamca.util.equalsDouble
 
 class Vector {
@@ -171,11 +170,7 @@ class Vector {
         val eY = (eZ % eX).direction()
         val thisTan = this * eX
         val thisNorm = this * eY
-        val res = Math.atan2(thisNorm, thisTan)
-        if (res < 0) {
-            return res + PI2
-        }
-        return res
+        return Math.atan2(thisNorm, thisTan)
     }
 
     /**

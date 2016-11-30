@@ -142,9 +142,7 @@ class Particle {
         } else {
             // уравнение третьей степени
             val x = sqrt((a + c) / (a - c))
-            roots = arrayListOf(0.0, x, -x).filter { it != Double.NaN }.map { 2 * atan(it) }.map {
-                if (it < 0) it + PI2 else it
-            }
+            roots = arrayListOf(0.0, x, -x).filter { it != Double.NaN }.map { 2 * atan(it) }
 
             // пока непонятно, как из трех точек выбирать корень, так что ловим такую ситуацию
             TODO()
@@ -162,34 +160,36 @@ class Particle {
         val phi: Double
         if (mins.size == 1) {
             phi = mins[0].second
-            /* // проверка, что повернулось хорошо
-             val currentPhi = lma.angleTo(m , eZ)
-             println("phi: ${mins[0].second.format()}, ${currentPhi.format()}")
-             println("energy: ${mins[0].first.format()}, ${computeEnergy(currentPhi, theta).format()}")*/
         } else if (mins.size > 1) {
             // два минимума, падаем в ближайший
             sample.twoMinimums += 1
 
+            // все относительные углы от 0 до 2 Pi
             // текущее положение момента
             val currentPhi = lma.angleTo(m, eZ)
-            val deltaPhi = mins[0].second - currentPhi
+            var deltaPhi = mins[0].second - currentPhi
+            if (deltaPhi < 0) {
+                deltaPhi += PI2
+            }
             // углы от текущего до максимумов
-            val phiMaxes = maxs.map { it.second - currentPhi }
+            val phiMaxes = maxs.map { it.second - currentPhi }.map { if (it < 0) it + PI2 else it }
 
             // считаем, сколько максимумов лежит между текущим углом и минимумов
             // если четное число -- то в этот минимум скатиться можно
             if (phiMaxes.count { deltaPhi - it > 0 } % 2 == 0) {
-                print('*')
                 phi = mins[0].second
             } else {
                 phi = mins[1].second
-                print('_')
             }
         } else {
             // TODO: ну а вдруг?
             TODO()
         }
         rotateMomentaToMinimum(phi, eZ)
+        /* // проверка, что повернулось хорошо
+        val currentPhi = lma.angleTo(m , eZ)
+        println("phi: ${mins[0].second.format()}, ${currentPhi.format()}")
+        println("energy: ${mins[0].first.format()}, ${computeEnergy(currentPhi, theta).format()}")*/
     }
 
     /**
