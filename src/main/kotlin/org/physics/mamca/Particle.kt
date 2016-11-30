@@ -143,27 +143,40 @@ class Particle {
             // уравнение третьей степени
             val x = sqrt((a + c) / (a - c))
             roots = arrayListOf(0.0, x, -x).filter { it != Double.NaN }.map { 2 * atan(it) }
+
+            // пока непонятно, как из трех точек выбирать корень, так что ловим такую ситуацию
+            TODO()
         }
         // энергия в экстремумах
         val energies = roots.map { computeEnergy(it, theta)}
 
+        val energyPerPhi = (energies zip roots).sortedBy { it.first }
+
         // минимумы (пары (энергия, угол))
-        val mins = (energies zip roots).filter { it.first < 0 }
+        val mins = energyPerPhi.drop(energyPerPhi.size / 2)
         // максимумы (пары (энергия, угол))
-        val maxs = (energies zip roots).filter { it.first > 0 }
+        val maxs = energyPerPhi.dropLast(energyPerPhi.size / 2)
+        val phi: Double
         if (mins.size == 1) {
-            rotateMomenta(mins[0].second, eZ)
-            // проверка, что повернулось хорошо
-            val currentPhi = lma.angleTo(m , eZ)
-//            println("phi: ${mins[0].second.format()}, ${currentPhi.format()}")
-//            println("energy: ${mins[0].first.format()}, ${computeEnergy(currentPhi, theta).format()}")
+            phi = mins[0].second
+            /* // проверка, что повернулось хорошо
+             val currentPhi = lma.angleTo(m , eZ)
+             println("phi: ${mins[0].second.format()}, ${currentPhi.format()}")
+             println("energy: ${mins[0].first.format()}, ${computeEnergy(currentPhi, theta).format()}")*/
         } else if (mins.size > 1) {
-            // TODO: нужно определять, в какой мминимум падать
-            TODO()
+            // два минимума, падаем в близжайший
+            sample.twoMinimums += 1
+
+            // текущее положение момента
+            val currentPhi = lma.angleTo(m, eZ)
+
+            // из двух минимумов выбираем тот, который ближе
+            phi = mins.minBy { Math.abs(it.second - currentPhi) }!!.second
         } else {
             // TODO: ну а вдруг?
             TODO()
         }
+        rotateMomentaToMinimum(phi, eZ)
     }
 
     /**
@@ -171,7 +184,7 @@ class Particle {
      * @param minPhi положение минимума
      * @param eZ нормаль к плоскости, в которой все происходит
      */
-    fun rotateMomenta(minPhi: Double, eZ: Vector) {
+    fun rotateMomentaToMinimum(minPhi: Double, eZ: Vector) {
         val currentPhi = lma.angleTo(m, eZ)
         val deltaPhi = (currentPhi - minPhi) * sample.settings.viscosity
         m = Matrix(eZ, deltaPhi) * m

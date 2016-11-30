@@ -29,5 +29,6 @@ fun main(args: Array<String>) {
     println("time of working is ${(endTime - startTime) / 1000.0} seconds")
     println("sample size is ${settings.x}x${settings.y}x${settings.z} with ${settings.n} particles per ring")
     println("total number of particles is ${settings.x * settings.y * settings.z * settings.n}")
+    println("number of \"two minimums\" situations is ${sample.twoMinimums}")
     println("$delimiter\n")
 }

@@ -19,6 +19,8 @@ class Sample : Serializable {
     val particles: MutableList<Particle>
     val settings: Settings
 
+    var twoMinimums = 0
+
     constructor() {
         // пустой конструктор-заглушка
 
