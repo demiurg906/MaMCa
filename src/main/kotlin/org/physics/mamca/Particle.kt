@@ -159,7 +159,6 @@ class Particle {
 //            println("energy: ${mins[0].first.format()}, ${computeEnergy(currentPhi, theta).format()}")
         } else if (mins.size > 1) {
             // TODO: нужно определять, в какой мминимум падать
-            sample.saveState()
             TODO()
         } else {
             // TODO: ну а вдруг?
