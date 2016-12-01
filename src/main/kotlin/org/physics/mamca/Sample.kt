@@ -21,20 +21,27 @@ class Sample : Serializable {
 
     var twoMinimums = 0
 
+    /**
+     * пустой конструктор-заглушка
+     */
     constructor() {
-        // пустой конструктор-заглушка
-
         b = Vector(0.0, 0.0, 0.0)
         particles = mutableListOf()
         settings = getDefaultSettings()
     }
 
+    /**
+     * еще один конструктор-заглушка
+     */
     constructor(b: Vector, particles: List<Particle>) {
         this.b = b
         this.particles = particles.toMutableList()
         this.settings = getDefaultSettings()
     }
 
+    /**
+     * основной конструктор, инициализирует образец на основе переданных настроек
+     */
     constructor(settings: Settings) {
         this.settings = settings
         if (settings.load) {
@@ -121,15 +128,26 @@ class Sample : Serializable {
         }
     }
 
+    /**
+     * вычисляет суммарную энергию образца
+     */
     fun computeEnergy(): Double {
-        TODO()
+        return particles.map { it.computeEnergy() }.sum()
     }
 
+    /**
+     * оптимизирует энергию всех частиц
+     */
     fun optimizeEnergy() {
         particles.forEach { it.computeEffectiveField() }
         particles.forEach { it.optimizeEnergy() }
     }
 
+    /**
+     * сохраняет состояние всех моментов
+     * @param outFolder путь к папке, в которую надо сохранять
+     * @param filename имя сохраняемого файла
+     */
     fun saveState(outFolder: String = ".", filename: String = "momenta.txt") {
         // записывает в файл текущее состояние моментов
         val path = outFolder + File.separator + filename
@@ -158,6 +176,9 @@ class Sample : Serializable {
         }
     }
 
+    /**
+     * сериализует образец в json строку
+     */
     fun toJsonString(): String {
         // возвращает сериализованную json строку
         val gson = GsonBuilder().registerTypeAdapter(this.javaClass, SampleSerializer()).setPrettyPrinting().create()
@@ -165,15 +186,22 @@ class Sample : Serializable {
         return json
     }
 
-    fun dumpToJsonFile(path: String) {
-        // записывает `org.physics.mamca.Sample` в json файл
-        File(path).printWriter().use { out ->
+    /**
+     * сериализует образец в json файл
+     * @param outFolder путь к папке, в которую надо сохранять
+     * @param filename имя сохраняемого файла
+     */
+    fun dumpToJsonFile(outFolder: String, filename: String) {
+        File("$outFolder/$filename").printWriter().use { out ->
             val json = toJsonString()
             out.write(json)
         }
 
     }
 
+    /**
+     * возвращает java-класс образца (служебная функция)
+     */
     fun getType(): Type {
         return TypeToken.get(this.javaClass).type
     }

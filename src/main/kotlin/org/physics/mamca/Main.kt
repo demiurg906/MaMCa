@@ -19,7 +19,7 @@ fun main(args: Array<String>) {
 
     val settings = loadSettingsFromJson(settingsFile)
     val sample = Sample(settings)
-    sample.dumpToJsonFile("$outFolder/sample.json")
+    sample.dumpToJsonFile(outFolder, "sample.json")
 
     val midTime = System.currentTimeMillis()
 
