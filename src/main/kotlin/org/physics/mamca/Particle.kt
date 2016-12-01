@@ -4,7 +4,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import org.physics.mamca.math.*
 import org.physics.mamca.util.Mathematica
-import org.physics.mamca.util.equalsDouble
+import org.physics.mamca.util.format
 import java.lang.Math.*
 import java.lang.reflect.Type
 
@@ -76,6 +76,15 @@ class Particle {
     }
 
     fun optimizeEnergy() {
+        optimizeMomentaPosition()
+        thermaFluctuations()
+    }
+
+    /**
+     * оптимизирует энергию, путем скатывания момента к положению минимума энергии
+     * (с учетом вязкости)
+     */
+    fun optimizeMomentaPosition() {
         // эффективное поле
         if (isKollinear(bEff, lma)) {
             // поле параллельно оси анизотропии
@@ -95,58 +104,12 @@ class Particle {
         val b = abs(bEff) * sample.settings.m * sin(theta)
         val c = 2 * abs(bEff) * sample.settings.m * cos(theta)
 
-        // корни уравнения от phi
-        val roots: List<Double>
-        if (!equalsDouble(b, 0.0)) {
-            // уравнение четвертой степени
-            /* решаем уравнение ручками
-            val alpha = sqr(a) - 4 * sqr(b) - sqr(c)
-            val beta = a * b * c
-            val tau = (c - a) / b
-            val delta = sqr(tau) / 2
-            val epsilon = pow(sqrt(11664 * sqr(beta) - 108 * pow(alpha, 3.0)) + 108 * beta, 1.0 / 3.0) / (3 * pow(2.0, 1.0 / 3.0) * b)
-            val mu = epsilon + alpha / epsilon
-            val gamma = sqrt(mu + delta / 2)
-            val nu = (pow(tau, 3.0) + 8 * (a + c) / b) / (4 * gamma)
-            val psi = tau / 2
-            val lambda = - mu + delta
+        // уравнение четвертой степени
+        val expr = "${b.format(MATH_DIGITS)} x^4 + ${(c-a).format(MATH_DIGITS)} x^3 + ${(c+a).format(MATH_DIGITS)} x - ${b.format(MATH_DIGITS)} == 0"
 
-            val nu1 = - gamma / 2 - psi
-            val nu2 = gamma / 2 - psi
-            val chi1 = sqrt(lambda + nu) / 2
-            val chi2 = sqrt(lambda - nu) / 2
+        // корни уравнения (с переходом от x к phi)
+        val roots = Mathematica.findRoots(expr).map { 2 * atan(it) }
 
-             массив значений угла phi, в которых достигаются экстремумы энергии
-            roots = listOf(nu1 - chi1, nu1 + chi1, nu2 - chi2, nu2 + chi2).map { 2 * atan(it) }
-                    .map {if (it == Double.NaN) Double.POSITIVE_INFINITY else it}*/
-            val expr = "$b x^4 + ${c-a} x^3 + ${c+a} x - $b == 0"
-            val xRoots = Mathematica.findRoots(expr)
-//            println("x roots: $xRoots")
-
-            fun diffWithX(x: Double): Double = b * pow(x, 4.0) + (c - a) * pow(x, 3.0) + (c + a) * x - b
-            xRoots.map(::diffWithX).map { assert(equalsDouble(it, 0.0)) }
-//            println("expr': ${xRoots.map(::diffWithX)}")
-
-            roots = xRoots.map { 2 * atan(it) }
-//            val energies = roots.map { computeEnergy(it, theta)}
-//            println("energies: $energies")
-
-            //значение производной энергии
-            fun diffEnergy(phi: Double): Double =
-                sample.settings.kan * 2 * sin(phi) * cos(phi) + abs(bEff) * sample.settings.m * sin(phi - theta)
-            val diffEnergies = roots.map(::diffEnergy)
-            diffEnergies.map { assert(equalsDouble(it, 0.0)) }
-//            println("diffEnergies: $diffEnergies")
-
-//            println()
-        } else {
-            // уравнение третьей степени
-            val x = sqrt((a + c) / (a - c))
-            roots = arrayListOf(0.0, x, -x).filter { it != Double.NaN }.map { 2 * atan(it) }
-
-            // пока непонятно, как из трех точек выбирать корень, так что ловим такую ситуацию
-            TODO()
-        }
         // энергия в экстремумах
         val energies = roots.map { computeEnergy(it, theta)}
 
@@ -154,13 +117,15 @@ class Particle {
 
         // минимумы (пары (энергия, угол))
         val mins = energyPerPhi.drop(energyPerPhi.size / 2)
-//        Collections.shuffle(mins)
-        // максимумы (пары (энергия, угол)), остортированные по углу
-        val maxs = energyPerPhi.dropLast(energyPerPhi.size / 2).sortedBy { it.second }
+
+        // максимумы (пары (энергия, угол))
+        val maxs = energyPerPhi.dropLast(energyPerPhi.size / 2)
+
+        // итоговое значение phi, на которое будет повернут момент после поворота
         val phi: Double
         if (mins.size == 1) {
             phi = mins[0].second
-        } else if (mins.size > 1) {
+        } else {
             // два минимума, падаем в ближайший
             sample.twoMinimums += 1
 
@@ -181,15 +146,15 @@ class Particle {
             } else {
                 phi = mins[1].second
             }
-        } else {
-            // TODO: ну а вдруг?
-            TODO()
         }
-        rotateMomentaToMinimum(phi, eZ)
-        /* // проверка, что повернулось хорошо
-        val currentPhi = lma.angleTo(m , eZ)
-        println("phi: ${mins[0].second.format()}, ${currentPhi.format()}")
-        println("energy: ${mins[0].first.format()}, ${computeEnergy(currentPhi, theta).format()}")*/
+        rotateMomentaToAngle(phi, eZ)
+    }
+
+    /**
+     * описывает тепловые колебания момента
+     */
+    fun thermaFluctuations() {
+        // TODO: реализовать
     }
 
     /**
@@ -197,7 +162,7 @@ class Particle {
      * @param minPhi положение минимума
      * @param eZ нормаль к плоскости, в которой все происходит
      */
-    fun rotateMomentaToMinimum(minPhi: Double, eZ: Vector) {
+    fun rotateMomentaToAngle(minPhi: Double, eZ: Vector) {
         val currentPhi = lma.angleTo(m, eZ)
         val deltaPhi = (currentPhi - minPhi) * sample.settings.viscosity
         m = Matrix(eZ, deltaPhi) * m

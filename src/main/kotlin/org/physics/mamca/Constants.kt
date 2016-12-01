@@ -10,5 +10,8 @@ const val DELTA = 1e-10
 const val EX_DIST = 1
 const val DIPOL_DIST = 30
 
-// стандартное число символов после запятой
+// число символов после запятой для вывода
 const val DIGITS = 2
+
+// число символов после запятой для отправки в математику
+const val MATH_DIGITS = 15

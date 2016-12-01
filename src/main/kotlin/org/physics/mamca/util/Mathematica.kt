@@ -1,5 +1,6 @@
 package org.physics.mamca.util
 
+import com.wolfram.jlink.Expr
 import com.wolfram.jlink.KernelLink
 import com.wolfram.jlink.MathLinkFactory
 import java.util.*
@@ -19,8 +20,7 @@ object Mathematica {
         m.evaluate("x /. NSolve[$expr, x, Reals]")
         m.waitForAnswer()
         val exprRoots = m.expr
-        val roots: List<Double> = exprRoots.args().map {it.asDouble()}
-//        (1..exprRoots.args().size).mapTo(roots) { exprRoots.part(intArrayOf(it, 1, 2)).asDouble() }
+        val roots: List<Double> = exprRoots.args().map(Expr::asDouble)
         return roots
     }
 }

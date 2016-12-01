@@ -37,4 +37,4 @@ fun deleteFile(path: String) = Files.delete(File(path).toPath())
  * возвращает отформатированный Double
  * @param digits количество цифр после запятой
  */
-fun Double.format(digits: Int = DIGITS): String = java.lang.String.format("%.${digits}f", this)
+fun Double.format(digits: Int = DIGITS): String = java.lang.String.format(Locale.US, "%.${digits}f", this)
