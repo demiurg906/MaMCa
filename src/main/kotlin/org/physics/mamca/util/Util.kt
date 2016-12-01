@@ -2,6 +2,7 @@ package org.physics.mamca.util
 
 import org.physics.mamca.DELTA
 import org.physics.mamca.DIGITS
+import org.physics.mamca.MATH_DIGITS
 import org.physics.mamca.PI2
 import java.io.File
 import java.lang.Math.acos
@@ -37,4 +38,10 @@ fun deleteFile(path: String) = Files.delete(File(path).toPath())
  * возвращает отформатированный Double
  * @param digits количество цифр после запятой
  */
-fun Double.format(digits: Int = DIGITS): String = java.lang.String.format(Locale.US, "%.${digits}f", this)
+fun Double.format(digits: Int = MATH_DIGITS): String = java.lang.String.format(Locale.US, "%.${digits}f", this)
+
+/**
+ * возвращает Double, отформатированный в e нотации
+ * @param digits количество цифр после запятой
+ */
+fun Double.eFormat(digits: Int = DIGITS): String = java.lang.String.format(Locale.US, "%.${digits}e", this)

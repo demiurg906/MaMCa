@@ -1,5 +1,7 @@
 package org.physics.mamca
 
+import org.physics.mamca.util.eFormat
+
 /**
  * Основная функция запуска симуляции
  * первым аргументом принимает путь к файлу с настройками
@@ -22,11 +24,11 @@ fun main(args: Array<String>) {
     sample.dumpToJsonFile(outFolder, "sample.json")
 
     val midTime = System.currentTimeMillis()
-
-    sample.optimizeEnergy()
+    val (startEnergy, endEnergy, numberOfSteps) = sample.processRelaxation()
     sample.saveState(outFolder = outFolder)
 
     val endTime = System.currentTimeMillis()
+
     val delimiter = "---------------------------------------------------"
     println("\n$delimiter")
     println("time of working is ${(endTime - startTime) / 1000.0} seconds")
@@ -34,5 +36,8 @@ fun main(args: Array<String>) {
     println("sample size is ${settings.x}x${settings.y}x${settings.z} with ${settings.n} particles per ring")
     println("total number of particles is ${settings.x * settings.y * settings.z * settings.n}")
     println("number of \"two minimums\" situations is ${sample.twoMinimums}")
+    println("energy on start is ${startEnergy.eFormat()}")
+    println("energy on end is ${endEnergy.eFormat()}")
+    println("number of simulation steps is $numberOfSteps")
     println("$delimiter\n")
 }

@@ -10,8 +10,7 @@ import org.physics.mamca.util.randomPhi
 import org.physics.mamca.util.randomTheta
 import java.io.File
 import java.io.Serializable
-import java.lang.Math.cos
-import java.lang.Math.sin
+import java.lang.Math.*
 import java.lang.reflect.Type
 
 class Sample : Serializable {
@@ -129,7 +128,33 @@ class Sample : Serializable {
     }
 
     /**
-     * вычисляет суммарную энергию образца
+     * основная функция, выполняющая релаксацию системы
+     * релаксация происходит в несколько шагов, до тех пор, пока относительное изменение энергии, или пока
+     * не будет сосчитано количество шагов, заданное в настройках
+     * @return (энергия до оптимизации, энергия после оптимизации, количество шагов оптимизации)
+     */
+    fun processRelaxation(): Triple<Double, Double, Int> {
+        var energies = optimizeEnergy()
+        val startEnergy = energies.first
+
+        val computeDelta: () -> Double = { abs(energies.first - energies.second) / energies.first}
+
+        var relativeDeltaEnergy = computeDelta()
+        var numberOfSteps = 1
+        for (i in 1 until settings.precision) {
+            if (relativeDeltaEnergy < RELATIVE_ENERGY_PRECISION) {
+                break
+            }
+            energies = optimizeEnergy(energies.second)
+            relativeDeltaEnergy = computeDelta()
+            numberOfSteps += 1
+        }
+
+        val endEnergy = energies.second
+        return Triple(startEnergy, endEnergy, numberOfSteps)
+    }
+    /**
+     * @return суммарная энергию образца
      */
     fun computeEnergy(): Double {
         return particles.map { it.computeEnergy() }.sum()
@@ -137,10 +162,20 @@ class Sample : Serializable {
 
     /**
      * оптимизирует энергию всех частиц
+     * @return энергию до оптимизации и после
      */
-    fun optimizeEnergy() {
-        particles.forEach { it.computeEffectiveField() }
+    private fun optimizeEnergy(computedOldEnergy: Double? = null): Pair<Double, Double> {
+        val oldEnergy: Double
+        if (computedOldEnergy == null) {
+            particles.forEach { it.computeEffectiveField() }
+            oldEnergy = computeEnergy()
+        } else {
+            oldEnergy = computedOldEnergy
+        }
         particles.forEach { it.optimizeEnergy() }
+        particles.forEach { it.computeEffectiveField() }
+        val newEnergy = computeEnergy()
+        return oldEnergy to newEnergy
     }
 
     /**
@@ -196,7 +231,6 @@ class Sample : Serializable {
             val json = toJsonString()
             out.write(json)
         }
-
     }
 
     /**

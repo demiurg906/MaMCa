@@ -77,7 +77,7 @@ class Particle {
 
     fun optimizeEnergy() {
         optimizeMomentaPosition()
-        thermaFluctuations()
+        thermalFluctuations()
     }
 
     /**
@@ -105,21 +105,21 @@ class Particle {
         val c = 2 * abs(bEff) * sample.settings.m * cos(theta)
 
         // уравнение четвертой степени
-        val expr = "${b.format(MATH_DIGITS)} x^4 + ${(c-a).format(MATH_DIGITS)} x^3 + ${(c+a).format(MATH_DIGITS)} x - ${b.format(MATH_DIGITS)} == 0"
+        val expr = "${b.format()} x^4 + ${(c-a).format()} x^3 + ${(c+a).format()} x - ${b.format()} == 0"
 
         // корни уравнения (с переходом от x к phi)
         val roots = Mathematica.findRoots(expr).map { 2 * atan(it) }
 
         // энергия в экстремумах
-        val energies = roots.map { computeEnergy(it, theta)}
+        val energies = roots.map { computeEnergyInPlane(it, theta)}
 
         val energyPerPhi = (energies zip roots).sortedBy { it.first }
 
         // минимумы (пары (энергия, угол))
-        val mins = energyPerPhi.drop(energyPerPhi.size / 2)
+        val mins = energyPerPhi.dropLast(energyPerPhi.size / 2)
 
         // максимумы (пары (энергия, угол))
-        val maxs = energyPerPhi.dropLast(energyPerPhi.size / 2)
+        val maxs = energyPerPhi.drop(energyPerPhi.size / 2)
 
         // итоговое значение phi, на которое будет повернут момент после поворота
         val phi: Double
@@ -153,7 +153,7 @@ class Particle {
     /**
      * описывает тепловые колебания момента
      */
-    fun thermaFluctuations() {
+    fun thermalFluctuations() {
         // TODO: реализовать
     }
 
@@ -168,19 +168,17 @@ class Particle {
         m = Matrix(eZ, deltaPhi) * m
     }
 
-    fun computeEnergy(): Double {
-        val eZ = norm(bEff, lma)
-        val phi = lma.angleTo(m , eZ)
-        val theta = lma.angleTo(bEff, eZ)
-        return computeEnergy(phi, theta)
-    }
+    /**
+     * расчитывает энергию момента
+     */
+    fun computeEnergy(): Double = sample.settings.kan * sqr(abs(m % lma)) - (m * bEff)
 
     /**
      * расчитывает энергию момента, отклоненного от оси анизотропии на угол phi
      * @param phi угол между осью анизотропии и моментом
      * @param theta угол между осью анизотропии и эффективным полем
      */
-    fun computeEnergy(phi: Double, theta: Double): Double =
+    fun computeEnergyInPlane(phi: Double, theta: Double): Double =
             sample.settings.kan * sqr(sin(phi)) - abs(bEff) * sample.settings.m * cos(phi - theta)
 
     override fun equals(other: Any?): Boolean {
