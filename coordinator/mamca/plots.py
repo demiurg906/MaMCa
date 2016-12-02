@@ -214,10 +214,10 @@ def create_hysteresis_gif(out_folder, pic_folder, borders=None,
 
 
 @prepare_dir_wrapper
-def draw_3d_vectors_plot(filename, settings_fname=None, *, borders=None,
-                         negative_borders=True, label=None,
-                         save=False, pic_dir='Screenshots', name=None,
-                         text=None, draw_particles=True, scale=0.3):
+def draw_3d_vectors_plot(filename: str, settings_fname: str=None, *, borders: list=None,
+                         negative_borders: bool=True, label: str=None,
+                         save: bool=False, pic_dir: str='Screenshots', name: str=None,
+                         text: str=None, draw_particles: bool=True, scale: float=1):
     """
     Рисует трехмерный график веторов
     :param filename: путь к файлу с данными
@@ -235,6 +235,7 @@ def draw_3d_vectors_plot(filename, settings_fname=None, *, borders=None,
     :param name: имя для скриншота
     :param text: текст для отображения на графике
     :param(bool) draw_particles: нужно ли отображать частицы
+    :param(float) scale: масштаб стрелочек
     """
     global _counter
     fig = plt.figure(_counter)
@@ -250,7 +251,8 @@ def draw_3d_vectors_plot(filename, settings_fname=None, *, borders=None,
         z_min, z_max = min(mins[2], mins[5]), max(maxs[2], maxs[5])
         x_k, y_k, z_k = 1.1, 1.1, 1.1
         if z_max - z_min < 1:
-            z_min, z_max = -3, 3
+            length = x_max - x_min
+            z_min, z_max = -length / 2, length / 2
         ax.set_xlim3d(x_min * x_k, x_max * x_k)
         ax.set_ylim3d(y_min * y_k, y_max * y_k)
         ax.set_zlim3d(z_min * z_k, z_max * z_k)
@@ -271,7 +273,20 @@ def draw_3d_vectors_plot(filename, settings_fname=None, *, borders=None,
     x1, y1, z1 = vectors[:, 0], vectors[:, 1], vectors[:, 2]
     x2, y2, z2 = vectors[:, 3], vectors[:, 4], vectors[:, 5]
     u, v, w = x2 - x1, y2 - y1, z2 - z1
-    ax.quiver(x1, y1, z1, u, v, w, length=0.5, pivot='tail', arrow_length_ratio=0.2)
+
+    # scaling
+    # уебался, пока разбирался, как масштабировать эти чертовы стрелочки
+    k = (scale - 1) / 2
+    dx, dy, dz = u * k, v * k, w * k
+    x1 -= dx
+    y1 -= dy
+    z1 -= dz
+    x2 += dx
+    y2 += dy
+    z2 += dz
+    u, v, w = x2 - x1, y2 - y1, z2 - z1
+
+    ax.quiver(x1, y1, z1, u, v, w, length=scale * 2, pivot='tail', arrow_length_ratio=0.2)  # 0.5
 
     if draw_particles:
         x, y, z = points[:, 0], points[:, 1], points[:, 2]

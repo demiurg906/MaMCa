@@ -7,31 +7,30 @@ class Settings:
     def __init__(self, filename=None):
         self._d = OrderedDict()
 
-        self._d['x'] = 4        # количество клеток по x
-        self._d['y'] = 4        # количество клеток по y
-        self._d['z'] = 1        # количество клеток по z
-        self._d['r'] = 1        # число частиц в кольце
+        self._d['x'] = 4  # количество клеток по x
+        self._d['y'] = 4  # количество клеток по y
+        self._d['z'] = 1  # количество клеток по z
+        self._d['r'] = 1  # число частиц в кольце
 
-        self._d['n'] = 4       # диаметр кольца
-        self._d['d'] = 10        # радиус частицы
-        self._d['offset'] = 0      # расстояние между клетками
+        self._d['n'] = 4  # диаметр кольца
+        self._d['d'] = 10  # радиус частицы
+        self._d['offset'] = 0  # расстояние между клетками
 
-        self._d['ms'] = 4.53e5  # константа диполь-диполь
-        self._d['kan'] = 8e4    # константа анизотропии
-        self._d['jex'] = 0.1    # константа обмена
-        self._d['m'] = 1        # значение момента
+        self._d['kan'] = 8e4  # константа анизотропии
+        self._d['jex'] = 0.1  # константа обмена
+        self._d['m'] = 1  # значение момента
         self._d['viscosity'] = 1  # коэффициент вязкости, <= 1
 
-        self._d['t'] = 0.01     # температура
-        self._d['ot'] = 0       # расположение осей анизотропии
+        self._d['t'] = 0.01  # температура
+        self._d['ot'] = 0  # расположение осей анизотропии
         # 0 -- рандом в 3D, 1 -- рандом в 2D, 2 -- заданная ось
         # отклонение оси анизотропии от оси z и оси x соответственно
         self._d['ot_theta'] = math.pi / 2
         self._d['ot_phi'] = 0
 
-        self._d['b_x'] = 0      # поле по x
-        self._d['b_y'] = 0      # поле по y
-        self._d['b_z'] = 0      # поле по z
+        self._d['b_x'] = 0  # поле по x
+        self._d['b_y'] = 0  # поле по y
+        self._d['b_z'] = 0  # поле по z
 
         self._d['precision'] = 7
         self._d['load'] = False
@@ -73,10 +72,6 @@ class Settings:
     @property
     def offset(self):
         return self._d['offset']
-
-    @property
-    def ms(self):
-        return self._d['ms']
 
     @property
     def kan(self):
@@ -146,13 +141,22 @@ class Settings:
         self._d[key] = value
 
     def __str__(self):
-        return '(x, y, z) = ({}, {}, {})\nn = {}\noff = {}\n\n' \
+        anisotropy = ''
+        if self.ot == 0:
+            anisotropy += 'random in 3D'
+        elif self.ot == 1:
+            anisotropy += 'random in 2D'
+        else:
+            anisotropy += 'theta={:.2f}, phi={:.2f}'.format(self.ot_theta, self.ot_phi)
+
+        return 'n = {}\noff = {}\n' \
                'B = ({:.1e}, {:.1e}, {:.1e})\n\n' \
-               'dipol (ms) = {:.2e}\nanizotropy (kan) = {:.2e}\n' \
-               'exchange (jex) = {:.2e}'.format(self._d['x'], self._d['y'],
-                                                self._d['z'], self._d['n'],
-                                                self._d['off'], self._d['b_x'],
-                                                self._d['b_y'], self._d['b_z'],
-                                                self._d['ms'],
-                                                self._d['kan'], self._d['jex']
-                                                )
+               'dipol (m) = {:.2e}\nanisotropy (kan) = {:.2e}\n' \
+               'exchange (jex) = {:.2e}\n' \
+               '\nanisotropy: {}'.format(self.n,
+                                         self.offset, self.b_x,
+                                         self.b_y, self.b_z,
+                                         self.m,
+                                         self.kan, self.jex,
+                                         anisotropy
+                                         )
