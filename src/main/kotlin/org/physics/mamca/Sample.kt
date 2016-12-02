@@ -73,6 +73,11 @@ class Sample : Serializable {
             val delta = s.d + s.offset
             // радиус кольца
             val r = s.d / 2
+
+            // отклонение оси анизотропии в радианах
+            val ot_theta = Math.toRadians(s.ot_theta)
+            val ot_phi = Math.toRadians(s.ot_phi)
+
             for (i in 0 until numberOfParticles) {
                 // параметры для определения координат частицы
                 val cell: Int = i / s.n
@@ -103,7 +108,7 @@ class Sample : Serializable {
                     // случайно в 2D
                     1 -> lma = Vector(1.0, PI / 2, randomPhi(), polar = true)
                     // задано
-                    2 -> lma = Vector(1.0, s.ot_theta, s.ot_phi, polar = true)
+                    2 -> lma = Vector(1.0, ot_theta, ot_phi, polar = true)
                     else -> throw IllegalArgumentException(
                             "ot in settings must be 0..2, but ${s.ot} given "
                     )
@@ -121,11 +126,11 @@ class Sample : Serializable {
         for ((p1, p2) in pairs(particles)) {
             // расстояние между частицами
             val dist = abs(p1.loc - p2.loc)
-            if (dist < DIPOL_DIST) {
+            if (dist < settings.dipol_distance) {
                 dipolParticles[p1]?.add(p2)
                 dipolParticles[p2]?.add(p1)
             }
-            if (dist < EX_DIST) {
+            if (dist < settings.exchange_distance) {
                 exchangeParticles[p1]?.add(p2)
                 exchangeParticles[p2]?.add(p1)
             }

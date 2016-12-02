@@ -10,10 +10,6 @@ const val DELTA = 1e-10
 // считается, как отношение разности энергий до и после к энергии до
 const val RELATIVE_ENERGY_PRECISION = 0.1
 
-// расстояния, на которых заметно обменное и дипольное взаимодействия соответственно
-const val EX_DIST = 1
-const val DIPOL_DIST = 30
-
 // число символов после запятой для вывода
 const val DIGITS = 2
 
@@ -21,10 +17,10 @@ const val DIGITS = 2
 const val MATH_DIGITS = 15
 
 // магнитная постоянная
-const val MU_0 = 1.25663706e-6
+const val MU_0 = 4 * PI *1.0e-4 // [мГн / м]
 
 // коэффициент для диполь-дипольного взаимодействия
-const val DIPOL_CONST = 1e-7 // MU_0 / (4 * PI)
+const val DIPOL_CONST = 1e-4 // MU_0 / (4 * PI)
 
 // ядерный магнетон
-const val MU_N = 5.050783434343e-27 // [Дж / Тл]
+const val MU_N = 5.050783434343e-3 // [иДж / Тл]

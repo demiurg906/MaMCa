@@ -2,22 +2,31 @@
   "x":1,
   "y":1,
   "z":1,
-  "n":2,
+  "n":40,
+
   "r":1.0,
-  "d":5.0,
-  "offset":2.0,
-  "kan":8.0e6,
-  "jex":1.0e1,
-  "m":1.0e7,
+  "d":60.0,
+  "offset":4.0,
+
+  "m":1.0,
+  "kan":1.0e-2,
+  "jex":1.0e2,
+
+  "dipol_distance":30.0,
+  "exchange_distance":4.0,
+
   "viscosity":1.0,
   "t":0.1,
-  "ot":0,
-  "ot_theta":1.5707963267948966,
+
+  "ot":2,
+  "ot_theta":90.0,
   "ot_phi":0.0,
-  "b_x":1.0e1,
+
+  "b_x":0.0,
   "b_y":0.0,
   "b_z":0.0,
+
   "precision":7,
   "load":false,
-  "jsonPath":"./resources/out/sample.json"
+  "jsonPath":"sample.json"
 }
