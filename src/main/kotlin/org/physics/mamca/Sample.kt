@@ -17,6 +17,7 @@ class Sample : Serializable {
     val b: Vector
     val particles: MutableList<Particle>
     val settings: Settings
+    val momentaValue: Double
 
     var twoMinimums = 0
 
@@ -27,6 +28,7 @@ class Sample : Serializable {
         b = Vector(0.0, 0.0, 0.0)
         particles = mutableListOf()
         settings = getDefaultSettings()
+        momentaValue = settings.m * MU_N
     }
 
     /**
@@ -36,6 +38,7 @@ class Sample : Serializable {
         this.b = b
         this.particles = particles.toMutableList()
         this.settings = getDefaultSettings()
+        momentaValue = settings.m * MU_N
     }
 
     /**
@@ -49,11 +52,15 @@ class Sample : Serializable {
             val sample: Sample = gson.fromJson(json, getType())
             this.b = sample.b
             this.particles = sample.particles
+            this.momentaValue = settings.m * MU_N
         }
         else {
             val s = settings
             // магнитное поле
             b = Vector(s.b_x, s.b_y, s.b_z)
+
+            // значение момента в абсольтных единицах [Дж / Тл]
+            momentaValue = settings.m * MU_N
 
             // заполнение частицами
             particles = mutableListOf()
@@ -86,7 +93,7 @@ class Sample : Serializable {
                 )
 
                 // начальное положение момента
-                val m = Vector(s.m, randomTheta(), randomPhi(), polar = true)
+                val m = Vector(1.0, randomTheta(), randomPhi(), polar = true)
 
                 // ось анизотропии
                 val lma: Vector

@@ -15,9 +15,9 @@ data class Settings(val x: Int, // количество клеток по x
                     val d: Double, // диаметр кольца [нм]
                     val offset: Double, // расстояние между клетками [нм]
 
-                    val m: Double, // значение момента [А*м^2]
+                    val m: Double, // значение момента [ядерный магнетон, шт]
                     val kan: Double, // константа анизотропии [Дж]
-                    val jex: Double, // константа обмена [Тл / (А * м^2)]
+                    val jex: Double, // константа обмена [ГТл / Дж]
 
                     val viscosity: Double, // коэффициент вязкости, 0 <= viscosity <= 1
                     val t: Double, // температура [К]

@@ -71,7 +71,7 @@ class Particle {
             val n = r.direction()
             dipols += (3 *(n * it.m) * n - it.m) / pow(abs(r), 3.0)
         }
-        bEff += dipols * sample.settings.m * DIPOL_CONST
+        bEff += dipols * sample.momentaValue * DIPOL_CONST
 
         // вклад обменного взаимодействия
         var exchange = Vector()
@@ -105,8 +105,8 @@ class Particle {
         val theta = lma.angleTo(bEff, eZ)
 
         val a = 4 * sample.settings.kan
-        val b = abs(bEff) * sample.settings.m * sin(theta)
-        val c = 2 * abs(bEff) * sample.settings.m * cos(theta)
+        val b = abs(bEff) * sample.momentaValue * sin(theta)
+        val c = 2 * abs(bEff) * sample.momentaValue * cos(theta)
 
         // уравнение четвертой степени
         val expr = "${b.format()} x^4 + ${(c-a).format()} x^3 + ${(c+a).format()} x - ${b.format()} == 0"
@@ -183,7 +183,7 @@ class Particle {
      * @param theta угол между осью анизотропии и эффективным полем
      */
     fun computeEnergyInPlane(phi: Double, theta: Double): Double =
-            sample.settings.kan * sqr(sin(phi)) - abs(bEff) * sample.settings.m * cos(phi - theta)
+            sample.settings.kan * sqr(sin(phi)) - abs(bEff) * sample.momentaValue * cos(phi - theta)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
