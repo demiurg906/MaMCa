@@ -7,33 +7,38 @@ class Settings:
     def __init__(self, filename=None):
         self._d = OrderedDict()
 
-        self._d['x'] = 4  # количество клеток по x
-        self._d['y'] = 4  # количество клеток по y
+        self._d['x'] = 1  # количество клеток по x
+        self._d['y'] = 1  # количество клеток по y
         self._d['z'] = 1  # количество клеток по z
-        self._d['r'] = 1  # число частиц в кольце
+        self._d['n'] = 40  # число частиц в кольце
 
-        self._d['n'] = 4  # диаметр кольца
-        self._d['d'] = 10  # радиус частицы
-        self._d['offset'] = 0  # расстояние между клетками
+        self._d['r'] = 1.0  # диаметр кольца [нм]
+        self._d['d'] = 60.0  # радиус частицы [нм]
+        self._d['offset'] = 4/0  # расстояние между клетками [нм]
 
-        self._d['kan'] = 8e4  # константа анизотропии
-        self._d['jex'] = 0.1  # константа обмена
-        self._d['m'] = 1  # значение момента
+        self._d['m'] = 1.0  # значение момента [ядерный магнетон, шт]
+        self._d['kan'] = 1.0e-2  # константа анизотропии [иДж], основной порядок -- 10^2 - 10^3
+        self._d['jex'] = 1.0e2  # константа обмена [Тл^2 / иДж], основной порядок -- 10^-2 - 10^-3
+
+        # расстояния, на которых чувтствуются взаимодействия:
+        self._d['dipol_distance'] = 30.0  # диполь-дипольное, [нм]
+        self._d['exchange_distance'] = 3.0  # обменное, [нм]
+
         self._d['viscosity'] = 1  # коэффициент вязкости, <= 1
+        self._d['t'] = 0.01  # температура [К]
 
-        self._d['t'] = 0.01  # температура
         self._d['ot'] = 0  # расположение осей анизотропии
         # 0 -- рандом в 3D, 1 -- рандом в 2D, 2 -- заданная ось
         # отклонение оси анизотропии от оси z и оси x соответственно
-        self._d['ot_theta'] = math.pi / 2
-        self._d['ot_phi'] = 0
+        self._d['ot_theta'] = 90.0  # [градус]
+        self._d['ot_phi'] = 0  # [градус]
 
-        self._d['b_x'] = 0  # поле по x
-        self._d['b_y'] = 0  # поле по y
-        self._d['b_z'] = 0  # поле по z
+        self._d['b_x'] = 0  # поле по x [Тл]
+        self._d['b_y'] = 0  # поле по y [Тл]
+        self._d['b_z'] = 0  # поле по z [Тл]
 
-        self._d['precision'] = 7
-        self._d['load'] = False
+        self._d['precision'] = 7  # точность (количтество шагов симуляции)
+        self._d['load'] = False  # загружать ли предыдущее состояние
         self._d['jsonPath'] = 'sample.json'
         if filename is not None:
             with open(filename) as f:
@@ -84,6 +89,14 @@ class Settings:
     @property
     def m(self):
         return self._d['m']
+
+    @property
+    def dipol_distance(self):
+        return self._d['dipol_distance']
+
+    @property
+    def exchange_distance(self):
+        return self._d['exchange_distance']
 
     @property
     def t(self):

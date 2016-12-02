@@ -28,12 +28,14 @@ class TestJson {
 
     @Test
     fun testSample() {
+        val resourcesFolder = "src/test/resources"
+        val filename = "sample.json"
         val settings = getDefaultSettings()
         val newSettings = getDefaultSettings()
         newSettings.load = true
-        newSettings.jsonPath = "src/test/resources/sample.json"
+        newSettings.jsonPath = "$resourcesFolder/$filename"
         val sample = Sample(settings)
-        sample.dumpToJsonFile(newSettings.jsonPath)
+        sample.dumpToJsonFile(resourcesFolder, filename)
         val newSample = Sample(newSettings)
         assertEquals(sample, newSample)
     }
