@@ -12,16 +12,15 @@ data class Settings(val x: Int, // количество клеток по x
                     val r: Double, // радиус частицы
 
                     val n: Int, // число частиц в кольце
-                    val d: Double, // диаметр кольца
-                    val offset: Double, // расстояние между клетками
+                    val d: Double, // диаметр кольца [нм]
+                    val offset: Double, // расстояние между клетками [нм]
 
-                    val ms: Double, // константа диполь-диполь
-                    val kan: Double, // константа анизотропии
-                    val jex: Double, // константа обмена
+                    val m: Double, // значение момента [А*м^2]
+                    val kan: Double, // константа анизотропии [Дж]
+                    val jex: Double, // константа обмена [Тл / (А * м^2)]
 
-                    val m: Double, // значение момента
                     val viscosity: Double, // коэффициент вязкости, 0 <= viscosity <= 1
-                    val t: Double, // температура
+                    val t: Double, // температура [К]
 
                     val ot: Int, // расположение осей анизотропии
                     // 0 -- рандом в 3D, 1 -- рандом в 2D, 2 -- заданная ось
@@ -29,9 +28,9 @@ data class Settings(val x: Int, // количество клеток по x
                     val ot_theta: Double,
                     val ot_phi: Double,
 
-                    val b_x: Double, // поле по x
-                    val b_y: Double, // поле по y
-                    val b_z: Double, // поле по z
+                    val b_x: Double, // поле по x [ГТл]
+                    val b_y: Double, // поле по y [ГТл]
+                    val b_z: Double, // поле по z [ГТл]
 
                     val precision: Int, // точность (количтество шагов симуляции)
                     var load: Boolean, // загружать ли предыдущее состояние
@@ -53,7 +52,7 @@ fun getDefaultSettings(): Settings =
         Settings(
             4, 4, 1, 1.0,
             4, 10.0, 0.0,
-            4.53e5, 8e4, 0.1, 1.0,
+            8e4, 0.1, 1.0,
             1.0, 0.1,
             0, PI / 2, 0.0,
             0.0, 0.0, 0.0,

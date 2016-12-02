@@ -104,6 +104,7 @@ class Sample : Serializable {
                 val p = Particle(loc, m, lma, this)
                 particles.add(p)
             }
+
         }
         // определение соседей частиц
         val dipolParticles: Map<Particle, MutableList<Particle>> =
@@ -124,6 +125,18 @@ class Sample : Serializable {
         }
         for (p in particles) {
             p.initializeNeighbors(dipolParticles[p]!!.toSet(), exchangeParticles[p]!!.toSet())
+        }
+
+        with(settings) {
+            // проверка, что все частицы помещаются на кольце
+            if (n * r * 2 > d * PI) {
+                println("WARNING: boundaries of ring particles overlap")
+            }
+
+            // проверка, что кольца на досточном расстоянии друг от друга
+            if ((r * 2 > offset) and (x * y * z > 1)) {
+                println("WARNNIG: rings overlap")
+            }
         }
     }
 
@@ -187,18 +200,14 @@ class Sample : Serializable {
         // записывает в файл текущее состояние моментов
         val path = outFolder + File.separator + filename
         File(path).printWriter().use { out ->
-            // TODO: move magic number to constants?
-            // масштаб  для моментов импульсов
-            // нужен, чтобы стрелочки не были слишком большие
-            val scale = 0.25
             for (p in particles) {
                 val x = p.loc.x
                 val y = p.loc.y
                 val z = p.loc.z
 
-                val mx = p.m.x * scale
-                val my = p.m.y * scale
-                val mz = p.m.z * scale
+                val mx = p.m.x
+                val my = p.m.y
+                val mz = p.m.z
 
                 val x1 = x - mx
                 val x2 = x + mx
@@ -206,7 +215,7 @@ class Sample : Serializable {
                 val y2 = y + my
                 val z1 = z - mz
                 val z2 = z + mz
-                out.write("$x1 $y1 $z1 $x2 $y2 $z2 $x $y $z \n")
+                out.write("$x1 $y1 $z1 $x2 $y2 $z2 $x $y $z\n")
             }
         }
     }

@@ -66,8 +66,12 @@ class Particle {
 
         // вклад диполь-дипольного взаимодействия
         var dipols = Vector()
-        dipolParticles.forEach { dipols += it.m }
-        bEff += dipols * sample.settings.ms
+        dipolParticles.forEach {
+            val r = it.loc - loc
+            val n = r.direction()
+            dipols += (3 *(n * it.m) * n - it.m) / pow(abs(r), 3.0)
+        }
+        bEff += dipols * sample.settings.m * DIPOL_CONST
 
         // вклад обменного взаимодействия
         var exchange = Vector()
