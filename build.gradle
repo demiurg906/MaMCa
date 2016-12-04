@@ -26,7 +26,7 @@ envs {
     minicondaVersion = 'latest'
     packages = ['pip', 'setuptools']
 
-    conda 'Python_3_5', '3.5', ['numpy', 'matplotlib'], true
+    conda 'python35_64', '3.5', ['numpy', 'matplotlib'], true
 }
 
 repositories {
@@ -56,7 +56,13 @@ task wrapper(type: Wrapper) {
     gradleVersion = '3.1'
 }
 
-def pythonPath = './build/envs/Python_3_5/python'
+def pythonPath
+
+if (org.gradle.internal.os.OperatingSystem.current().windows) {
+    pythonPath = './build/envs/python35_64/python'
+} else {
+    pythonPath = './build/envs/python35_64/bin/python'
+}
 
 task create_and_draw(type:Exec) {
     group = 'python tasks'
