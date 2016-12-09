@@ -3,7 +3,6 @@ package org.physics.mamca
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
-import java.io.Serializable
 
 
 data class Settings(val x: Int, // количество клеток по x
@@ -15,9 +14,9 @@ data class Settings(val x: Int, // количество клеток по x
                     val d: Double, // диаметр кольца [нм]
                     val offset: Double, // расстояние между клетками [нм]
 
-                    val m: Double, // значение момента [ядерный магнетон, шт]
-                    val kan: Double, // константа анизотропии [иДж], основной порядок -- 10^2 - 10^3
-                    val jex: Double, // константа обмена [Тл^2 / иДж], основной порядок -- 10^-2 - 10^-3
+                    val m: Double, // значение момента [магнетон бора, шт]
+                    var kan: Double, // константа анизотропии [эВ], основной порядок -- 10^2 - 10^3
+                    var jex: Double, // константа обмена [Тл^2 / эВ], основной порядок -- 10^-2 - 10^-3
 
                     // расстояния, на которых чувтствуются взаимодействия:
                     val dipol_distance: Double, // диполь-дипольное, [нм]
@@ -39,7 +38,7 @@ data class Settings(val x: Int, // количество клеток по x
                     val precision: Int, // точность (количтество шагов симуляции)
                     var load: Boolean, // загружать ли предыдущее состояние
                     var jsonPath: String
-) : Serializable
+)
 
 fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()
@@ -55,8 +54,8 @@ fun createSettingsJson(filename: String, settings: Settings) {
 fun getDefaultSettings(): Settings =
         Settings(
                 1, 1, 1, 10, // размеры
-                1.0, 20.0, 4.0, // параметры колец
-                1.0, 1.0e-2, 1.0e2, // константы взаимодействий
+                1.5, 20.0, 4.0, // параметры колец
+                800.0, 1.0e-2, 1.0e2, // константы взаимодействий
                 30.0, 4.0, // расстояния взаимодействий
                 1.0, 0.1, // вязкость и температура
                 0, 90.0, 0.0, // анизотропия

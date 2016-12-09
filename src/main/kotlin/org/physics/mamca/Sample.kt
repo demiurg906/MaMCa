@@ -28,7 +28,10 @@ class Sample : Serializable {
         b = Vector(0.0, 0.0, 0.0)
         particles = mutableListOf()
         settings = getDefaultSettings()
-        momentaValue = settings.m * MU_N
+        // перевод констант в единицы с Дж
+        this.momentaValue = settings.m * MU_B
+        settings.kan *= EV_TO_DJ
+        settings.jex /= EV_TO_DJ
     }
 
     /**
@@ -38,7 +41,10 @@ class Sample : Serializable {
         this.b = b
         this.particles = particles.toMutableList()
         this.settings = getDefaultSettings()
-        momentaValue = settings.m * MU_N
+        // перевод констант в единицы с Дж
+        this.momentaValue = settings.m * MU_B
+        settings.kan *= EV_TO_DJ
+        settings.jex /= EV_TO_DJ
     }
 
     /**
@@ -46,21 +52,24 @@ class Sample : Serializable {
      */
     constructor(settings: Settings) {
         this.settings = settings
+
+        // перевод констант в единицы с Дж
+        this.momentaValue = settings.m * MU_B
+        settings.kan *= EV_TO_DJ
+        settings.jex /= EV_TO_DJ
+
+        // инициализация образца
         if (settings.load) {
             val json = FileUtils.readFileToString(File(settings.jsonPath))
             val gson = GsonBuilder().registerTypeAdapter(this.javaClass, SampleDeserializer()).create()
             val sample: Sample = gson.fromJson(json, getType())
             this.b = sample.b
             this.particles = sample.particles
-            this.momentaValue = settings.m * MU_N
         }
         else {
             val s = settings
             // магнитное поле
             b = Vector(s.b_x, s.b_y, s.b_z)
-
-            // значение момента в абсольтных единицах [Дж / Тл]
-            momentaValue = settings.m * MU_N
 
             // заполнение частицами
             particles = mutableListOf()
