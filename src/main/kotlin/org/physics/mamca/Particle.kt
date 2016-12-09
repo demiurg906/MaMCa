@@ -18,7 +18,7 @@ class Particle {
     // ось анизотропии
     val lma: Vector
 
-    val sample: Sample
+    var sample: Sample
 
     private var bEff: Vector = Vector()
 
@@ -97,8 +97,6 @@ class Particle {
             // поле параллельно оси анизотропии
             eZ = norm(m, lma)
             theta = 0.0
-
-            println("they kollinear, Karl")
         } else {
             // поле не параллельно оси анизотропии
             eZ = norm(bEff, lma)
@@ -217,6 +215,8 @@ class Particle {
 //        result = 31 * result + exchangeParticles.hashCode()
         return result
     }
+
+    override fun toString(): String = "loc :${this.loc}, lma: ${this.lma}, m: ${this.m}"
 
     fun toJsonString(): String {
         val gson = GsonBuilder().registerTypeAdapter(this.javaClass, ParticleSerializer()).setPrettyPrinting().create()

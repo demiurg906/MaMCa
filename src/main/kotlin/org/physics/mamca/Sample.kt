@@ -27,24 +27,18 @@ class Sample : Serializable {
     constructor() {
         b = Vector(0.0, 0.0, 0.0)
         particles = mutableListOf()
-        settings = getDefaultSettings()
-        // перевод констант в единицы с Дж
-        this.momentaValue = settings.m * MU_B
-        settings.kan *= EV_TO_DJ
-        settings.jex /= EV_TO_DJ
+        settings = Settings()
+        this.momentaValue = 0.0
     }
 
     /**
      * еще один конструктор-заглушка
      */
-    constructor(b: Vector, particles: List<Particle>) {
-        this.b = b
+    constructor(particles: List<Particle>) {
+        this.b = Vector()
         this.particles = particles.toMutableList()
-        this.settings = getDefaultSettings()
-        // перевод констант в единицы с Дж
-        this.momentaValue = settings.m * MU_B
-        settings.kan *= EV_TO_DJ
-        settings.jex /= EV_TO_DJ
+        this.settings = Settings()
+        this.momentaValue = 0.0
     }
 
     /**
@@ -58,18 +52,18 @@ class Sample : Serializable {
         settings.kan *= EV_TO_DJ
         settings.jex /= EV_TO_DJ
 
+        b = Vector(settings.b_x, settings.b_y, settings.b_z)
+
         // инициализация образца
         if (settings.load) {
             val json = FileUtils.readFileToString(File(settings.jsonPath))
             val gson = GsonBuilder().registerTypeAdapter(this.javaClass, SampleDeserializer()).create()
             val sample: Sample = gson.fromJson(json, getType())
-            this.b = sample.b
             this.particles = sample.particles
+            this.particles.forEach { it.sample = this }
         }
         else {
             val s = settings
-            // магнитное поле
-            b = Vector(s.b_x, s.b_y, s.b_z)
 
             // заполнение частицами
             particles = mutableListOf()
@@ -176,9 +170,9 @@ class Sample : Serializable {
         var relativeDeltaEnergy = computeDelta()
         var numberOfSteps = 1
         for (i in 1 until settings.precision) {
-            if (relativeDeltaEnergy < RELATIVE_ENERGY_PRECISION) {
-                break
-            }
+//            if (relativeDeltaEnergy < RELATIVE_ENERGY_PRECISION) {
+//                break
+//            }
             energies = optimizeEnergy(energies.second)
             relativeDeltaEnergy = computeDelta()
             numberOfSteps += 1
