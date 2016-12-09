@@ -180,7 +180,7 @@ class Particle {
     /**
      * расчитывает энергию момента
      */
-    fun computeEnergy(): Double = sample.settings.kan * sqr(abs(m % lma)) - (m * bEff)
+    fun computeEnergy(): Double = sample.settings.kan * sqr(abs(m % lma)) - (m * bEff) + (abs(m) * abs(bEff))
 
     /**
      * расчитывает энергию момента, отклоненного от оси анизотропии на угол phi
@@ -188,7 +188,7 @@ class Particle {
      * @param theta угол между осью анизотропии и эффективным полем
      */
     fun computeEnergyInPlane(phi: Double, theta: Double): Double =
-            sample.settings.kan * sqr(sin(phi)) - abs(bEff) * sample.momentaValue * cos(phi - theta)
+            sample.settings.kan * sqr(sin(phi)) - abs(bEff) * sample.momentaValue * (cos(phi - theta) - 1)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
