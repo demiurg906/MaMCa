@@ -30,8 +30,8 @@ class TestJson {
     fun testSample() {
         val resourcesFolder = "src/test/resources"
         val filename = "sample.json"
-        val settings = getDefaultSettings()
-        val newSettings = getDefaultSettings()
+        val settings = Settings()
+        val newSettings = Settings()
         newSettings.load = true
         newSettings.jsonPath = "$resourcesFolder/$filename"
         val sample = Sample(settings)
@@ -42,7 +42,7 @@ class TestJson {
 
     @Test
     fun testSettings() {
-        val settings = getDefaultSettings()
+        val settings = Settings()
         val filename = "src/test/resources/settings.json"
         createSettingsJson(filename, settings)
         val newSettings = loadSettingsFromJson(filename)
