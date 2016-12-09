@@ -2,15 +2,15 @@
   "x":1,
   "y":1,
   "z":1,
-  "n":40,
+  "n":50,
 
-  "r":1.0,
+  "r":1.5,
   "d":60.0,
   "offset":4.0,
 
-  "m":1.0,
-  "kan":1.0e-2,
-  "jex":1.0e2,
+  "m":800.0,
+  "kan":5.0e-2,
+  "jex":0.0e2,
 
   "dipol_distance":30.0,
   "exchange_distance":4.0,
@@ -27,6 +27,6 @@
   "b_z":0.0,
 
   "precision":7,
-  "load":false,
-  "jsonPath":"sample.json"
+  "load":true,
+  "jsonPath":"./resources/out/sample.json"
 }
