@@ -14,7 +14,7 @@ const val RELATIVE_ENERGY_PRECISION = 0.1
 const val DIGITS = 2
 
 // число символов после запятой для отправки в математику
-const val MATH_DIGITS = 15
+const val MATH_DIGITS = 50
 
 // магнитная постоянная
 const val MU_0 = 4 * PI *1.0e-7 // [Гн / м]

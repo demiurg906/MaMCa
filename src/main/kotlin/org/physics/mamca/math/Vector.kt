@@ -2,6 +2,7 @@ package org.physics.mamca.math
 
 import com.google.gson.Gson
 import org.physics.mamca.util.equalsDouble
+import org.physics.mamca.util.format
 
 class Vector {
     var x: Double = 0.0
@@ -163,7 +164,7 @@ class Vector {
     }
 
     /**
-     * возвращает значение угла между двумя векторами
+     * возвращает направленное значение угла между двумя векторами
      */
     fun angleTo(other: Vector, eZ: Vector): Double {
         val eX = other.direction()
@@ -171,6 +172,13 @@ class Vector {
         val thisTan = this * eX
         val thisNorm = this * eY
         return Math.atan2(thisNorm, thisTan)
+    }
+
+    /**
+     * возвращает ненаправленное значение угла между двумя векторами
+     */
+    fun angleTo(other: Vector): Double {
+        return Math.acos(this * other)
     }
 
     /**
@@ -205,7 +213,7 @@ class Vector {
     }
 
     override fun toString(): String {
-        return "($x, $y, $z)"
+        return "(${x.format(2)}, ${y.format(2)}, ${z.format(2)})"
     }
 
     /**

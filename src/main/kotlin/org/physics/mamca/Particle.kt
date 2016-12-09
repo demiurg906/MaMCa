@@ -89,20 +89,25 @@ class Particle {
      * (с учетом вязкости)
      */
     fun optimizeMomentaPosition() {
-        // эффективное поле
+        // нормаль к плоскости, в которой вращается момент
+        val eZ: Vector
+        val theta: Double
+
         if (isKollinear(bEff, lma)) {
             // поле параллельно оси анизотропии
-            TODO()
+            eZ = norm(m, lma)
+            theta = 0.0
+
+            println("they kollinear, Karl")
+        } else {
+            // поле не параллельно оси анизотропии
+            eZ = norm(bEff, lma)
+            theta = lma.angleTo(bEff, eZ)
+
+            // поворот момента в плоскость поля и анизотропии
+            m -= eZ * (m * eZ)
+            m.normalize()
         }
-
-        // нормаль к плоскости
-        val eZ = norm(bEff, lma)
-
-        // поворот момента в плоскость
-        m -= eZ * (m * eZ)
-        m.normalize()
-
-        val theta = lma.angleTo(bEff, eZ)
 
         val a = 4 * sample.settings.kan
         val b = abs(bEff) * sample.momentaValue * sin(theta)
