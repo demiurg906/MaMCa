@@ -24,7 +24,9 @@ fun main(args: Array<String>) {
     sample.dumpToJsonFile(outFolder, "sample.json")
 
     val midTime = System.currentTimeMillis()
-    val (startEnergy, endEnergy, numberOfSteps) = sample.processRelaxation()
+    var (startEnergy, endEnergy, numberOfSteps) = sample.processRelaxation()
+    startEnergy /= EV_TO_DJ
+    endEnergy /= EV_TO_DJ
     sample.saveState(outFolder = outFolder)
 
     val endTime = System.currentTimeMillis()
@@ -36,8 +38,8 @@ fun main(args: Array<String>) {
     println("sample size is ${settings.x}x${settings.y}x${settings.z} with ${settings.n} particles per ring")
     println("total number of particles is ${settings.x * settings.y * settings.z * settings.n}")
     println("number of \"two minimums\" situations is ${sample.twoMinimums}")
-    println("energy on start is ${startEnergy.eFormat()}")
-    println("energy on end is ${endEnergy.eFormat()}")
+    println("energy on start is ${startEnergy.eFormat()} eV")
+    println("energy on end is ${endEnergy.eFormat()} eV")
     println("number of simulation steps is $numberOfSteps")
     println("$delimiter\n")
 }

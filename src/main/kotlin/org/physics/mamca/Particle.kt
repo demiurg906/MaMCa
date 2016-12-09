@@ -4,7 +4,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import org.physics.mamca.math.*
 import org.physics.mamca.util.Mathematica
-import org.physics.mamca.util.format
+import org.physics.mamca.util.eFormat
 import java.lang.Math.*
 import java.lang.reflect.Type
 
@@ -114,7 +114,7 @@ class Particle {
         val c = 2 * abs(bEff) * sample.momentaValue * cos(theta)
 
         // уравнение четвертой степени
-        val expr = "${b.format()} x^4 + ${(c-a).format()} x^3 + ${(c+a).format()} x - ${b.format()} == 0"
+        val expr = "${b.eFormat(MATH_DIGITS)} x^4 + ${(c-a).eFormat(MATH_DIGITS)} x^3 + ${(c+a).eFormat(MATH_DIGITS)} x - ${b.eFormat(MATH_DIGITS)} == 0"
 
         // корни уравнения (с переходом от x к phi)
         val roots = Mathematica.findRoots(expr).map { 2 * atan(it) }

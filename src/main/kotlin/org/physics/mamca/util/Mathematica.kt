@@ -17,7 +17,8 @@ object Mathematica {
     }
 
     fun findRoots(expr: String): List<Double> {
-        m.evaluate("x /. NSolve[$expr, x, Reals]")
+        val formattedExpr = expr.replace("e", "*^", true)
+        m.evaluate("x /. NSolve[$formattedExpr, x, Reals]")
         m.waitForAnswer()
         val exprRoots = m.expr
         val roots: List<Double> = exprRoots.args().map(Expr::asDouble)

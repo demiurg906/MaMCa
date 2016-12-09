@@ -4,7 +4,7 @@ const val PI = Math.PI
 const val PI2 = 2 * PI
 
 // точность сравнение чисел с плавающей запятой
-const val DELTA = 1e-30
+const val DELTA = 1e-20
 
 // отночительная точность, при которой считаем, что изменение энергии системы несущественно
 // считается, как отношение разности энергий до и после к энергии до
@@ -14,7 +14,7 @@ const val RELATIVE_ENERGY_PRECISION = 0.1
 const val DIGITS = 2
 
 // число символов после запятой для отправки в математику
-const val MATH_DIGITS = 50
+const val MATH_DIGITS = 10
 
 // магнитная постоянная
 const val MU_0 = 4 * PI *1.0e-7 // [Гн / м]
