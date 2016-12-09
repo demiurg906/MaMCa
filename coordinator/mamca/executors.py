@@ -30,7 +30,12 @@ def pre_clean(func):
             out = get_default_out_folder()
         if not os.path.exists(out):
             os.mkdir(out)
-        _clear_out_folder(out)
+        settings = Settings(kwargs['settings_fname'])
+        if settings.load:
+            sample_file = settings.jsonPath.split('/')[-1]
+        else:
+            sample_file = ''
+        _clear_out_folder(out, sample_file)
         func(*args, **kwargs)
         # dumpedState = '{}/sample.json'.format(out)
         # if os.path.exists(dumpedState):
@@ -288,7 +293,7 @@ def cycle_one_parameter(par_name, start, end, step, addition=True,
     print('Generation complete')
 
 
-def _clear_out_folder(path=None):
+def _clear_out_folder(path=None, sample_file=""):
     """
     Очищает выходную папку
     :param path: путь к папке
@@ -296,4 +301,5 @@ def _clear_out_folder(path=None):
     if path is None:
         path = get_default_out_folder()
     for f in os.listdir(path):
-        os.remove('{}/{}'.format(path, f))
+        if f != sample_file:
+            os.remove('{}/{}'.format(path, f))

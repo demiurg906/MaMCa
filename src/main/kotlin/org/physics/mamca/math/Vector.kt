@@ -1,8 +1,8 @@
 package org.physics.mamca.math
 
 import com.google.gson.Gson
+import org.physics.mamca.util.eFormat
 import org.physics.mamca.util.equalsDouble
-import org.physics.mamca.util.format
 
 class Vector {
     var x: Double = 0.0
@@ -213,7 +213,7 @@ class Vector {
     }
 
     override fun toString(): String {
-        return "(${x.format(2)}, ${y.format(2)}, ${z.format(2)})"
+        return "(${x.eFormat(2)}, ${y.eFormat(2)}, ${z.eFormat(2)})"
     }
 
     /**

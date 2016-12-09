@@ -8,7 +8,7 @@ const val DELTA = 1e-20
 
 // отночительная точность, при которой считаем, что изменение энергии системы несущественно
 // считается, как отношение разности энергий до и после к энергии до
-const val RELATIVE_ENERGY_PRECISION = 0.1
+const val RELATIVE_ENERGY_PRECISION = 0.01
 
 // число символов после запятой для вывода
 const val DIGITS = 2
@@ -20,7 +20,7 @@ const val MATH_DIGITS = 10
 const val MU_0 = 4 * PI *1.0e-7 // [Гн / м]
 
 // коэффициент для диполь-дипольного взаимодействия
-const val DIPOL_CONST = 1e-7 // MU_0 / (4 * PI)
+const val DIPOL_CONST = MU_0 / (4 * PI) * 1e27 // с учетом того, что расстояния измеряются в [нм], а не в [м]
 
 // магнетон бора
 const val MU_B = 927.40096820e-26 // [Дж / Тл]
