@@ -166,7 +166,13 @@ class Sample : Serializable {
         var energies = optimizeEnergy()
         val startEnergy = energies.first
 
-        val computeDelta: () -> Double = { energies.second / energies.first }
+        val computeDelta: () -> Double = {
+            val delta = (energies.first - energies.second) / energies.first
+            if (delta < 0)
+                1 - delta
+            else
+                delta
+        }
 
         var relativeDeltaEnergy = computeDelta()
         var numberOfSteps = 1
