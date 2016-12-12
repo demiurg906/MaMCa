@@ -61,7 +61,7 @@ def pythonPath
 if (org.gradle.internal.os.OperatingSystem.current().windows) {
     pythonPath = './build/envs/python35_64/python'
 } else {
-    pythonPath = './build/envs/python35_64/bin/python'
+    pythonPath = './build/envs/python35_64/bin/python3'
 }
 
 task create_and_draw(type:Exec) {
