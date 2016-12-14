@@ -1,6 +1,7 @@
 package org.physics.mamca
 
 import org.physics.mamca.util.eFormat
+import org.physics.mamca.util.formatEnergies
 
 /**
  * Основная функция запуска симуляции
@@ -25,9 +26,9 @@ fun main(args: Array<String>) {
     sample.saveState(outFolder = outFolder, filename = "momenta_before.txt")
 
     val midTime = System.currentTimeMillis()
-    var (startEnergy, endEnergy, numberOfSteps) = sample.processRelaxation()
-    startEnergy /= EV_TO_DJ
-    endEnergy /= EV_TO_DJ
+    val (startEnergies, endEnergies, numberOfSteps) = sample.processRelaxation()
+    val startEnergy = startEnergies.first / EV_TO_DJ
+    val endEnergy = endEnergies.first / EV_TO_DJ
     sample.saveState(outFolder = outFolder)
 
     val endTime = System.currentTimeMillis()
@@ -39,10 +40,13 @@ fun main(args: Array<String>) {
     println("sample size is ${settings.x}x${settings.y}x${settings.z} with ${settings.n} particles per ring")
     println("total number of particles is ${settings.x * settings.y * settings.z * settings.n}")
     println("number of \"two minimums\" situations is ${sample.twoMinimums}")
-    println("energy on start is ${startEnergy.eFormat()} eV")
-    println("energy on end is ${endEnergy.eFormat()} eV")
+    println("")
+    println("full energy on start is ${startEnergy.eFormat()} eV")
+    println("energies on start is ${formatEnergies(startEnergies.second)} eV")
+    println("full energy on end is ${endEnergy.eFormat()} eV")
+    println("energies on end is ${formatEnergies(endEnergies.second)} eV")
+    println("")
     println("number of simulation steps is $numberOfSteps")
-
     if (endEnergy > startEnergy) {
         println("\nWOOOOOOOOOOW\n")
     }

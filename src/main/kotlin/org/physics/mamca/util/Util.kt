@@ -1,9 +1,6 @@
 package org.physics.mamca.util
 
-import org.physics.mamca.DELTA
-import org.physics.mamca.DIGITS
-import org.physics.mamca.MATH_DIGITS
-import org.physics.mamca.PI2
+import org.physics.mamca.*
 import java.io.File
 import java.lang.Math.acos
 import java.nio.file.Files
@@ -45,3 +42,13 @@ fun Double.format(digits: Int = MATH_DIGITS): String = java.lang.String.format(L
  * @param digits количество цифр после запятой
  */
 fun Double.eFormat(digits: Int = DIGITS): String = java.lang.String.format(Locale.US, "%.${digits}e", this)
+
+infix operator fun Triple<Double, Double, Double>.plus(it: Triple<Double, Double, Double>): Triple<Double, Double, Double> =
+        Triple(this.first + it.first, this.second + it.second, this.third + it.third)
+
+fun formatEnergies(energies: Triple<Double, Double, Double>, k: Double = 1 / EV_TO_DJ, digits: Int = DIGITS): String {
+    val an = energies.first * k
+    val int = energies.second * k
+    val b = energies.third * k
+    return "(an: ${an.eFormat(digits)}, int: ${int.eFormat(digits)}, B: ${b.eFormat(digits)})"
+}

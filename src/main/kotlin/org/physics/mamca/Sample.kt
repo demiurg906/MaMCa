@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils
 import org.physics.mamca.math.Vector
 import org.physics.mamca.math.abs
 import org.physics.mamca.util.pairs
+import org.physics.mamca.util.plus
 import org.physics.mamca.util.randomPhi
 import org.physics.mamca.util.randomTheta
 import java.io.File
@@ -162,12 +163,15 @@ class Sample : Serializable {
      * не будет сосчитано количество шагов, заданное в настройках
      * @return (энергия до оптимизации, энергия после оптимизации, количество шагов оптимизации)
      */
-    fun processRelaxation(): Triple<Double, Double, Int> {
+    fun processRelaxation(): Triple<
+            Pair<Double, Triple<Double, Double, Double>>,
+            Pair<Double, Triple<Double, Double, Double>>,
+            Int> {
         var energies = optimizeEnergy()
         val startEnergy = energies.first
 
         val computeDelta: () -> Double = {
-            val delta = (energies.first - energies.second) / energies.first
+            val delta = (energies.first.first - energies.second.first) / energies.first.first
             if (delta < 0)
                 1 - delta
             else
@@ -189,18 +193,23 @@ class Sample : Serializable {
         return Triple(startEnergy, endEnergy, numberOfSteps)
     }
     /**
-     * @return суммарная энергию образца
+     * @return суммарная энергию образца (пара из полной энергии и тройки энергий по взаимодействиям)
      */
-    fun computeEnergy(): Double {
-        return particles.map { it.computeEnergy() }.sum()
+    fun computeEnergy(): Pair<Double, Triple<Double, Double, Double>> {
+//        val fullE = particles.map { it.computeEnergy() }.sum()
+        var partE = Triple(0.0, 0.0, 0.0)
+        particles.map { it.computeEnergies() }.forEach { partE += it }
+        val fullE = partE.first + partE.second + partE.third
+        return fullE to partE
     }
 
     /**
      * оптимизирует энергию всех частиц
-     * @return энергию до оптимизации и после
+     * @return энергии до оптимизации и после
      */
-    private fun optimizeEnergy(computedOldEnergy: Double? = null): Pair<Double, Double> {
-        val oldEnergy: Double
+    private fun optimizeEnergy(computedOldEnergy: Pair<Double, Triple<Double, Double, Double>>? = null):
+            Pair<Pair<Double, Triple<Double, Double, Double>>, Pair<Double, Triple<Double, Double, Double>>> {
+        val oldEnergy: Pair<Double, Triple<Double, Double, Double>>
         if (computedOldEnergy == null) {
             particles.forEach { it.computeEffectiveField() }
             oldEnergy = computeEnergy()

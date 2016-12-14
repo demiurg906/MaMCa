@@ -95,8 +95,15 @@ class Particle {
 
         if (isKollinear(bEff, lma)) {
             // поле параллельно оси анизотропии
+            if (isKollinear(lma, m)) {
+                TODO()
+            }
             eZ = norm(m, lma)
-            theta = 0.0
+            if (lma * bEff < 0) {
+                theta = PI
+            } else {
+                theta = 0.0
+            }
         } else {
             // поле не параллельно оси анизотропии
             eZ = norm(bEff, lma)
@@ -178,7 +185,18 @@ class Particle {
     /**
      * расчитывает энергию момента
      */
-    fun computeEnergy(): Double = sample.settings.kan * sqr(abs(m % lma)) - (m * bEff) + (abs(m) * abs(bEff))
+    fun computeEnergy(): Double = sample.settings.kan * sqr(abs(m % lma)) + sample.momentaValue * ((m * bEff) - (abs(m) * abs(bEff)))
+
+    /**
+     * расчитывает энергии анизотропии, внешнего поля и взаимодействий
+     * @return (eAnisotropy, eInteraction, eField)
+     */
+    fun computeEnergies(): Triple<Double, Double, Double>{
+        val eAn = sample.settings.kan * sqr(abs(m % lma))
+        val eBeff = (- (m * bEff) + (abs(m) * abs(bEff))) * sample.momentaValue
+        val eB = (- m * sample.b + (abs(m) * abs(sample.b))) * sample.momentaValue
+        return Triple(eAn, eBeff - eB, eB)
+    }
 
     /**
      * расчитывает энергию момента, отклоненного от оси анизотропии на угол phi
