@@ -1,45 +1,37 @@
+"""
+That file generated automatically, don't change it
+"""
+
 import json
-import math
 from collections import OrderedDict
 
 
 class Settings:
     def __init__(self, filename=None):
         self._d = OrderedDict()
-
-        self._d['x'] = 1  # количество клеток по x
-        self._d['y'] = 1  # количество клеток по y
-        self._d['z'] = 1  # количество клеток по z
-        self._d['n'] = 40  # число частиц в кольце
-
-        self._d['r'] = 1.0  # диаметр кольца [нм]
-        self._d['d'] = 60.0  # радиус частицы [нм]
-        self._d['offset'] = 4.0  # расстояние между клетками [нм]
-
-        self._d['m'] = 1.0  # значение момента [ядерный магнетон, шт]
-        self._d['kan'] = 1.0e-2  # константа анизотропии [иДж], основной порядок -- 10^2 - 10^3
-        self._d['jex'] = 1.0e2  # константа обмена [Тл^2 / иДж], основной порядок -- 10^-2 - 10^-3
-
-        # расстояния, на которых чувтствуются взаимодействия:
-        self._d['dipol_distance'] = 30.0  # диполь-дипольное, [нм]
-        self._d['exchange_distance'] = 3.0  # обменное, [нм]
-
-        self._d['viscosity'] = 1  # коэффициент вязкости, <= 1
-        self._d['t'] = 0.01  # температура [К]
-
-        self._d['ot'] = 0  # расположение осей анизотропии
-        # 0 -- рандом в 3D, 1 -- рандом в 2D, 2 -- заданная ось
-        # отклонение оси анизотропии от оси z и оси x соответственно
-        self._d['ot_theta'] = 90.0  # [градус]
-        self._d['ot_phi'] = 0  # [градус]
-
-        self._d['b_x'] = 0  # поле по x [Тл]
-        self._d['b_y'] = 0  # поле по y [Тл]
-        self._d['b_z'] = 0  # поле по z [Тл]
-
-        self._d['precision'] = 7  # точность (количтество шагов симуляции)
-        self._d['load'] = False  # загружать ли предыдущее состояние
-        self._d['jsonPath'] = 'sample.json'
+        self._d['x'] = 1
+        self._d['y'] = 1
+        self._d['z'] = 1
+        self._d['n'] = 1
+        self._d['r'] = 1.5
+        self._d['d'] = 20.0
+        self._d['offset'] = 4.0
+        self._d['m'] = 800.0
+        self._d['kan'] = 0.05
+        self._d['jex'] = 100.0
+        self._d['dipol_distance'] = 30.0
+        self._d['exchange_distance'] = 4.0
+        self._d['viscosity'] = 0.9
+        self._d['t'] = 0.0
+        self._d['ot'] = 0
+        self._d['ot_theta'] = 90.0
+        self._d['ot_phi'] = 0.0
+        self._d['b_x'] = 0.0
+        self._d['b_y'] = 0.0
+        self._d['b_z'] = 0.0
+        self._d['precision'] = 7
+        self._d['load'] = False
+        self._d['jsonPath'] = './resources/out/sample.json'
         if filename is not None:
             with open(filename) as f:
                 d = json.load(f)
@@ -58,94 +50,177 @@ class Settings:
     def y(self):
         return self._d['y']
 
+    @y.setter
+    def y(self, value):
+        self._d['y'] = value
+
     @property
     def z(self):
         return self._d['z']
+
+    @z.setter
+    def z(self, value):
+        self._d['z'] = value
 
     @property
     def n(self):
         return self._d['n']
 
-    @property
-    def d(self):
-        return self._d['d']
+    @n.setter
+    def n(self, value):
+        self._d['n'] = value
 
     @property
     def r(self):
         return self._d['r']
 
+    @r.setter
+    def r(self, value):
+        self._d['r'] = value
+
+    @property
+    def d(self):
+        return self._d['d']
+
+    @d.setter
+    def d(self, value):
+        self._d['d'] = value
+
     @property
     def offset(self):
         return self._d['offset']
 
-    @property
-    def kan(self):
-        return self._d['kan']
-
-    @property
-    def jex(self):
-        return self._d['jex']
+    @offset.setter
+    def offset(self, value):
+        self._d['offset'] = value
 
     @property
     def m(self):
         return self._d['m']
 
+    @m.setter
+    def m(self, value):
+        self._d['m'] = value
+
+    @property
+    def kan(self):
+        return self._d['kan']
+
+    @kan.setter
+    def kan(self, value):
+        self._d['kan'] = value
+
+    @property
+    def jex(self):
+        return self._d['jex']
+
+    @jex.setter
+    def jex(self, value):
+        self._d['jex'] = value
+
     @property
     def dipol_distance(self):
         return self._d['dipol_distance']
+
+    @dipol_distance.setter
+    def dipol_distance(self, value):
+        self._d['dipol_distance'] = value
 
     @property
     def exchange_distance(self):
         return self._d['exchange_distance']
 
+    @exchange_distance.setter
+    def exchange_distance(self, value):
+        self._d['exchange_distance'] = value
+
+    @property
+    def viscosity(self):
+        return self._d['viscosity']
+
+    @viscosity.setter
+    def viscosity(self, value):
+        self._d['viscosity'] = value
+
     @property
     def t(self):
         return self._d['t']
+
+    @t.setter
+    def t(self, value):
+        self._d['t'] = value
 
     @property
     def ot(self):
         return self._d['ot']
 
+    @ot.setter
+    def ot(self, value):
+        self._d['ot'] = value
+
     @property
     def ot_theta(self):
         return self._d['ot_theta']
+
+    @ot_theta.setter
+    def ot_theta(self, value):
+        self._d['ot_theta'] = value
 
     @property
     def ot_phi(self):
         return self._d['ot_phi']
 
+    @ot_phi.setter
+    def ot_phi(self, value):
+        self._d['ot_phi'] = value
+
     @property
     def b_x(self):
         return self._d['b_x']
+
+    @b_x.setter
+    def b_x(self, value):
+        self._d['b_x'] = value
 
     @property
     def b_y(self):
         return self._d['b_y']
 
+    @b_y.setter
+    def b_y(self, value):
+        self._d['b_y'] = value
+
     @property
     def b_z(self):
         return self._d['b_z']
 
+    @b_z.setter
+    def b_z(self, value):
+        self._d['b_z'] = value
+
     @property
-    def prec(self):
-        return self._d['prec']
+    def precision(self):
+        return self._d['precision']
+
+    @precision.setter
+    def precision(self, value):
+        self._d['precision'] = value
 
     @property
     def load(self):
         return self._d['load']
 
+    @load.setter
+    def load(self, value):
+        self._d['load'] = value
+
     @property
     def jsonPath(self):
         return self._d['jsonPath']
 
-    def save_settings(self, filename):
-        # проверка на то, что все частицы помещаются в окружность
-        if self.n * 2 * self.r > self.d * math.pi:
-            raise ValueError('{} particles with {} radius can not be placed'
-                             'on the ring of '
-                             '{} diameter'.format(self.n, self.r, self.d))
-        with open(filename, mode='w') as f:
-            json.dump(self._d, f)
+    @jsonPath.setter
+    def jsonPath(self, value):
+        self._d['jsonPath'] = value
 
     def __getitem__(self, key):
         return self._d[key]
@@ -153,23 +228,10 @@ class Settings:
     def __setitem__(self, key, value):
         self._d[key] = value
 
-    def __str__(self):
-        anisotropy = ''
-        if self.ot == 0:
-            anisotropy += 'random in 3D'
-        elif self.ot == 1:
-            anisotropy += 'random in 2D'
-        else:
-            anisotropy += 'theta={:.2f}, phi={:.2f}'.format(self.ot_theta, self.ot_phi)
+    def save_settings(self, filename):
+        with open(filename, mode='w') as f:
+            json.dump(self._d, f)
 
-        return 'n = {}\noff = {}\n' \
-               'B = ({:.1e}, {:.1e}, {:.1e})\n\n' \
-               'dipol (m) = {:.2e}\nanisotropy (kan) = {:.2e}\n' \
-               'exchange (jex) = {:.2e}\n' \
-               '\nanisotropy: {}'.format(self.n,
-                                         self.offset, self.b_x,
-                                         self.b_y, self.b_z,
-                                         self.m,
-                                         self.kan, self.jex,
-                                         anisotropy
-                                         )
+    def __str__(self):
+        return 'settings str not implemented'
+
