@@ -168,10 +168,12 @@ class Sample : Serializable {
             Pair<Double, Triple<Double, Double, Double>>,
             Int> {
         var energies = optimizeEnergy()
-        val startEnergy = energies.first
+
+        // energies on start
+        val startEnergy = computeEnergies()
 
         val computeDelta: () -> Double = {
-            val delta = (energies.first.first - energies.second.first) / energies.first.first
+            val delta = (energies.first - energies.second) / energies.first
             if (delta < 0)
                 1 - delta
             else
@@ -189,14 +191,15 @@ class Sample : Serializable {
             numberOfSteps += 1
         }
 
-        val endEnergy = energies.second
+        // energies on end
+        val endEnergy = computeEnergies()
         return Triple(startEnergy, endEnergy, numberOfSteps)
     }
+
     /**
      * @return суммарная энергию образца (пара из полной энергии и тройки энергий по взаимодействиям)
      */
-    fun computeEnergy(): Pair<Double, Triple<Double, Double, Double>> {
-//        val fullE = particles.map { it.computeEnergy() }.sum()
+    fun computeEnergies(): Pair<Double, Triple<Double, Double, Double>> {
         var partE = Triple(0.0, 0.0, 0.0)
         particles.map { it.computeEnergies() }.forEach { partE += it }
         val fullE = partE.first + partE.second + partE.third
@@ -204,12 +207,17 @@ class Sample : Serializable {
     }
 
     /**
+     * @return суммарная энергия образца
+     */
+    fun computeEnergy(): Double = particles.map { it.computeEnergy() }.sum()
+
+
+    /**
      * оптимизирует энергию всех частиц
      * @return энергии до оптимизации и после
      */
-    private fun optimizeEnergy(computedOldEnergy: Pair<Double, Triple<Double, Double, Double>>? = null):
-            Pair<Pair<Double, Triple<Double, Double, Double>>, Pair<Double, Triple<Double, Double, Double>>> {
-        val oldEnergy: Pair<Double, Triple<Double, Double, Double>>
+    private fun optimizeEnergy(computedOldEnergy: Double? = null): Pair<Double, Double> {
+        val oldEnergy: Double
         if (computedOldEnergy == null) {
             particles.forEach { it.computeEffectiveField() }
             oldEnergy = computeEnergy()
