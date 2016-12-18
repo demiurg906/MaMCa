@@ -8,10 +8,10 @@ import java.io.File
 data class Settings(val x: Int = 1, // количество клеток по x
                     val y: Int = 1, // количество клеток по y
                     val z: Int = 1, // количество клеток по z
-                    val n: Int = 1, // число частиц в кольце
+                    val n: Int = 50, // число частиц в кольце
 
                     val r: Double = 1.5, // радиус частицы
-                    val d: Double = 20.0, // диаметр кольца [нм]
+                    val d: Double = 60.0, // диаметр кольца [нм]
                     val offset: Double = 4.0, // расстояние между клетками [нм]
 
                     val m: Double = 800.0, // значение момента [магнетон бора, шт]
@@ -25,7 +25,7 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val viscosity: Double = 0.9, // коэффициент вязкости, 0 <= viscosity <= 1
                     val t: Double = 0.0, // температура [К]
 
-                    val ot: Int = 0, // расположение осей анизотропии
+                    val ot: Int = 2, // расположение осей анизотропии
                     // 0 -- рандом в 3D, 1 -- рандом в 2D, 2 -- заданная ось
                     // отклонение оси анизотропии от оси z и оси x соответственно
                     val ot_theta: Double = 90.0, // [градус]
@@ -35,10 +35,21 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val b_y: Double = 0.0, // поле по y [Тл]
                     val b_z: Double = 0.0, // поле по z [Тл]
 
+                    val time: Double = 1.0, // время релаксации [с]
+
                     val precision: Int = 7, // точность (количтество шагов симуляции)
                     var load: Boolean = false, // загружать ли предыдущее состояние
                     var jsonPath: String = "./resources/out/sample.json" // путь к сохраненному состоянию
 )
+
+// списки с полями типа string и boolean
+// костыль
+val stringFields = setOf("jsonPath")
+val booleanFields = setOf("load")
+
+// количество полей в блоке, отделенном от остальных новой строкой
+// нужен, чтобы поля были логически разделены пустыми строками
+val newLines = listOf(4, 3, 3, 2, 2, 3, 3, 1, 4)
 
 fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()
@@ -47,8 +58,37 @@ fun loadSettingsFromJson(filename: String): Settings {
 }
 
 fun createSettingsJson(filename: String, settings: Settings) {
-    val mapper = jacksonObjectMapper()
-    mapper.writeValue(File(filename), settings)
+    val fields = settings.toString().substringAfter("Settings(").
+            substringBeforeLast(")").split(", ").
+            associate {
+                val (key, value) = it.split("=")
+                key to value
+            }
+    val code = StringBuilder()
+    with (code) {
+        append("{\n")
+        var i = 0
+        var linesCounter = 0
+        for ((field, value) in fields) {
+            if (field in stringFields) {
+                append("  \"$field\":\"$value\",\n")
+            } else {
+                append("  \"$field\":$value,\n")
+            }
+            i += 1
+            if (i == newLines[linesCounter]) {
+                append("\n")
+                linesCounter += 1
+                i = 0
+            }
+        }
+        deleteCharAt(lastIndexOf(","))
+        append("}\n")
+    }
+
+    File(filename).printWriter().use { out ->
+        out.write(code.toString())
+    }
 }
 
 fun main(args: Array<String>) {
@@ -56,6 +96,6 @@ fun main(args: Array<String>) {
     // путь к файлу передается в первом аргументе запуска
     // если запустить без аргументов, то используется путь ./defaultSettings.json
     val defaultSettings = Settings()
-    val pathToDefaultSettings = if (args.isNotEmpty()) args[0] else "defaultSettings.json"
+    val pathToDefaultSettings = if (args.isNotEmpty()) args[0] else "./resources/defaultSettings.json"
     createSettingsJson(pathToDefaultSettings, defaultSettings)
 }

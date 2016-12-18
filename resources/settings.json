@@ -9,14 +9,14 @@
   "offset":4.0,
 
   "m":800.0,
-  "kan":5.0e-2,
-  "jex":0.0e2,
+  "kan":0.05,
+  "jex":100.0,
 
   "dipol_distance":30.0,
   "exchange_distance":4.0,
 
-  "viscosity":1.0,
-  "t":0.1,
+  "viscosity":0.9,
+  "t":0.0,
 
   "ot":2,
   "ot_theta":90.0,
@@ -26,7 +26,9 @@
   "b_y":0.0,
   "b_z":0.0,
 
+  "time":1.0,
+
   "precision":7,
-  "load":true,
+  "load":false,
   "jsonPath":"./resources/out/sample.json"
 }

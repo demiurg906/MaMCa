@@ -1,6 +1,8 @@
 package org.physics.mamca.util
 
 import org.physics.mamca.Settings
+import org.physics.mamca.booleanFields
+import org.physics.mamca.stringFields
 import java.io.File
 
 /**
@@ -13,12 +15,6 @@ fun main(args: Array<String>) {
     val dTab = tab + tab
     val tTab = dTab + tab
     val fTab = tTab + tab
-
-    // списки с полями типа string и boolean
-    // костыль
-    val stringFields = listOf("jsonPath")
-    val booleanFields = listOf("load")
-
 
     // мапа с именами полей и их значениями по-умолчанию
     val fields = Settings().toString().substringAfter("Settings(").
