@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken
 import org.physics.mamca.math.*
 import org.physics.mamca.util.Mathematica
 import org.physics.mamca.util.eFormat
+import org.physics.mamca.util.equalsDouble
 import java.lang.Math.*
 import java.lang.reflect.Type
 
@@ -18,7 +19,15 @@ class Particle {
     // ось анизотропии
     val lma: Vector
 
+    // нормаль к плоскости, в которой вращается момент
+    var eZ: Vector = Vector()
+
     var sample: Sample
+
+    var maxs: List<Pair<Double, Double>> = listOf()
+    var mins: List<Pair<Double, Double>> = listOf()
+
+    var energy: Double = 0.0
 
     private var bEff: Vector = Vector()
 
@@ -80,8 +89,8 @@ class Particle {
     }
 
     fun optimizeEnergy() {
+        // TODO: remove function
         optimizeMomentaPosition()
-        thermalFluctuations()
     }
 
     /**
@@ -89,8 +98,6 @@ class Particle {
      * (с учетом вязкости)
      */
     fun optimizeMomentaPosition() {
-        // нормаль к плоскости, в которой вращается момент
-        val eZ: Vector
         val theta: Double
 
         if (isKollinear(bEff, lma)) {
@@ -130,10 +137,10 @@ class Particle {
         val energyPerPhi = (energies zip roots).sortedBy { it.first }
 
         // минимумы (пары (энергия, угол))
-        val mins = energyPerPhi.dropLast(energyPerPhi.size / 2)
+        mins = energyPerPhi.dropLast(energyPerPhi.size / 2)
 
         // максимумы (пары (энергия, угол))
-        val maxs = energyPerPhi.drop(energyPerPhi.size / 2)
+        maxs = energyPerPhi.drop(energyPerPhi.size / 2)
 
         // итоговое значение phi, на которое будет повернут момент после поворота
         val phi: Double
@@ -141,7 +148,7 @@ class Particle {
             phi = mins[0].second
         } else {
             // два минимума, падаем в ближайший
-            sample.twoMinimums += 1
+            sample.twoMinimums.add(this)
 
             // все относительные углы от 0 до 2 Pi
             // текущее положение момента
@@ -161,22 +168,30 @@ class Particle {
                 phi = mins[1].second
             }
         }
-        rotateMomentaToAngle(phi, eZ)
+        rotateMomentaToAngle(phi)
+        energy = computeEnergy()
     }
 
     /**
      * описывает тепловые колебания момента
      */
-    fun thermalFluctuations() {
-        // TODO: реализовать
+    fun energyJump(): Boolean {
+        val deltaE = Math.min(maxs[0].first, maxs[1].first) - energy
+        val p = Math.exp(-deltaE / sample.KT)
+        if (sample.random.nextDouble() < p) {
+            val currentPhi = lma.angleTo(m, eZ)
+            val minPhi = if (equalsDouble(currentPhi, mins[0].second)) mins[1].second else mins[0].second
+            rotateMomentaToAngle(minPhi)
+            return true
+        }
+        return false
     }
 
     /**
      * поворачивает момент к положению минимума
      * @param minPhi положение минимума
-     * @param eZ нормаль к плоскости, в которой все происходит
      */
-    fun rotateMomentaToAngle(minPhi: Double, eZ: Vector) {
+    fun rotateMomentaToAngle(minPhi: Double) {
         val currentPhi = lma.angleTo(m, eZ)
         val deltaPhi = (currentPhi - minPhi) * sample.settings.viscosity
         m = Matrix(eZ, deltaPhi) * m

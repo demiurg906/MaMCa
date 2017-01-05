@@ -14,6 +14,7 @@ import java.io.Serializable
 import java.lang.Math.cos
 import java.lang.Math.sin
 import java.lang.reflect.Type
+import java.util.*
 
 class Sample : Serializable {
     val b: Vector
@@ -21,7 +22,11 @@ class Sample : Serializable {
     val settings: Settings
     val momentaValue: Double
 
-    var twoMinimums = 0
+    // частицы, у которых обнаружилось два минимума
+    var twoMinimums: MutableSet<Particle> = mutableSetOf()
+
+    val KT: Double
+    val random = Random()
 
     /**
      * пустой конструктор-заглушка
@@ -31,6 +36,7 @@ class Sample : Serializable {
         particles = mutableListOf()
         settings = Settings()
         this.momentaValue = 0.0
+        this.KT = 1.0
     }
 
     /**
@@ -41,6 +47,7 @@ class Sample : Serializable {
         this.particles = particles.toMutableList()
         this.settings = Settings()
         this.momentaValue = 0.0
+        this.KT = 1.0
     }
 
     /**
@@ -53,6 +60,9 @@ class Sample : Serializable {
         this.momentaValue = settings.m * MU_B
         settings.kan *= EV_TO_DJ
         settings.jex /= EV_TO_DJ
+        settings.time += S_TO_NS
+
+        this.KT = settings.t * K
 
         b = Vector(settings.b_x, settings.b_y, settings.b_z)
 
@@ -158,6 +168,36 @@ class Sample : Serializable {
     }
 
     /**
+     * основная функция, оптимизируящая энергию
+     * @return (энергия до оптимизации, энергия после оптимизации, количество шагов оптимизации)
+     */
+    fun processModel(): Triple<
+            Pair<Double, Triple<Double, Double, Double>>,
+            Pair<Double, Triple<Double, Double, Double>>,
+            Int> {
+        var res = processRelaxation()
+        if (settings.t > 0) {
+            for (t in 0..settings.time.toInt() step JUMP_TIME) {
+                if (twoMinimums.isEmpty()) {
+                    break
+                }
+                if (energyJumps()) {
+                    res = processRelaxation()
+                }
+            }
+        }
+        return res
+    }
+
+    fun energyJumps(): Boolean {
+        var res = false
+        for (particle in twoMinimums) {
+            res = particle.energyJump() or res
+        }
+        return res
+    }
+
+    /**
      * основная функция, выполняющая релаксацию системы
      * релаксация происходит в несколько шагов, до тех пор, пока относительное изменение энергии, или пока
      * не будет сосчитано количество шагов, заданное в настройках
@@ -167,6 +207,7 @@ class Sample : Serializable {
             Pair<Double, Triple<Double, Double, Double>>,
             Pair<Double, Triple<Double, Double, Double>>,
             Int> {
+        twoMinimums = mutableSetOf()
         var energies = optimizeEnergy()
 
         // energies on start

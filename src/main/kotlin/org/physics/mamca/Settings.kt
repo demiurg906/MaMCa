@@ -35,7 +35,7 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val b_y: Double = 0.0, // поле по y [Тл]
                     val b_z: Double = 0.0, // поле по z [Тл]
 
-                    val time: Double = 1.0, // время релаксации [с]
+                    var time: Double = 1.0, // время релаксации [с]
 
                     val precision: Int = 7, // точность (количтество шагов симуляции)
                     var load: Boolean = false, // загружать ли предыдущее состояние

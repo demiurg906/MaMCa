@@ -149,7 +149,6 @@ class Vector {
         return Vector(x * c, y * c, z * c)
     }
 
-
     operator fun div(c: Double): Vector {
         return Vector(x / c, y / c, z / c)
     }
