@@ -85,7 +85,7 @@ class Particle {
         // вклад обменного взаимодействия
         var exchange = Vector()
         exchangeParticles.forEach { exchange += it.m }
-        bEff += exchange * sample.settings.jex
+        bEff += exchange * sample.settings.jex * sample.momentaValue
     }
 
     fun optimizeEnergy() {
