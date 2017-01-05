@@ -19,8 +19,8 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     var jex: Double = 1.0e2, // константа обмена [Тл^2 / эВ]
 
                     // расстояния, на которых чувтствуются взаимодействия:
-                    val dipol_distance: Double = 30.0, // диполь-дипольное, [нм]
-                    val exchange_distance: Double = 4.0, // обменное, [нм]
+                    val dipolDistance: Double = 30.0, // диполь-дипольное, [нм]
+                    val exchangeDistance: Double = 4.0, // обменное, [нм]
 
                     val viscosity: Double = 0.9, // коэффициент вязкости, 0 <= viscosity <= 1
                     val t: Double = 0.0, // температура [К]
@@ -39,17 +39,23 @@ data class Settings(val x: Int = 1, // количество клеток по x
 
                     val precision: Int = 7, // точность (количтество шагов симуляции)
                     var load: Boolean = false, // загружать ли предыдущее состояние
-                    var jsonPath: String = "./resources/out/sample.json" // путь к сохраненному состоянию
+                    var jsonPath: String = "./resources/out/sample.json", // путь к сохраненному состоянию
+
+                    val hysteresis: Boolean = false, // нужно ли запускать в режиме гистерезиса
+                    val hysteresisSteps: Int = 7, // количество шагов гистерезиса в ветке от нуля до края
+
+                    val outFolder: String = "./resources/out", // путь к папке для выходных данных
+                    val momentaFileName: String = "momenta.txt" // имя файла, для итогового состояния
 )
 
 // списки с полями типа string и boolean
 // костыль
-val stringFields = setOf("jsonPath")
-val booleanFields = setOf("load")
+val stringFields = setOf("jsonPath", "outFolder", "momentaFileName")
+val booleanFields = setOf("load", "hysteresis")
 
 // количество полей в блоке, отделенном от остальных новой строкой
 // нужен, чтобы поля были логически разделены пустыми строками
-val newLines = listOf(4, 3, 3, 2, 2, 3, 3, 1, 4)
+val newLines = listOf(4, 3, 3, 2, 2, 3, 3, 1, 3, 2, 3)
 
 fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()

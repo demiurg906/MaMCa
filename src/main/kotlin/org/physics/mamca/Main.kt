@@ -1,35 +1,62 @@
 package org.physics.mamca
 
+import org.apache.commons.cli.*
 import org.physics.mamca.util.eFormat
 import org.physics.mamca.util.formatEnergies
 
-/**
- * Основная функция запуска симуляции
- * первым аргументом принимает путь к файлу с настройками
- * создает Sample и запускает моделирование
- */
+
 fun main(args: Array<String>) {
-    val settingsFile: String
-    val outFolder: String
-    if (args.isEmpty()) {
-        settingsFile = "./resources/settings.json"
-        outFolder = "./resources/out"
-    } else {
-        settingsFile = args[0]
-        outFolder = args[1]
+    val options = Options()
+
+    // settings
+    options.addOption(Option.
+            builder("s").
+            required().
+            longOpt("settings").
+            desc("path to json settings file").
+            build()
+    )
+
+    val parser: CommandLineParser = DefaultParser()
+    val formatter: HelpFormatter = HelpFormatter()
+    val cmd: CommandLine
+
+    try {
+        cmd = parser.parse(options, args)
+    } catch (e: ParseException) {
+        System.out.println(e.message)
+        formatter.printHelp("utility-name", options)
+
+        System.exit(1)
+        return
     }
+
+    val settingsFile = cmd.getOptionValue("settings")
+    val settings = loadSettingsFromJson(settingsFile)
+
+    if (!settings.hysteresis) {
+        singleRun(settings)
+    } else {
+        hysteresisRun(settings)
+    }
+}
+
+
+/**
+ * Запускает один цикл симуляции
+ */
+fun singleRun(settings: Settings) {
     val startTime = System.currentTimeMillis()
 
-    val settings = loadSettingsFromJson(settingsFile)
     val sample = Sample(settings)
-    sample.dumpToJsonFile(outFolder, "sample.json")
-    sample.saveState(outFolder = outFolder, filename = "momenta_before.txt")
+    sample.dumpToJsonFile(settings.outFolder, "sample.json")
+    sample.saveState(outFolder = settings.outFolder, filename = "momenta_before.txt")
 
     val midTime = System.currentTimeMillis()
-    val (startEnergies, endEnergies, numberOfSteps) = sample.processRelaxation()
+    val (startEnergies, endEnergies, numberOfSteps) = sample.processModel()
     val startEnergy = startEnergies.first / EV_TO_DJ
     val endEnergy = endEnergies.first / EV_TO_DJ
-    sample.saveState(outFolder = outFolder)
+    sample.saveState(outFolder = settings.outFolder, filename = settings.momentaFileName)
 
     val endTime = System.currentTimeMillis()
 
@@ -44,42 +71,16 @@ fun main(args: Array<String>) {
     println("energies on start is ${formatEnergies(startEnergies.second)} eV")
     println("full energy on end is ${endEnergy.eFormat()} eV")
     println("energies on end is ${formatEnergies(endEnergies.second)} eV")
+    println("diff between enerfies is ${(startEnergy - endEnergy).eFormat()}")
     println("")
     println("number of simulation steps is $numberOfSteps")
-    if (endEnergy > startEnergy) {
-        println("\nWOOOOOOOOOOW\n")
-    }
+
+//    if (endEnergy > startEnergy) {
+//        println("\nWOOOOOOOOOOW\n")
+//    }
     println("$delimiter\n")
 }
 
-//fun tesWTF(settingsFile: String, outFolder: String) {
-//    var settings = loadSettingsFromJson(settingsFile)
-//    var sample = Sample(settings)
-//    sample.dumpToJsonFile(outFolder, "sample.json")
-//    var energy = sample.processRelaxation().first
-//    energy /= EV_TO_DJ
-//    fun printLog() {
-//        val filename = "./resources/${settings.load}_sample"
-//        File(filename).bufferedWriter().use { out ->
-//            out.write("energy: $energy\n")
-//            sample.particles.forEach { out.write("$it\n") }
-//            out.write("b: ${sample.b}, momentaValue: ${sample.momentaValue}\n")
-//            for (particle in sample.particles) {
-//                for (dp in particle.dipolParticles) {
-//                    out.write("$dp\n")
-//                }
-//                for (ep in particle.exchangeParticles) {
-//                    out.write("$ep\n")
-//                }
-//            }
-//        }
-//        println(energy.eFormat(2))
-//    }
-//    printLog()
-//    settings = loadSettingsFromJson(settingsFile)
-//    settings.load = true
-//    sample = Sample(settings)
-//    energy = sample.processRelaxation().first
-//    energy /= EV_TO_DJ
-//    printLog()
-//}
+fun hysteresisRun(settings: Settings) {
+
+}

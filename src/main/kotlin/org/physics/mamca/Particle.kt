@@ -88,16 +88,11 @@ class Particle {
         bEff += exchange * sample.settings.jex * sample.momentaValue
     }
 
-    fun optimizeEnergy() {
-        // TODO: remove function
-        optimizeMomentaPosition()
-    }
-
     /**
      * оптимизирует энергию, путем скатывания момента к положению минимума энергии
      * (с учетом вязкости)
      */
-    fun optimizeMomentaPosition() {
+    fun optimizeEnergy() {
         val theta: Double
 
         if (isKollinear(bEff, lma)) {

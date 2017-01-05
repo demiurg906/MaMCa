@@ -12,8 +12,8 @@
   "kan":0.05,
   "jex":100.0,
 
-  "dipol_distance":30.0,
-  "exchange_distance":4.0,
+  "dipolDistance":30.0,
+  "exchangeDistance":4.0,
 
   "viscosity":0.9,
   "t":0.0,
@@ -30,5 +30,11 @@
 
   "precision":7,
   "load":false,
-  "jsonPath":"./resources/out/sample.json"
+  "jsonPath":"./resources/out/sample.json",
+
+  "hysteresis":false,
+  "hysteresisSteps":7,
+
+  "outFolder":"./resources/out",
+  "momentaFileName":"momenta.txt"
 }

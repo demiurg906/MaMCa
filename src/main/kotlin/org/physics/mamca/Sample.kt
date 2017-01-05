@@ -141,11 +141,11 @@ class Sample : Serializable {
         for ((p1, p2) in pairs(particles)) {
             // расстояние между частицами
             val dist = abs(p1.loc - p2.loc)
-            if (dist < settings.dipol_distance) {
+            if (dist < settings.dipolDistance) {
                 dipolParticles[p1]?.add(p2)
                 dipolParticles[p2]?.add(p1)
             }
-            if (dist < settings.exchange_distance) {
+            if (dist < settings.exchangeDistance) {
                 exchangeParticles[p1]?.add(p2)
                 exchangeParticles[p2]?.add(p1)
             }
