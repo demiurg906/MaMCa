@@ -64,18 +64,18 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
     pythonPath = './build/envs/python35_64/bin/python3'
 }
 
-task create_and_draw(type:Exec) {
-    group = 'python tasks'
-    workingDir './coordinator'
-
-    commandLine pythonPath, 'create_and_draw.py'
-}
-
-task test_py(type: Exec, dependsOn: 'jar') {
+task create_and_draw(type: Exec, dependsOn: 'jar') {
     group = 'python tasks'
     workingDir './'
 
-    commandLine pythonPath, 'coordinator/test.py'
+    commandLine pythonPath, 'coordinator/create_and_draw.py'
+}
+
+task hysteresises(type: Exec, dependsOn: 'jar') {
+    group = 'python tasks'
+    workingDir './'
+
+    commandLine pythonPath, 'coordinator/hysteresises.py'
 }
 
 jar {
