@@ -39,7 +39,7 @@ def pre_clean(func):
             sample_file = settings.jsonPath.split('/')[-1]
         else:
             sample_file = ''
-        _clear_out_folder(out, sample_file)
+        # _clear_out_folder(out, sample_file)
         func(*args, **kwargs)
         # dumpedState = '{}/sample.json'.format(out)
         # if os.path.exists(dumpedState):
@@ -58,8 +58,8 @@ def single_run(settings_fname=None, out_folder=None, mamca_path=None):
     """
     print('Single run just started')
     subprocess.run(
-        # 'java -jar {} {} {}'.format(mamca_path, settings_fname, out_folder),
-        exe(mamca_path, settings_fname, out_folder),
+        'java -jar {} -s {}'.format(mamca_path, settings_fname),
+        # exe(mamca_path, settings_fname, out_folder),
         stdout=sys.stdout, stderr=sys.stderr, )
     print('Single run has finished')
 

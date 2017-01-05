@@ -22,7 +22,7 @@
   "ot_theta":90.0,
   "ot_phi":0.0,
 
-  "b_x":0.0,
+  "b_x":100.0,
   "b_y":0.0,
   "b_z":0.0,
 
@@ -32,9 +32,9 @@
   "load":false,
   "jsonPath":"./resources/out/sample.json",
 
-  "hysteresis":false,
-  "hysteresisSteps":7,
+  "hysteresis":true,
+  "hysteresisSteps":5,
 
-  "outFolder":"./resources/out",
+  "outFolder":"./resources/out/hyst",
   "momentaFileName":"momenta.txt"
 }

@@ -178,12 +178,17 @@ def create_hysteresis_gif(out_folder, pic_folder, borders=None,
     names = []
     b_fields = {}
     signs = {'fst': 0, 'neg': 1, 'pos': 2}
+    files = []
 
     for f in os.listdir(out_folder):
-        _, sign, *b = f[:-4].split(',')
+        try:
+            _, sign, *b = f[:-4].split(',')
+        except ValueError:
+            continue
         b = list(map(lambda x: int(float(x)), b))
         names.append([signs[sign], *b, f])
         b_fields[f] = b
+        files.append(f)
 
     def cmp(x, y):
         if x[0] != y[0]:
@@ -201,7 +206,7 @@ def create_hysteresis_gif(out_folder, pic_folder, borders=None,
         os.mkdir(pic_folder)
     if clear:
         _clear_folder(pic_folder)
-    for f in os.listdir(out_folder):
+    for f in files:
         if is3d:
             draw_3d_vectors_plot(
                 '{}/{}'.format(out_folder, f), borders=borders,

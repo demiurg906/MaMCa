@@ -3,6 +3,7 @@ package org.physics.mamca.math
 import com.google.gson.Gson
 import org.physics.mamca.util.eFormat
 import org.physics.mamca.util.equalsDouble
+import java.lang.Math.pow
 
 class Vector {
     var x: Double = 0.0
@@ -149,8 +150,19 @@ class Vector {
         return Vector(x * c, y * c, z * c)
     }
 
+    operator fun div(c: Int): Vector {
+        return Vector(x / c, y / c, z / c)
+    }
+
     operator fun div(c: Double): Vector {
         return Vector(x / c, y / c, z / c)
+    }
+
+    /**
+     * поэлементное деление векторов
+     */
+    operator fun div(other: Vector): Vector {
+        return Vector(x / other.x, y / other.y, z / other.z)
     }
 
     /**
@@ -161,6 +173,11 @@ class Vector {
                 this.z * other.x - this.x * other.z,
                 this.x * other.y - this.y * other.x)
     }
+
+    /**
+     * возведение всех элементов вектора в степень c
+     */
+    operator fun mod(c: Double): Vector = Vector(pow(x, c), pow(y, c), pow(z, c))
 
     /**
      * возвращает направленное значение угла между двумя векторами

@@ -17,7 +17,7 @@ import java.lang.reflect.Type
 import java.util.*
 
 class Sample : Serializable {
-    val b: Vector
+    var b: Vector
     val particles: MutableList<Particle>
     val settings: Settings
     val momentaValue: Double

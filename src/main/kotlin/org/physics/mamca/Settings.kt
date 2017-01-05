@@ -22,7 +22,7 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val dipolDistance: Double = 30.0, // диполь-дипольное, [нм]
                     val exchangeDistance: Double = 4.0, // обменное, [нм]
 
-                    val viscosity: Double = 0.9, // коэффициент вязкости, 0 <= viscosity <= 1
+                    var viscosity: Double = 0.9, // коэффициент вязкости, 0 <= viscosity <= 1
                     val t: Double = 0.0, // температура [К]
 
                     val ot: Int = 2, // расположение осей анизотропии
@@ -43,6 +43,7 @@ data class Settings(val x: Int = 1, // количество клеток по x
 
                     val hysteresis: Boolean = false, // нужно ли запускать в режиме гистерезиса
                     val hysteresisSteps: Int = 7, // количество шагов гистерезиса в ветке от нуля до края
+                    val hysteresisLogScale: Double = 0.1, // доля линейной области от всего диапазона поля
 
                     val outFolder: String = "./resources/out", // путь к папке для выходных данных
                     val momentaFileName: String = "momenta.txt" // имя файла, для итогового состояния

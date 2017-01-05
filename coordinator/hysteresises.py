@@ -51,29 +51,23 @@ class ThreadPool:
 
 
 def single_hyst_run():
-    cur_folder = out_folder
-    if not os.path.exists(cur_folder):
-        os.mkdir(cur_folder)
-    s = def_s
-    s.save_settings(cur_settings)
-    hysteresis_log_run(out_folder=cur_folder, settings_fname=cur_settings,
-                       k=5, precision=1)
+    single_run(settings_fname=settings, out_folder=out_folder)
 
 
 def single_draw_hyst():
     cur_folder = out_folder
     draw_hyst_plot(cur_folder, 'x', 'x',  # filter=[20, 20, 60, 60],
-                   settings_fname=cur_settings, pic_dir=pic_folder,
+                   pic_dir=pic_folder,
                    save=True, name='0_hyst_plot')
     draw_hyst_plot(cur_folder, 'x', 'x', direction='fst',  # filter=[20, 20, 60, 60],
-                   settings_fname=cur_settings, pic_dir=pic_folder,
+                   pic_dir=pic_folder,
                    save=True, name='1_hyst_plot_fst')
-    draw_hyst_plot(cur_folder, 'x', 'x', direction='pos',  # filter=[20, 20, 60, 60],
-                   settings_fname=cur_settings, pic_dir=pic_folder,
-                   save=True, name='2_hyst_plot_pos')
     draw_hyst_plot(cur_folder, 'x', 'x', direction='neg',  # filter=[20, 20, 60, 60],
-                   settings_fname=cur_settings, pic_dir=pic_folder,
-                   save=True, name='3_hyst_plot_neg')
+                   pic_dir=pic_folder,
+                   save=True, name='2_hyst_plot_neg')
+    draw_hyst_plot(cur_folder, 'x', 'x', direction='pos',  # filter=[20, 20, 60, 60],
+                   pic_dir=pic_folder,
+                   save=True, name='3_hyst_plot_pos')
 
 
 def create_gif():
@@ -92,15 +86,15 @@ def prepare_folder(path):
 if __name__ == '__main__':
     start_time = time.time()
 
-    parent_out_folder = 'resources/out/out_hyst'
+    parent_out_folder = 'resources/out/hyst'
     out_folder = parent_out_folder
     pic_folder = 'resources/pictures/hysteresis'
     settings = 'resources/settings.json'
 
     cur_settings = 'resources/current_settings.json'
 
-    prepare_folder(parent_out_folder)
-    prepare_folder(pic_folder)
+    # prepare_folder(parent_out_folder)
+    # prepare_folder(pic_folder)
 
     def_s = Settings(settings)
 
