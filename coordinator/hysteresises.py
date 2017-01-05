@@ -1,3 +1,5 @@
+import time
+
 from mamca import *
 
 import os
@@ -48,62 +50,75 @@ class ThreadPool:
         self.tasks.join()
 
 
-def single_hyst_run(ms, kan, jex):
-    cur_folder = out_folder.format(ms, kan, jex)
+def single_hyst_run():
+    cur_folder = out_folder
     if not os.path.exists(cur_folder):
         os.mkdir(cur_folder)
-    cur_settings = '{0}/{1}.txt'.format(parent_out_folder,
-                                        template.format(ms, kan, jex))
-    s = Settings(settings)
-    s['ms'] = ms
-    s['kan'] = kan
-    s['jex'] = jex
+    s = def_s
     s.save_settings(cur_settings)
     hysteresis_log_run(out_folder=cur_folder, settings_fname=cur_settings,
-                       k=5, prec=1)
+                       k=5, precision=1)
 
 
-def single_draw_hyst(ms, kan, jex):
-    cur_folder = out_folder.format(ms, kan, jex)
-    cur_settings = '{0}/{1}.txt'.format(parent_out_folder,
-                                        template.format(ms, kan, jex))
-    draw_hyst_plot(cur_folder, 'x', 'x', filter=[20, 20, 60, 60],
+def single_draw_hyst():
+    cur_folder = out_folder
+    draw_hyst_plot(cur_folder, 'x', 'x',  # filter=[20, 20, 60, 60],
                    settings_fname=cur_settings, pic_dir=pic_folder,
-                   save=True, name=template.format(ms, kan, jex))
+                   save=True, name='0_hyst_plot')
+    draw_hyst_plot(cur_folder, 'x', 'x', direction='fst',  # filter=[20, 20, 60, 60],
+                   settings_fname=cur_settings, pic_dir=pic_folder,
+                   save=True, name='1_hyst_plot_fst')
+    draw_hyst_plot(cur_folder, 'x', 'x', direction='pos',  # filter=[20, 20, 60, 60],
+                   settings_fname=cur_settings, pic_dir=pic_folder,
+                   save=True, name='2_hyst_plot_pos')
+    draw_hyst_plot(cur_folder, 'x', 'x', direction='neg',  # filter=[20, 20, 60, 60],
+                   settings_fname=cur_settings, pic_dir=pic_folder,
+                   save=True, name='3_hyst_plot_neg')
+
+
+def create_gif():
+    create_hysteresis_gif(out_folder, '{}/gif'.format(pic_folder),
+                          borders=[30, 30, 30], negative_borders=True,
+                          scale=2)
 
 
 def prepare_folder(path):
     if os.path.exists(path):
-        shutil.rmtree(path)
-    os.mkdir(path)
+        shutil.rmtree(path, ignore_errors=True)
+    if not os.path.exists(path):
+        os.mkdir(path)
+
 
 if __name__ == '__main__':
-    template = 'ms={:.0e},_kan={:.0e},_jex={:.0e}'
-    parent_out_folder = 'out_hysts_'
-    out_folder = parent_out_folder + '/' + template
-    pic_folder = 'Screenshots/hysteresises_'
-    settings = 'settings.txt'
+    start_time = time.time()
+
+    parent_out_folder = 'resources/out/out_hyst'
+    out_folder = parent_out_folder
+    pic_folder = 'resources/pictures/hysteresis'
+    settings = 'resources/settings.json'
+
+    cur_settings = 'resources/current_settings.json'
 
     prepare_folder(parent_out_folder)
     prepare_folder(pic_folder)
 
-    tens = [10 ** (i - 3) for i in range(7)]
     def_s = Settings(settings)
 
-    to_grad = lambda x: [x * ten for ten in tens]
-    ms_s = to_grad(def_s['ms'])
-    kan_s = to_grad(def_s['kan'])
-    jex_s = to_grad(def_s['jex'])
-    args = [(ms, def_s['kan'], def_s['jex']) for ms in ms_s] + \
-           [(def_s['ms'], kan, def_s['jex']) for kan in kan_s] + \
-           [(def_s['ms'], def_s['kan'], jex) for jex in jex_s]
-    # args = list(product(ms_s, kan_s, jex_s))
+    single_hyst_run()
+    single_draw_hyst()
+    create_gif()
 
-    pool = ThreadPool(4)
-    for arg in args:
-        pool.add_task(single_hyst_run, *arg)
-    pool.wait_completion()
+    end_time = time.time()
+    print(('-' * 50 + '\n') * 3)
+    print('time of work is {:.2f} seconds'.format(end_time - start_time))
 
-    for arg in args:
-        single_draw_hyst(*arg)
+    # args = list(product(ms_s,
+    #  kan_s, jex_s))
+    # pool = ThreadPool(4)
+    # for arg in args:
+    #     pool.add_task(single_hyst_run, *arg)
+    # pool.wait_completion()
+    #
+    # for arg in args:
+    #     single_draw_hyst(*arg)
 

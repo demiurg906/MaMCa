@@ -2,6 +2,7 @@ default_out_folder = './resources/out'
 default_settings_fname = './resources/settings.json'
 default_mamca_path = './build/libs/MaMCa.jar'
 kotlin_path = './'
+JAVA_PATH = 'E:\\Soft\\Java\\jdk1.8.0_111\\bin\\java.exe'
 
 
 def get_default_out_folder():

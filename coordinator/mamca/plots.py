@@ -134,7 +134,10 @@ def draw_hyst_plot(folder, b_axis, m_axis, label=None, borders=None,
     min_b, max_b = np.inf, -np.inf
     min_m, max_m = np.inf, -np.inf
     for f in os.listdir(folder):
-        s, sign, *b = f[:-4].split(',')
+        try:
+            s, sign, *b = f[:-4].split(',')
+        except ValueError:
+            continue
         if sign not in direction:
             continue
         b = float(b[axises[b_axis]])
@@ -159,7 +162,7 @@ def draw_hyst_plot(folder, b_axis, m_axis, label=None, borders=None,
 
 def create_hysteresis_gif(out_folder, pic_folder, borders=None,
                           negative_borders=False, clear=True,
-                          show=False, is3d=True):
+                          show=False, is3d=True, scale=1):
     """
     Рисует набор трехмерных графиков для цикла гистерезиса
     :param out_folder: путь к папке с данными о гистерезисе
@@ -170,6 +173,7 @@ def create_hysteresis_gif(out_folder, pic_folder, borders=None,
     :param(bool) clear: очищать ли папку со скриншотами перед сохранением
     :param(bool) show: отображать ли окна с графиками
     :param(bool) is3d: рисовать трехмерный график или двумерный в осяц x y
+    :param(float) scale: масштаб для стрелочек
     """
     names = []
     b_fields = {}
@@ -204,7 +208,7 @@ def create_hysteresis_gif(out_folder, pic_folder, borders=None,
                 negative_borders=negative_borders, save=not show,
                 pic_dir=pic_folder, name=d_names[f],
                 text='B = ({}, {}, {})'.format(*b_fields[f]),
-                draw_particles=False)
+                draw_particles=False, scale=scale)
         else:
             draw_xy_vectors_plot(
                 '{}/{}'.format(out_folder, f), borders=borders,

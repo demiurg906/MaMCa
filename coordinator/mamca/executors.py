@@ -6,16 +6,20 @@ import subprocess
 from functools import wraps
 
 from .default_names import get_default_settings_file, get_default_mamca_path, \
-    get_default_out_folder
+    get_default_out_folder, JAVA_PATH
 from .settings import Settings
 
 
-#
+def exe(mamca_path, settings_fname, out_folder, momenta_filename='momenta.txt'):
+    return [JAVA_PATH, '-jar', mamca_path, settings_fname, out_folder, momenta_filename]
+
+
 def pre_clean(func):
     """
     Декоратор, подготавлявающий выходную папку.
         если ее нет, и очищает ее, если в ней что-то есть
     """
+
     @wraps(func)
     def inner(*args, **kwargs):
         if kwargs.get('settings_fname', None) is None:
@@ -40,6 +44,7 @@ def pre_clean(func):
         # dumpedState = '{}/sample.json'.format(out)
         # if os.path.exists(dumpedState):
         #     os.remove(dumpedState)
+
     return inner
 
 
@@ -54,14 +59,14 @@ def single_run(settings_fname=None, out_folder=None, mamca_path=None):
     print('Single run just started')
     subprocess.run(
         # 'java -jar {} {} {}'.format(mamca_path, settings_fname, out_folder),
-        ['java', '-jar', mamca_path, settings_fname, out_folder],
-        stdout=sys.stdout, stderr=sys.stderr,)
+        exe(mamca_path, settings_fname, out_folder),
+        stdout=sys.stdout, stderr=sys.stderr, )
     print('Single run has finished')
 
 
 @pre_clean
 def hysteresis_log_run(k=3, n=None, settings_fname=None, out_folder=None,
-                       mamca_path=None, min_log_scale=0.1, prec=1):
+                       mamca_path=None, min_log_scale=0.1, precision=1):
     """
     Запускает моделирование петли гистерезиса с показательным шагом
     :param k: количество линейных шагов
@@ -70,7 +75,7 @@ def hysteresis_log_run(k=3, n=None, settings_fname=None, out_folder=None,
     :param out_folder: путь к выходной папке
     :param mamca_path: путь к исполняемому файлу моделирующей программы
     :param min_log_scale: доля линейной области от всего диапазона поля
-    :param prec: точность вычисления
+    :param precision: точность вычисления
     """
     if n is None:
         s = 1 + 4 / k
@@ -79,16 +84,16 @@ def hysteresis_log_run(k=3, n=None, settings_fname=None, out_folder=None,
     print('Hysteresis cycle started')
     print('There will be {} steps'.format(int(5 * number_of_steps / 2)))
     s = Settings(settings_fname)
-    s['load'] = False
-    temp_settings_fname = out_folder + '/temp_settings.txt'
+    s.load = False
+    temp_settings_fname = out_folder + './temp_settings.json'
 
-    max_bx = s['b_x']
-    max_by = s['b_y']
-    max_bz = s['b_z']
+    max_bx = s.b_x
+    max_by = s.b_y
+    max_bz = s.b_z
 
-    min_log_bx = s['b_x'] * min_log_scale
-    min_log_by = s['b_y'] * min_log_scale
-    min_log_bz = s['b_z'] * min_log_scale
+    min_log_bx = s.b_x * min_log_scale
+    min_log_by = s.b_y * min_log_scale
+    min_log_bz = s.b_z * min_log_scale
 
     bx_lin_step = min_log_bx / k
     by_lin_step = min_log_by / k
@@ -101,9 +106,9 @@ def hysteresis_log_run(k=3, n=None, settings_fname=None, out_folder=None,
     if min_log_bz == 0:
         min_log_bz = 1
 
-    bx_log_step = (s['b_x'] / min_log_bx) ** (1 / (n - 1))
-    by_log_step = (s['b_y'] / min_log_by) ** (1 / (n - 1))
-    bz_log_step = (s['b_z'] / min_log_bz) ** (1 / (n - 1))
+    bx_log_step = (s.b_x / min_log_bx) ** (1 / (n - 1))
+    by_log_step = (s.b_y / min_log_by) ** (1 / (n - 1))
+    bz_log_step = (s.b_z / min_log_bz) ** (1 / (n - 1))
 
     if bx_log_step == 0:
         bx_log_step = 1
@@ -114,80 +119,70 @@ def hysteresis_log_run(k=3, n=None, settings_fname=None, out_folder=None,
 
     def step(i, inc):
         if i < n - 1:
-            s['visc'] = 0.5
-            s['b_x'] /= bx_log_step
-            s['b_y'] /= by_log_step
-            s['b_z'] /= bz_log_step
+            s.viscosity = 0.5
+            s.b_x /= bx_log_step
+            s.b_y /= by_log_step
+            s.b_z /= bz_log_step
         elif n - 1 <= i < n - 1 + 2 * k:
-            s['visc'] = 0.05
+            s.viscosity = 0.05
             op = lambda x, y: x + y if inc else x - y
-            s['b_x'] = op(s['b_x'], bx_lin_step)
-            s['b_y'] = op(s['b_y'], by_lin_step)
-            s['b_z'] = op(s['b_z'], bz_lin_step)
+            s.b_x = op(s.b_x, bx_lin_step)
+            s.b_y = op(s.b_y, by_lin_step)
+            s.b_z = op(s.b_z, bz_lin_step)
         else:
-            s['visc'] = 0.5
-            s['b_x'] *= bx_log_step
-            s['b_y'] *= by_log_step
-            s['b_z'] *= bz_log_step
+            s.viscosity = 0.5
+            s.b_x *= bx_log_step
+            s.b_y *= by_log_step
+            s.b_z *= bz_log_step
 
-    s['b_x'] = 0
-    s['b_y'] = 0
-    s['b_z'] = 0
+    s.b_x = 0
+    s.b_y = 0
+    s.b_z = 0
     s.save_settings(temp_settings_fname)
-    s['prec'] = prec
-    s['load'] = True
+    s.precision = precision
+    s.load = True
+
+    momenta_filename_template = 'hyst,{},{:.2f},{:.2f},{:.2f}.txt'
 
     print('Magnetic field began to increase')
     print('Wait {} steps'.format(number_of_steps // 2))
     for i in range(number_of_steps // 2, number_of_steps):
         subprocess.run(
-            '{} -s {} -o {} -f {}'.format(mamca_path, temp_settings_fname,
-                                          out_folder,
-                                          'hyst,{},{},{},{}'.format('fst',
-                                                                    s['b_x'],
-                                                                    s['b_y'],
-                                                                    s['b_z'])),
+            exe(mamca_path, temp_settings_fname, out_folder,
+                momenta_filename_template.format('fst', s.b_x, s.b_y, s.b_z)),
             stdout=sys.stdout, stderr=sys.stderr)
         step(i, True)
         s.save_settings(temp_settings_fname)
         print('{} of {} steps completed'.format(i + 1 - number_of_steps // 2,
                                                 number_of_steps // 2))
 
-    s['b_x'] = max_bx
-    s['b_y'] = max_by
-    s['b_z'] = max_bz
+    s.b_x = max_bx
+    s.b_y = max_by
+    s.b_z = max_bz
     s.save_settings(temp_settings_fname)
 
     print('Magnetic field began to decline')
     print('Wait {} steps'.format(number_of_steps))
     for i in range(number_of_steps):
         subprocess.run(
-            '{} -s {} -o {} -f {}'.format(mamca_path, temp_settings_fname,
-                                          out_folder,
-                                          'hyst,{},{},{},{}'.format('neg',
-                                                                    s['b_x'],
-                                                                    s['b_y'],
-                                                                    s['b_z'])),
+            exe(mamca_path, temp_settings_fname, out_folder,
+                momenta_filename_template.format('neg', s.b_x, s.b_y, s.b_z)),
             stdout=sys.stdout, stderr=sys.stderr)
         step(i, False)
         s.save_settings(temp_settings_fname)
         print('{} of {} steps completed'.format(i + 1, number_of_steps))
 
-    s['b_x'] = -max_bx
-    s['b_y'] = -max_by
-    s['b_z'] = -max_bz
+    s.b_x = -max_bx
+    s.b_y = -max_by
+    s.b_z = -max_bz
     s.save_settings(temp_settings_fname)
 
     print('Magnetic field began to increase')
     print('Wait another {} steps'.format(number_of_steps))
     for i in range(number_of_steps):
         subprocess.run(
-            '{} -s {} -o {} -f {}'.format(mamca_path, temp_settings_fname,
-                                          out_folder,
-                                          'hyst,{},{},{},{}'.format('pos',
-                                                                    s['b_x'],
-                                                                    s['b_y'],
-                                                                    s['b_z'])),
+            exe(mamca_path, temp_settings_fname, out_folder,
+                momenta_filename_template.format('pos', s.b_x, s.b_y, s.b_z)),
             stdout=sys.stdout, stderr=sys.stderr)
         step(i, True)
         s.save_settings(temp_settings_fname)
@@ -272,6 +267,7 @@ def cycle_one_parameter(par_name, start, end, step, addition=True,
     :param mamca_path: путь к исполняемому файлу моделирующей программы
     :return:
     """
+
     def op(x, y):
         return x + y if addition else x * y
 

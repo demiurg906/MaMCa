@@ -12,9 +12,9 @@ class Settings:
         self._d['x'] = 1
         self._d['y'] = 1
         self._d['z'] = 1
-        self._d['n'] = 1
+        self._d['n'] = 50
         self._d['r'] = 1.5
-        self._d['d'] = 20.0
+        self._d['d'] = 60.0
         self._d['offset'] = 4.0
         self._d['m'] = 800.0
         self._d['kan'] = 0.05
@@ -23,12 +23,13 @@ class Settings:
         self._d['exchange_distance'] = 4.0
         self._d['viscosity'] = 0.9
         self._d['t'] = 0.0
-        self._d['ot'] = 0
+        self._d['ot'] = 2
         self._d['ot_theta'] = 90.0
         self._d['ot_phi'] = 0.0
         self._d['b_x'] = 0.0
         self._d['b_y'] = 0.0
         self._d['b_z'] = 0.0
+        self._d['time'] = 1.0
         self._d['precision'] = 7
         self._d['load'] = False
         self._d['jsonPath'] = './resources/out/sample.json'
@@ -197,6 +198,14 @@ class Settings:
     @b_z.setter
     def b_z(self, value):
         self._d['b_z'] = value
+
+    @property
+    def time(self):
+        return self._d['time']
+
+    @time.setter
+    def time(self, value):
+        self._d['time'] = value
 
     @property
     def precision(self):
