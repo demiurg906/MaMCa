@@ -106,8 +106,9 @@ fun hysteresisRun(settings: Settings) {
     val numberOfSteps = 2 * (n + k) - 1
 
     val maxB = Vector(settings.b_x, settings.b_y, settings.b_z)
-    val minLogB = switchZerosToOnes(maxB * settings.hysteresisLogScale)
+    var minLogB = maxB * settings.hysteresisLogScale
     val bLinStep = minLogB / k
+    minLogB = switchZerosToOnes(minLogB)
     val bLogStep = switchZerosToOnes(maxB / minLogB) % (1.0 / (n - 1))
 
     fun step(i: Int, inc: Boolean, direction: String) {
