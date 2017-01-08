@@ -40,6 +40,7 @@ class Settings:
         self._d['resourcesFolder'] = './resources'
         self._d['outFolder'] = 'out'
         self._d['picFolder'] = 'pictures'
+        self._d['logFolder'] = 'log'
         self._d['momentaFileName'] = 'momenta.txt'
         if filename is not None:
             with open(filename) as f:
@@ -294,6 +295,14 @@ class Settings:
     @picFolder.setter
     def picFolder(self, value):
         self._d['picFolder'] = value
+
+    @property
+    def logFolder(self):
+        return self._d['logFolder']
+
+    @logFolder.setter
+    def logFolder(self, value):
+        self._d['logFolder'] = value
 
     @property
     def momentaFileName(self):

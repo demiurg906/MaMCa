@@ -39,6 +39,8 @@ fun main(args: Array<String>) {
     val settingsFile = cmd.getOptionValue("settings")
     val settings = loadSettingsFromJson(settingsFile)
 
+    prepareFolders(settings)
+
     if (!settings.hysteresis) {
         singleRun(settings)
     } else {
@@ -49,6 +51,19 @@ fun main(args: Array<String>) {
 //    Sound.playSound("./resources/notifications/office-2.wav").join()
 }
 
+
+/**
+ * создает все выходные папки, если их нет
+ */
+fun prepareFolders(settings: Settings) {
+    val folders = listOf(
+            File("${settings.resourcesFolder}/${settings.outFolder}"),
+            File("${settings.resourcesFolder}/${settings.picFolder}"),
+            File("${settings.resourcesFolder}/${settings.logFolder}")
+    )
+
+    folders.filterNot { it.exists() }.forEach { it.mkdir() }
+}
 
 /**
  * Запускает один цикл симуляции
@@ -71,24 +86,32 @@ fun singleRun(settings: Settings) {
     val endTime = System.currentTimeMillis()
 
     val delimiter = "---------------------------------------------------"
-    println("\n$delimiter")
-    println("time of working is ${(endTime - startTime) / 1000.0} seconds")
-    println("time of computation is ${(endTime - midTime) / 1000.0} seconds")
-    println("sample size is ${settings.x}x${settings.y}x${settings.z} with ${settings.n} particles per ring")
-    println("total number of particles is ${settings.x * settings.y * settings.z * settings.n}")
-    println("")
-    println("full energy on start is ${startEnergy.eFormat()} eV")
-    println("energies on start is ${formatEnergies(startEnergies.second)} eV")
-    println("full energy on end is ${endEnergy.eFormat()} eV")
-    println("energies on end is ${formatEnergies(endEnergies.second)} eV")
-    println("diff between enerfies is ${(startEnergy - endEnergy).eFormat()}")
-    println("")
-    println("number of simulation steps is $numberOfSteps")
+    
+    val log = StringBuilder().apply {
+        append("\n$delimiter\n")
+        append("time of working is ${(endTime - startTime) / 1000.0} seconds\n")
+        append("time of computation is ${(endTime - midTime) / 1000.0} seconds\n")
+        append("sample size is ${settings.x}x${settings.y}x${settings.z} with ${settings.n} particles per ring\n")
+        append("total number of particles is ${settings.x * settings.y * settings.z * settings.n}\n")
+        append("\n")
+        append("full energy on start is ${startEnergy.eFormat()} eV\n")
+        append("energies on start is ${formatEnergies(startEnergies.second)} eV\n")
+        append("full energy on end is ${endEnergy.eFormat()} eV\n")
+        append("energies on end is ${formatEnergies(endEnergies.second)} eV\n")
+        append("diff between enerfies is ${(startEnergy - endEnergy).eFormat()}\n")
+        append("\n")
+        append("number of simulation steps is $numberOfSteps\n")
 
-    if (endEnergy > startEnergy) {
-        println("\nWOOOOOOOOOOW\n")
+        if (endEnergy > startEnergy) {
+            append("\nWOOOOOOOOOOW\n\n")
+        }
+        append("$delimiter\n\n")
+    }.toString()
+
+    print(log)
+    File("${settings.resourcesFolder}/${settings.logFolder}/${settings.name}.log").printWriter().use { out ->
+        out.write(log)
     }
-    println("$delimiter\n")
 }
 
 fun hysteresisRun(settings: Settings) {

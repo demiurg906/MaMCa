@@ -41,5 +41,6 @@
   "resourcesFolder":"./resources",
   "outFolder":"out",
   "picFolder":"pictures",
+  "logFolder":"log",
   "momentaFileName":"momenta.txt"
 }
