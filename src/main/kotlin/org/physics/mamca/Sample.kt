@@ -14,6 +14,7 @@ import java.io.Serializable
 import java.lang.Math.cos
 import java.lang.Math.sin
 import java.lang.reflect.Type
+import java.nio.charset.Charset
 import java.util.*
 
 class Sample : Serializable {
@@ -60,7 +61,7 @@ class Sample : Serializable {
         this.momentaValue = settings.m * MU_B
         settings.kan *= EV_TO_DJ
         settings.jex /= EV_TO_DJ
-        settings.time += S_TO_NS
+        settings.time *= S_TO_NS
 
         this.KT = settings.t * K
 
@@ -68,7 +69,7 @@ class Sample : Serializable {
 
         // инициализация образца
         if (settings.load) {
-            val json = FileUtils.readFileToString(File(settings.jsonPath))
+            val json = FileUtils.readFileToString(File(settings.jsonPath), Charset.defaultCharset())
             val gson = GsonBuilder().registerTypeAdapter(this.javaClass, SampleDeserializer()).create()
             val sample: Sample = gson.fromJson(json, getType())
             this.particles = sample.particles
@@ -182,6 +183,7 @@ class Sample : Serializable {
                     break
                 }
                 if (energyJumps()) {
+                    println("t is ${t / S_TO_NS} seconds")
                     res = processRelaxation()
                 }
             }
@@ -208,10 +210,10 @@ class Sample : Serializable {
             Pair<Double, Triple<Double, Double, Double>>,
             Int> {
         twoMinimums = mutableSetOf()
-        var energies = optimizeEnergy()
-
         // energies on start
         val startEnergy = computeEnergies()
+
+        var energies = optimizeEnergy()
 
         val computeDelta: () -> Double = {
             val delta = (energies.first - energies.second) / energies.first
