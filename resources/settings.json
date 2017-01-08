@@ -9,7 +9,7 @@
   "offset":4.0,
 
   "m":800.0,
-  "kan":50,
+  "kan":0.05,
   "jex":100.0,
 
   "dipolDistance":30.0,
@@ -26,9 +26,11 @@
   "b_y":0.0,
   "b_z":0.0,
 
-  "time":1.0e-3,
+  "time":1.0,
 
-  "precision":15,
+  "name":"default",
+
+  "precision":7,
   "load":false,
   "jsonPath":"./resources/out/sample.json",
 

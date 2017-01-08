@@ -30,6 +30,7 @@ class Settings:
         self._d['b_y'] = 0.0
         self._d['b_z'] = 0.0
         self._d['time'] = 1.0
+        self._d['name'] = 'default'
         self._d['precision'] = 7
         self._d['load'] = False
         self._d['jsonPath'] = './resources/out/sample.json'
@@ -213,6 +214,14 @@ class Settings:
     @time.setter
     def time(self, value):
         self._d['time'] = value
+
+    @property
+    def name(self):
+        return self._d['name']
+
+    @name.setter
+    def name(self, value):
+        self._d['name'] = value
 
     @property
     def precision(self):

@@ -230,8 +230,8 @@ def create_hysteresis_gif(*, settings_fname, borders=None,
 
 def draw_both_3d_vectors_plots(*, settings_fname: str=None, borders: list=None,
                                negative_borders: bool=True, label: str=None,
-                               save: bool=False, name: str=None,
-                               text: str=None, draw_particles: bool=True, scale: float=1):
+                               save: bool=False, text: str=None,
+                               draw_particles: bool=True, scale: float=1):
     """
     Рисует графики состояний до и после оптимизации
     :param settings_fname:
@@ -250,7 +250,6 @@ def draw_both_3d_vectors_plots(*, settings_fname: str=None, borders: list=None,
                          negative_borders=negative_borders,
                          label=label,
                          save=save,
-                         name=name,
                          text=text,
                          draw_particles=draw_particles,
                          scale=scale,
@@ -261,7 +260,6 @@ def draw_both_3d_vectors_plots(*, settings_fname: str=None, borders: list=None,
                          negative_borders=negative_borders,
                          label=label,
                          save=save,
-                         name=name,
                          text=text,
                          draw_particles=draw_particles,
                          scale=scale,
@@ -272,8 +270,8 @@ def draw_both_3d_vectors_plots(*, settings_fname: str=None, borders: list=None,
 @prepare_dir_wrapper
 def draw_3d_vectors_plot(*, settings_fname: str=None, borders: list=None,
                          negative_borders: bool=True, label: str=None,
-                         save: bool=False, name: str=None,
-                         text: str=None, draw_particles: bool=True, scale: float=1,
+                         save: bool=False, text: str=None,
+                         draw_particles: bool=True, scale: float=1,
                          at_start: bool=False):
     """
     Рисует трехмерный график веторов
@@ -295,10 +293,10 @@ def draw_3d_vectors_plot(*, settings_fname: str=None, borders: list=None,
     """
     settings = Settings(settings_fname)
     filename = '{}/{}/{}'.format(settings.resourcesFolder, settings.outFolder, settings.momentaFileName)
+    name = settings.name
     if at_start:
-        filename = filename[:-4] + '_at_start.txt'
-        if name is not None:
-            name += '_at_start'
+        filename = filename[:-4] + '.at_start.txt'
+        name += '_at_start'
     pic_dir = '{}/{}'.format(settings.resourcesFolder, settings.picFolder)
 
     global _counter

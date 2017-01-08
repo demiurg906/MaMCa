@@ -37,7 +37,9 @@ data class Settings(val x: Int = 1, // количество клеток по x
 
                     var time: Double = 1.0, // время релаксации [с]
 
-                    val precision: Int = 7, // точность (количтество шагов симуляции)
+                    val name: String = "default", // имя модели (используется для графиков и логов)
+
+                    val precision: Int = 7, // точность (количество шагов симуляции)
                     var load: Boolean = false, // загружать ли предыдущее состояние
                     var jsonPath: String = "./resources/out/sample.json", // путь к сохраненному состоянию
 
@@ -53,12 +55,12 @@ data class Settings(val x: Int = 1, // количество клеток по x
 
 // списки с полями типа string и boolean
 // костыль
-val stringFields = setOf("jsonPath", "resourcesFolder", "outFolder", "picFolder", "momentaFileName")
+val stringFields = setOf("name", "jsonPath", "resourcesFolder", "outFolder", "picFolder", "momentaFileName")
 val booleanFields = setOf("load", "hysteresis")
 
 // количество полей в блоке, отделенном от остальных новой строкой
 // нужен, чтобы поля были логически разделены пустыми строками
-val newLines = listOf(4, 3, 3, 2, 2, 3, 3, 1, 3, 3, 5)
+val newLines = listOf(4, 3, 3, 2, 2, 3, 3, 1, 1, 3, 3, 5)
 
 fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()
