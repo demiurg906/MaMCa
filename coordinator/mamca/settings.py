@@ -19,8 +19,8 @@ class Settings:
         self._d['m'] = 800.0
         self._d['kan'] = 0.05
         self._d['jex'] = 100.0
-        self._d['dipol_distance'] = 30.0
-        self._d['exchange_distance'] = 4.0
+        self._d['dipolDistance'] = 30.0
+        self._d['exchangeDistance'] = 4.0
         self._d['viscosity'] = 0.9
         self._d['t'] = 0.0
         self._d['ot'] = 2
@@ -33,6 +33,13 @@ class Settings:
         self._d['precision'] = 7
         self._d['load'] = False
         self._d['jsonPath'] = './resources/out/sample.json'
+        self._d['hysteresis'] = False
+        self._d['hysteresisSteps'] = 7
+        self._d['hysteresisLogScale'] = 0.1
+        self._d['resourcesFolder'] = './resources'
+        self._d['outFolder'] = 'out'
+        self._d['picFolder'] = 'pictures'
+        self._d['momentaFileName'] = 'momenta.txt'
         if filename is not None:
             with open(filename) as f:
                 d = json.load(f)
@@ -120,20 +127,20 @@ class Settings:
         self._d['jex'] = value
 
     @property
-    def dipol_distance(self):
-        return self._d['dipol_distance']
+    def dipolDistance(self):
+        return self._d['dipolDistance']
 
-    @dipol_distance.setter
-    def dipol_distance(self, value):
-        self._d['dipol_distance'] = value
+    @dipolDistance.setter
+    def dipolDistance(self, value):
+        self._d['dipolDistance'] = value
 
     @property
-    def exchange_distance(self):
-        return self._d['exchange_distance']
+    def exchangeDistance(self):
+        return self._d['exchangeDistance']
 
-    @exchange_distance.setter
-    def exchange_distance(self, value):
-        self._d['exchange_distance'] = value
+    @exchangeDistance.setter
+    def exchangeDistance(self, value):
+        self._d['exchangeDistance'] = value
 
     @property
     def viscosity(self):
@@ -230,6 +237,62 @@ class Settings:
     @jsonPath.setter
     def jsonPath(self, value):
         self._d['jsonPath'] = value
+
+    @property
+    def hysteresis(self):
+        return self._d['hysteresis']
+
+    @hysteresis.setter
+    def hysteresis(self, value):
+        self._d['hysteresis'] = value
+
+    @property
+    def hysteresisSteps(self):
+        return self._d['hysteresisSteps']
+
+    @hysteresisSteps.setter
+    def hysteresisSteps(self, value):
+        self._d['hysteresisSteps'] = value
+
+    @property
+    def hysteresisLogScale(self):
+        return self._d['hysteresisLogScale']
+
+    @hysteresisLogScale.setter
+    def hysteresisLogScale(self, value):
+        self._d['hysteresisLogScale'] = value
+
+    @property
+    def resourcesFolder(self):
+        return self._d['resourcesFolder']
+
+    @resourcesFolder.setter
+    def resourcesFolder(self, value):
+        self._d['resourcesFolder'] = value
+
+    @property
+    def outFolder(self):
+        return self._d['outFolder']
+
+    @outFolder.setter
+    def outFolder(self, value):
+        self._d['outFolder'] = value
+
+    @property
+    def picFolder(self):
+        return self._d['picFolder']
+
+    @picFolder.setter
+    def picFolder(self, value):
+        self._d['picFolder'] = value
+
+    @property
+    def momentaFileName(self):
+        return self._d['momentaFileName']
+
+    @momentaFileName.setter
+    def momentaFileName(self, value):
+        self._d['momentaFileName'] = value
 
     def __getitem__(self, key):
         return self._d[key]

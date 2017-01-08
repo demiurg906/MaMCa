@@ -56,15 +56,17 @@ fun main(args: Array<String>) {
 fun singleRun(settings: Settings) {
     val startTime = System.currentTimeMillis()
 
+    val outFolder = File("${settings.resourcesFolder}/${settings.outFolder}")
+
     val sample = Sample(settings)
-    sample.dumpToJsonFile(settings.outFolder, "sample.json")
-    sample.saveState(outFolder = settings.outFolder, filename = "momenta_at_start.txt")
+    sample.dumpToJsonFile(outFolder.canonicalPath, "sample.json")
+    sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta_at_start.txt")
 
     val midTime = System.currentTimeMillis()
     val (startEnergies, endEnergies, numberOfSteps) = sample.processModel()
     val startEnergy = startEnergies.first / EV_TO_DJ
     val endEnergy = endEnergies.first / EV_TO_DJ
-    sample.saveState(outFolder = settings.outFolder, filename = settings.momentaFileName)
+    sample.saveState(outFolder = outFolder.canonicalPath, filename = settings.momentaFileName)
 
     val endTime = System.currentTimeMillis()
 
@@ -83,22 +85,22 @@ fun singleRun(settings: Settings) {
     println("")
     println("number of simulation steps is $numberOfSteps")
 
-//    if (endEnergy > startEnergy) {
-//        println("\nWOOOOOOOOOOW\n")
-//    }
+    if (endEnergy > startEnergy) {
+        println("\nWOOOOOOOOOOW\n")
+    }
     println("$delimiter\n")
 }
 
 fun hysteresisRun(settings: Settings) {
     val startTime = System.currentTimeMillis()
 
-    val outFolder = File(settings.outFolder)
+    val outFolder = File("${settings.resourcesFolder}/${settings.outFolder}")
     FileUtils.deleteDirectory(outFolder)
     outFolder.mkdir()
 
     val sample = Sample(settings)
-    sample.dumpToJsonFile(settings.outFolder, "sample.json")
-    sample.saveState(outFolder = settings.outFolder, filename = "momenta_at_start.txt")
+    sample.dumpToJsonFile(outFolder.canonicalPath, "sample.json")
+    sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta_at_start.txt")
 
     val k = settings.hysteresisSteps
     val n = (2.5 * log(1 / settings.hysteresisLogScale, 1 + 4.0 / k)).toInt()
@@ -127,7 +129,7 @@ fun hysteresisRun(settings: Settings) {
             sample.b /= (1.0 / bLogStep) // костыльное поэлементное перемножение двух векторов
         }
         sample.processModel()
-        sample.saveState(settings.outFolder, "hyst,$direction,${sample.b.x.format(2)},${sample.b.y.format(2)},${sample.b.z.format(2)}.txt")
+        sample.saveState(outFolder.canonicalPath, "hyst,$direction,${sample.b.x.format(2)},${sample.b.y.format(2)},${sample.b.z.format(2)}.txt")
     }
 
 

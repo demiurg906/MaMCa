@@ -9,7 +9,7 @@
   "offset":4.0,
 
   "m":800.0,
-  "kan":0.05,
+  "kan":50,
   "jex":100.0,
 
   "dipolDistance":30.0,
@@ -22,19 +22,22 @@
   "ot_theta":90.0,
   "ot_phi":0.0,
 
-  "b_x":100.0,
+  "b_x":0.0,
   "b_y":0.0,
   "b_z":0.0,
 
-  "time":1.0,
+  "time":1.0e-3,
 
-  "precision":7,
+  "precision":15,
   "load":false,
   "jsonPath":"./resources/out/sample.json",
 
-  "hysteresis":true,
-  "hysteresisSteps":5,
+  "hysteresis":false,
+  "hysteresisSteps":7,
+  "hysteresisLogScale":0.1,
 
-  "outFolder":"./resources/out/hyst",
+  "resourcesFolder":"./resources",
+  "outFolder":"out",
+  "picFolder":"pictures",
   "momentaFileName":"momenta.txt"
 }

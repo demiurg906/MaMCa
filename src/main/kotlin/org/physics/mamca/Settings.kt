@@ -45,18 +45,20 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val hysteresisSteps: Int = 7, // количество шагов гистерезиса в ветке от нуля до края
                     val hysteresisLogScale: Double = 0.1, // доля линейной области от всего диапазона поля
 
-                    val outFolder: String = "./resources/out", // путь к папке для выходных данных
+                    val resourcesFolder: String = "./resources",
+                    val outFolder: String = "out", // путь к папке для выходных данных
+                    val picFolder: String = "pictures", // путь к папке для графиков
                     val momentaFileName: String = "momenta.txt" // имя файла, для итогового состояния
 )
 
 // списки с полями типа string и boolean
 // костыль
-val stringFields = setOf("jsonPath", "outFolder", "momentaFileName")
+val stringFields = setOf("jsonPath", "resourcesFolder", "outFolder", "picFolder", "momentaFileName")
 val booleanFields = setOf("load", "hysteresis")
 
 // количество полей в блоке, отделенном от остальных новой строкой
 // нужен, чтобы поля были логически разделены пустыми строками
-val newLines = listOf(4, 3, 3, 2, 2, 3, 3, 1, 3, 2, 3)
+val newLines = listOf(4, 3, 3, 2, 2, 3, 3, 1, 3, 3, 5)
 
 fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()
