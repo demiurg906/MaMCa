@@ -1,21 +1,16 @@
 from mamca import *
 
 if __name__ == '__main__':
-    single_run()
-    out_folder = get_default_out_folder()
-    # draw_3d_vectors_plot('{}/momenta.txt'.format(out_folder), settings_fname='./resources/settings.json',
-    #                      save=True, pic_dir='./resources/pictures', name='exchange_3')
-    # draw_3d_vectors_plot(
-    #     '{}/momenta_before.txt'.format(get_default_out_folder()),
-    #     borders=[30, 30, 30],
-    #     scale=8
-    # )
-    draw_3d_vectors_plot(
-        '{}/momenta.txt'.format(get_default_out_folder()),
+    settings_fname = './resources/settings.json'
+    single_run(settings_fname=settings_fname)
+    draw_both_3d_vectors_plots(
+        settings_fname=settings_fname,
         borders=[30, 30, 30],
-        scale=8
+        scale=8,
+        save=True,
+        name='T=0 K, kan=50, t=1 ms'
     )
-    end_of_drawing()
+    # end_of_drawing()
 
 
 # from mamca import *

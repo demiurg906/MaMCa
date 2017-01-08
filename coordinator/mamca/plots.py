@@ -39,7 +39,8 @@ def prepare_dir_wrapper(func):
         if 'save' in kwargs:
             save = kwargs['save']
             if save:
-                out = kwargs['pic_dir']
+                settings = Settings(kwargs['settings_fname'])
+                out = '{}/{}'.format(settings.resourcesFolder, settings.picFolder)
                 if not os.path.exists(out):
                     os.mkdir(out)
         func(*args, **kwargs)
@@ -75,12 +76,13 @@ def _read_vectors(filename):
 
 
 @prepare_dir_wrapper
-def draw_hyst_plot(folder, b_axis, m_axis, label=None, borders=None,
-                   direction=None, filter=None, settings_fname=None,
-                   save=False, pic_dir='Screenshots', name=None):
+def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
+                   direction=None, filter=None,
+                   save=False, name=None):
     """
     Рисует петлю гистерезиса
-    :param folder: папка с данными о гистерезисе
+    :param settings_fname: путь к файлу с настройками, для отображения
+        их на графике
     :param b_axis: проекция поля ('x', 'y', 'z')
     :param m_axis: проекиця момента ('x', 'y', 'z')
     :param label: название графика
@@ -91,12 +93,13 @@ def draw_hyst_plot(folder, b_axis, m_axis, label=None, borders=None,
         использовать только для систем, лежащих в плоскости.
         формат: [dn_x, dn_y, n_x, n_y] -- dn_x и dn_y -- сколько частиц
         отрезать с обеих сторон, n_x и n_y -- сколько частиц всего
-    :param settings_fname: путь к файлу с настройками, для отображения
-        их на графике
     :param(bool) save: сохранять ли график в файл
-    :param pic_dir: путь к папке для сохранения скриншотов
     :param name: имя для скриншота
     """
+    settings = Settings(settings_fname)
+    out_folder = '{}/{}'.format(settings.resourcesFolder, settings.outFolder)
+    pic_dir = '{}/{}'.format(settings.resourcesFolder, settings.picFolder)
+
     if direction is None:
         direction = {'fst', 'pos', 'neg'}
     axises = {'x': 0, 'y': 1, 'z': 2}
@@ -133,7 +136,7 @@ def draw_hyst_plot(folder, b_axis, m_axis, label=None, borders=None,
 
     min_b, max_b = np.inf, -np.inf
     min_m, max_m = np.inf, -np.inf
-    for f in os.listdir(folder):
+    for f in os.listdir(out_folder):
         try:
             s, sign, *b = f[:-4].split(',')
         except ValueError:
@@ -141,7 +144,7 @@ def draw_hyst_plot(folder, b_axis, m_axis, label=None, borders=None,
         if sign not in direction:
             continue
         b = float(b[axises[b_axis]])
-        m = get_full_moment('{}/{}'.format(folder, f))[axises[m_axis]]
+        m = get_full_moment('{}/{}'.format(out_folder, f))[axises[m_axis]]
         min_b, max_b = min(min_b, b), max(max_b, b)
         min_m, max_m = min(min_m, m), max(max_m, m)
 
@@ -160,13 +163,12 @@ def draw_hyst_plot(folder, b_axis, m_axis, label=None, borders=None,
         plt.clf()
 
 
-def create_hysteresis_gif(out_folder, pic_folder, borders=None,
+def create_hysteresis_gif(*, settings_fname, borders=None,
                           negative_borders=False, clear=True,
                           show=False, is3d=True, scale=1):
     """
     Рисует набор трехмерных графиков для цикла гистерезиса
-    :param out_folder: путь к папке с данными о гистерезисе
-    :param pic_folder: путь к папке для сохранения графиков
+    :param settings_fname: путь к файлу с настройками
     :param borders: границы графиков в формате borders функции
         draw_3d_vectors_plot
     :param(bool) negative_borders: параметр для draw_3d_vectors_plot
@@ -175,6 +177,10 @@ def create_hysteresis_gif(out_folder, pic_folder, borders=None,
     :param(bool) is3d: рисовать трехмерный график или двумерный в осяц x y
     :param(float) scale: масштаб для стрелочек
     """
+    settings = Settings(settings_fname)
+    out_folder = '{}/{}'.format(settings.resourcesFolder, settings.outFolder)
+    pic_dir = '{}/{}'.format(settings.resourcesFolder, settings.picFolder)
+
     names = []
     b_fields = {}
     signs = {'fst': 0, 'neg': 1, 'pos': 2}
@@ -202,34 +208,75 @@ def create_hysteresis_gif(out_folder, pic_folder, borders=None,
     names.sort(key=cmp_to_key(cmp))
     d_names = {x[4]: ('{}_{}_{}_{}_{}'.format(x[0], i, x[1], x[2], x[3]))
                for i, x in enumerate(names)}
-    if not os.path.exists(pic_folder):
-        os.mkdir(pic_folder)
+    if not os.path.exists(pic_dir):
+        os.mkdir(pic_dir)
     if clear:
-        _clear_folder(pic_folder)
+        _clear_folder(pic_dir)
     for f in files:
         if is3d:
             draw_3d_vectors_plot(
                 '{}/{}'.format(out_folder, f), borders=borders,
                 negative_borders=negative_borders, save=not show,
-                pic_dir=pic_folder, name=d_names[f],
+                pic_dir=pic_dir, name=d_names[f],
                 text='B = ({}, {}, {})'.format(*b_fields[f]),
                 draw_particles=False, scale=scale)
         else:
             draw_xy_vectors_plot(
                 '{}/{}'.format(out_folder, f), borders=borders,
                 negative_borders=negative_borders, save=not show,
-                pic_dir=pic_folder, name=d_names[f],
+                pic_dir=pic_dir, name=d_names[f],
                 text='B = ({}, {}, {})'.format(*b_fields[f]))
 
 
+def draw_both_3d_vectors_plots(*, settings_fname: str=None, borders: list=None,
+                               negative_borders: bool=True, label: str=None,
+                               save: bool=False, name: str=None,
+                               text: str=None, draw_particles: bool=True, scale: float=1):
+    """
+    Рисует графики состояний до и после оптимизации
+    :param settings_fname:
+    :param borders:
+    :param negative_borders:
+    :param label:
+    :param save:
+    :param name:
+    :param text:
+    :param draw_particles:
+    :param scale:
+    :return:
+    """
+    draw_3d_vectors_plot(settings_fname=settings_fname,
+                         borders=borders,
+                         negative_borders=negative_borders,
+                         label=label,
+                         save=save,
+                         name=name,
+                         text=text,
+                         draw_particles=draw_particles,
+                         scale=scale,
+                         at_start=True
+                         )
+    draw_3d_vectors_plot(settings_fname=settings_fname,
+                         borders=borders,
+                         negative_borders=negative_borders,
+                         label=label,
+                         save=save,
+                         name=name,
+                         text=text,
+                         draw_particles=draw_particles,
+                         scale=scale,
+                         at_start=False
+                         )
+
+
 @prepare_dir_wrapper
-def draw_3d_vectors_plot(filename: str, settings_fname: str=None, *, borders: list=None,
+def draw_3d_vectors_plot(*, settings_fname: str=None, borders: list=None,
                          negative_borders: bool=True, label: str=None,
-                         save: bool=False, pic_dir: str='Screenshots', name: str=None,
-                         text: str=None, draw_particles: bool=True, scale: float=1):
+                         save: bool=False, name: str=None,
+                         text: str=None, draw_particles: bool=True, scale: float=1,
+                         at_start: bool=False):
     """
     Рисует трехмерный график веторов
-    :param filename: путь к файлу с данными
     :param settings_fname: путь к файлу с настройками, для отображения
         их на графике
     :param borders: массив границ графика.
@@ -240,12 +287,20 @@ def draw_3d_vectors_plot(filename: str, settings_fname: str=None, *, borders: li
         если False, то [0, x, 0, y, 0, z]
     :param label: название графика
     :param(bool) save: сохранять ли график в файл
-    :param pic_dir: путь к папке для сохранения скриншотов
     :param name: имя для скриншота
     :param text: текст для отображения на графике
     :param(bool) draw_particles: нужно ли отображать частицы
     :param(float) scale: масштаб стрелочек
+    :param(bool) at_start: рисовать ли состояние до оптимизации
     """
+    settings = Settings(settings_fname)
+    filename = '{}/{}/{}'.format(settings.resourcesFolder, settings.outFolder, settings.momentaFileName)
+    if at_start:
+        filename = filename[:-4] + '_at_start.txt'
+        if name is not None:
+            name += '_at_start'
+    pic_dir = '{}/{}'.format(settings.resourcesFolder, settings.picFolder)
+
     global _counter
     fig = plt.figure(_counter)
     _counter += 1
@@ -301,9 +356,8 @@ def draw_3d_vectors_plot(filename: str, settings_fname: str=None, *, borders: li
         x, y, z = points[:, 0], points[:, 1], points[:, 2]
         ax.scatter(x, y, z, c='r')
 
-    if settings_fname is not None:
-        ax.text2D(0.05, 0.65, str(Settings(settings_fname)),
-                  transform=ax.transAxes)
+    # ax.text2D(0.05, 0.65, str(settings),
+    #           transform=ax.transAxes)
     if text is not None:
         ax.text2D(0.05, 0.65, text, transform=ax.transAxes)
 
