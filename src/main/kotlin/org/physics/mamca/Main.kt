@@ -5,10 +5,7 @@ import org.apache.commons.io.FileUtils
 import org.physics.mamca.math.Vector
 import org.physics.mamca.math.div
 import org.physics.mamca.math.log
-import org.physics.mamca.util.eFormat
-import org.physics.mamca.util.equalsDouble
-import org.physics.mamca.util.format
-import org.physics.mamca.util.formatEnergies
+import org.physics.mamca.util.*
 import java.io.File
 
 
@@ -47,6 +44,9 @@ fun main(args: Array<String>) {
     } else {
         hysteresisRun(settings)
     }
+//    Sound.playSound("./resources/notifications/ache.wav").join()
+    Sound.playSound("./resources/notifications/arpeggio.wav").join()
+//    Sound.playSound("./resources/notifications/office-2.wav").join()
 }
 
 
