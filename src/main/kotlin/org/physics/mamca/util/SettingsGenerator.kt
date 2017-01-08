@@ -80,7 +80,7 @@ fun main(args: Array<String>) {
 
         // TODO: add pretty __str__
         append("${tab}def __str__(self):\n")
-        append("${dTab}return 'settings str not implemented'\n")
+        append("${dTab}return ''\n")
         append("\n")
     }
 

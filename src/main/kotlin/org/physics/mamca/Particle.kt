@@ -175,6 +175,7 @@ class Particle {
         val p = Math.exp(-deltaE / sample.KT)
 //        println(p.eFormat())
         if (sample.random.nextDouble() < p) {
+            sample.nJumps += 1
             val currentPhi = lma.angleTo(m, eZ)
             val minPhi = if (equalsDouble(currentPhi, mins[0].second)) mins[1].second else mins[0].second
             rotateMomentaToAngle(minPhi)

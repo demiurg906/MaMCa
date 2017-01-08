@@ -29,6 +29,8 @@ class Sample : Serializable {
     val KT: Double
     val random = Random()
 
+    var nJumps = 0
+
     /**
      * пустой конструктор-заглушка
      */
@@ -180,6 +182,7 @@ class Sample : Serializable {
         if (settings.t > 0) {
             for (t in 0..settings.time.toInt() step JUMP_TIME) {
                 if (twoMinimums.isEmpty()) {
+                    println("oops, no minimums, t = ${t / S_TO_NS} s")
                     break
                 }
                 if (energyJumps()) {

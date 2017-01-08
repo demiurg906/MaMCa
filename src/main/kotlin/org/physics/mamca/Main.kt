@@ -40,15 +40,15 @@ fun main(args: Array<String>) {
     val settings = loadSettingsFromJson(settingsFile)
 
     prepareFolders(settings)
+    createSettingsJson("${settings.dataFolder}/${settings.name}/settings.json", settings)
 
     if (!settings.hysteresis) {
         singleRun(settings)
     } else {
         hysteresisRun(settings)
     }
-//    Sound.playSound("./resources/notifications/ache.wav").join()
+
     Sound.playSound("./resources/notifications/arpeggio.wav").join()
-//    Sound.playSound("./resources/notifications/office-2.wav").join()
 }
 
 
@@ -56,13 +56,14 @@ fun main(args: Array<String>) {
  * создает все выходные папки, если их нет
  */
 fun prepareFolders(settings: Settings) {
-    val folders = listOf(
-            File("${settings.resourcesFolder}/${settings.outFolder}"),
-            File("${settings.resourcesFolder}/${settings.picFolder}"),
-            File("${settings.resourcesFolder}/${settings.logFolder}")
-    )
-
-    folders.filterNot { it.exists() }.forEach { it.mkdir() }
+    var outFolderPath =  "${settings.dataFolder}/${settings.name}/out"
+    if (settings.hysteresis) {
+        outFolderPath += "/hyst"
+    }
+    val outFolder = File(outFolderPath)
+    if (!outFolder.exists()) {
+        outFolder.mkdirs()
+    }
 }
 
 /**
@@ -71,11 +72,12 @@ fun prepareFolders(settings: Settings) {
 fun singleRun(settings: Settings) {
     val startTime = System.currentTimeMillis()
 
-    val outFolder = File("${settings.resourcesFolder}/${settings.outFolder}")
+    val dataFolder ="${settings.dataFolder}/${settings.name}"
+    val outFolder = File("$dataFolder/out")
 
     val sample = Sample(settings)
     sample.dumpToJsonFile(outFolder.canonicalPath, "sample.json")
-    sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta_at_start.txt")
+    sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta.at_start.txt")
 
     val midTime = System.currentTimeMillis()
     val (startEnergies, endEnergies, numberOfSteps) = sample.processModel()
@@ -101,6 +103,8 @@ fun singleRun(settings: Settings) {
         append("diff between enerfies is ${(startEnergy - endEnergy).eFormat()}\n")
         append("\n")
         append("number of simulation steps is $numberOfSteps\n")
+        append("\n")
+        append("number of jumps is ${sample.nJumps}\n")
 
         if (endEnergy > startEnergy) {
             append("\nWOOOOOOOOOOW\n\n")
@@ -109,7 +113,7 @@ fun singleRun(settings: Settings) {
     }.toString()
 
     print(log)
-    File("${settings.resourcesFolder}/${settings.logFolder}/${settings.name}.log").printWriter().use { out ->
+    File("$dataFolder/log.log").printWriter().use { out ->
         out.write(log)
     }
 }
@@ -117,9 +121,10 @@ fun singleRun(settings: Settings) {
 fun hysteresisRun(settings: Settings) {
     val startTime = System.currentTimeMillis()
 
-    val outFolder = File("${settings.resourcesFolder}/${settings.outFolder}")
-    FileUtils.deleteDirectory(outFolder)
-    outFolder.mkdir()
+    val dataFolder ="${settings.dataFolder}/${settings.name}"
+    val outFolder = File("$dataFolder/out")
+    val outHystFolder = File("$dataFolder/out/hyst")
+    FileUtils.cleanDirectory(outHystFolder)
 
     val sample = Sample(settings)
     sample.dumpToJsonFile(outFolder.canonicalPath, "sample.json")
@@ -152,10 +157,8 @@ fun hysteresisRun(settings: Settings) {
             sample.b /= (1.0 / bLogStep) // костыльное поэлементное перемножение двух векторов
         }
         sample.processModel()
-        sample.saveState(outFolder.canonicalPath, "hyst,$direction,${sample.b.x.format(2)},${sample.b.y.format(2)},${sample.b.z.format(2)}.txt")
+        sample.saveState(outHystFolder.canonicalPath, "hyst,$direction,${sample.b.x.format(2)},${sample.b.y.format(2)},${sample.b.z.format(2)}.txt")
     }
-
-
 
     println("Hysteresis cycle started")
     println("There will be ${5 * numberOfSteps / 2} steps")

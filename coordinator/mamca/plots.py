@@ -29,25 +29,6 @@ def _clear_folder(folder):
             print(e)
 
 
-def prepare_dir_wrapper(func):
-    """
-    Декоратор, подготавливающий папку со скриншотами
-    """
-
-    @wraps(func)
-    def inner(*args, **kwargs):
-        if 'save' in kwargs:
-            save = kwargs['save']
-            if save:
-                settings = Settings(kwargs['settings_fname'])
-                out = '{}/{}'.format(settings.resourcesFolder, settings.picFolder)
-                if not os.path.exists(out):
-                    os.mkdir(out)
-        func(*args, **kwargs)
-
-    return inner
-
-
 def _get_lines(filename, skip=0):
     """
     :param filename: путь к файлу
@@ -75,7 +56,41 @@ def _read_vectors(filename):
     return temp[:, :6], temp[:, 6:]
 
 
-@prepare_dir_wrapper
+def draw_all_hyst_plots(*, settings_fname, b_axis, m_axis, label=None, borders=None,
+                        filter=None, save=False):
+    """
+    Рисует три графика гистерезиса -- по одному на каждую ветвь и общий
+    """
+    draw_hyst_plot(settings_fname=settings_fname,
+                   b_axis=b_axis, m_axis=m_axis,
+                   label=label, borders=borders,
+                   filter=filter, save=save,
+                   direction=None,
+                   name='0_hyst_plot'
+                   )
+    draw_hyst_plot(settings_fname=settings_fname,
+                   b_axis=b_axis, m_axis=m_axis,
+                   label=label, borders=borders,
+                   filter=filter, save=save,
+                   direction='fst',
+                   name='1_hyst_plot_fst'
+                   )
+    draw_hyst_plot(settings_fname=settings_fname,
+                   b_axis=b_axis, m_axis=m_axis,
+                   label=label, borders=borders,
+                   filter=filter, save=save,
+                   direction='neg',
+                   name='2_hyst_plot_neg'
+                   )
+    draw_hyst_plot(settings_fname=settings_fname,
+                   b_axis=b_axis, m_axis=m_axis,
+                   label=label, borders=borders,
+                   filter=filter, save=save,
+                   direction='pos',
+                   name='3_hyst_plot_pos'
+                   )
+
+
 def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
                    direction=None, filter=None,
                    save=False, name=None):
@@ -97,8 +112,9 @@ def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
     :param name: имя для скриншота
     """
     settings = Settings(settings_fname)
-    out_folder = '{}/{}'.format(settings.resourcesFolder, settings.outFolder)
-    pic_dir = '{}/{}'.format(settings.resourcesFolder, settings.picFolder)
+    data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
+    out_folder = '{}/out/hyst'.format(data_folder)
+    pic_dir = data_folder
 
     if direction is None:
         direction = {'fst', 'pos', 'neg'}
@@ -178,8 +194,9 @@ def create_hysteresis_gif(*, settings_fname, borders=None,
     :param(float) scale: масштаб для стрелочек
     """
     settings = Settings(settings_fname)
-    out_folder = '{}/{}'.format(settings.resourcesFolder, settings.outFolder)
-    pic_dir = '{}/{}'.format(settings.resourcesFolder, settings.picFolder)
+    data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
+    out_folder = '{}/out/hyst'.format(data_folder)
+    pic_dir = data_folder
 
     names = []
     b_fields = {}
@@ -228,10 +245,10 @@ def create_hysteresis_gif(*, settings_fname, borders=None,
                 text='B = ({}, {}, {})'.format(*b_fields[f]))
 
 
-def draw_both_3d_vectors_plots(*, settings_fname: str=None, borders: list=None,
-                               negative_borders: bool=True, label: str=None,
-                               save: bool=False, text: str=None,
-                               draw_particles: bool=True, scale: float=1):
+def draw_both_3d_vectors_plots(*, settings_fname: str = None, borders: list = None,
+                               negative_borders: bool = True, label: str = None,
+                               save: bool = False, text: str = None,
+                               draw_particles: bool = True, scale: float = 1):
     """
     Рисует графики состояний до и после оптимизации
     :param settings_fname:
@@ -267,12 +284,11 @@ def draw_both_3d_vectors_plots(*, settings_fname: str=None, borders: list=None,
                          )
 
 
-@prepare_dir_wrapper
-def draw_3d_vectors_plot(*, settings_fname: str=None, borders: list=None,
-                         negative_borders: bool=True, label: str=None,
-                         save: bool=False, text: str=None,
-                         draw_particles: bool=True, scale: float=1,
-                         at_start: bool=False):
+def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
+                         negative_borders: bool = True, label: str = None,
+                         save: bool = False, text: str = None,
+                         draw_particles: bool = True, scale: float = 1,
+                         at_start: bool = False):
     """
     Рисует трехмерный график веторов
     :param settings_fname: путь к файлу с настройками, для отображения
@@ -292,12 +308,13 @@ def draw_3d_vectors_plot(*, settings_fname: str=None, borders: list=None,
     :param(bool) at_start: рисовать ли состояние до оптимизации
     """
     settings = Settings(settings_fname)
-    filename = '{}/{}/{}'.format(settings.resourcesFolder, settings.outFolder, settings.momentaFileName)
-    name = settings.name
+    data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
+    filename = '{}/out/{}'.format(data_folder, settings.momentaFileName)
+    name = 'result'
     if at_start:
         filename = filename[:-4] + '.at_start.txt'
-        name += '_at_start'
-    pic_dir = '{}/{}'.format(settings.resourcesFolder, settings.picFolder)
+        name = 'at_start'
+    pic_dir = data_folder
 
     global _counter
     fig = plt.figure(_counter)

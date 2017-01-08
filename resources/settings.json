@@ -38,9 +38,6 @@
   "hysteresisSteps":7,
   "hysteresisLogScale":0.1,
 
-  "resourcesFolder":"./resources",
-  "outFolder":"out",
-  "picFolder":"pictures",
-  "logFolder":"log",
+  "dataFolder":"./resources",
   "momentaFileName":"momenta.txt"
 }

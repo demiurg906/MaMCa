@@ -26,22 +26,7 @@ def pre_clean(func):
             kwargs['settings_fname'] = get_default_settings_file()
         if kwargs.get('mamca_path', None) is None:
             kwargs['mamca_path'] = get_default_mamca_path()
-        try:
-            out = kwargs['out_folder']
-        except KeyError:
-            out = get_default_out_folder()
-        if not os.path.exists(out):
-            os.mkdir(out)
-        settings = Settings(kwargs['settings_fname'])
-        if settings.load:
-            sample_file = settings.jsonPath.split('/')[-1]
-        else:
-            sample_file = ''
-        # _clear_out_folder(out, sample_file)
         func(*args, **kwargs)
-        # dumpedState = '{}/sample.json'.format(out)
-        # if os.path.exists(dumpedState):
-        #     os.remove(dumpedState)
 
     return inner
 

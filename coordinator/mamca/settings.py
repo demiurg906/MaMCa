@@ -18,7 +18,7 @@ class Settings:
         self._d['offset'] = 4.0
         self._d['m'] = 800.0
         self._d['kan'] = 0.05
-        self._d['jex'] = 100.0
+        self._d['jex'] = 5.0
         self._d['dipolDistance'] = 30.0
         self._d['exchangeDistance'] = 4.0
         self._d['viscosity'] = 0.9
@@ -37,10 +37,7 @@ class Settings:
         self._d['hysteresis'] = False
         self._d['hysteresisSteps'] = 7
         self._d['hysteresisLogScale'] = 0.1
-        self._d['resourcesFolder'] = './resources'
-        self._d['outFolder'] = 'out'
-        self._d['picFolder'] = 'pictures'
-        self._d['logFolder'] = 'log'
+        self._d['dataFolder'] = './resources'
         self._d['momentaFileName'] = 'momenta.txt'
         if filename is not None:
             with open(filename) as f:
@@ -273,36 +270,12 @@ class Settings:
         self._d['hysteresisLogScale'] = value
 
     @property
-    def resourcesFolder(self):
-        return self._d['resourcesFolder']
+    def dataFolder(self):
+        return self._d['dataFolder']
 
-    @resourcesFolder.setter
-    def resourcesFolder(self, value):
-        self._d['resourcesFolder'] = value
-
-    @property
-    def outFolder(self):
-        return self._d['outFolder']
-
-    @outFolder.setter
-    def outFolder(self, value):
-        self._d['outFolder'] = value
-
-    @property
-    def picFolder(self):
-        return self._d['picFolder']
-
-    @picFolder.setter
-    def picFolder(self, value):
-        self._d['picFolder'] = value
-
-    @property
-    def logFolder(self):
-        return self._d['logFolder']
-
-    @logFolder.setter
-    def logFolder(self, value):
-        self._d['logFolder'] = value
+    @dataFolder.setter
+    def dataFolder(self, value):
+        self._d['dataFolder'] = value
 
     @property
     def momentaFileName(self):
