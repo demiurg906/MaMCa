@@ -209,8 +209,6 @@ class Sample : Serializable {
             Pair<Double, Triple<Double, Double, Double>>,
             Pair<Double, Triple<Double, Double, Double>>,
             Int> {
-        twoMinimums = mutableSetOf()
-
         particles.forEach { it.computeEffectiveField() }
         // energies on start
         val startEnergy = computeEnergies()
@@ -262,6 +260,7 @@ class Sample : Serializable {
      * @return энергии до оптимизации и после
      */
     private fun optimizeEnergy(computedOldEnergy: Double? = null): Pair<Double, Double> {
+        twoMinimums = mutableSetOf()
         val oldEnergy: Double
         if (computedOldEnergy == null) {
             oldEnergy = computeEnergy()

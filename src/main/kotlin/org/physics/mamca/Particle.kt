@@ -173,6 +173,7 @@ class Particle {
     fun energyJump(): Boolean {
         val deltaE = Math.min(maxs[0].first, maxs[1].first) - energy
         val p = Math.exp(-deltaE / sample.KT)
+//        println(p.eFormat())
         if (sample.random.nextDouble() < p) {
             val currentPhi = lma.angleTo(m, eZ)
             val minPhi = if (equalsDouble(currentPhi, mins[0].second)) mins[1].second else mins[0].second
