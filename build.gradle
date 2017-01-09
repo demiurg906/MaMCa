@@ -62,9 +62,9 @@ task wrapper(type: Wrapper) {
 def pythonPath
 
 if (org.gradle.internal.os.OperatingSystem.current().windows) {
-    pythonPath = './build/envs/python35_64/python'
+    pythonPath = './build/envs/python36_64/python'
 } else {
-    pythonPath = './build/envs/python35_64/bin/python3'
+    pythonPath = './build/envs/python36_64/bin/python3'
 }
 
 task create_and_draw(type: Exec, dependsOn: 'jar') {
