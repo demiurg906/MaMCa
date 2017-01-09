@@ -87,31 +87,29 @@ fun singleRun(settings: Settings) {
 
     val endTime = System.currentTimeMillis()
 
-    val delimiter = "---------------------------------------------------"
-    
-    val log = StringBuilder().apply {
-        append("\n$delimiter\n")
-        append("time of working is ${(endTime - startTime) / 1000.0} seconds\n")
-        append("time of computation is ${(endTime - midTime) / 1000.0} seconds\n")
-        append("sample size is ${settings.x}x${settings.y}x${settings.z} with ${settings.n} particles per ring\n")
-        append("total number of particles is ${settings.x * settings.y * settings.z * settings.n}\n")
-        append("\n")
-        append("full energy on start is ${startEnergy.eFormat()} eV\n")
-        append("energies on start is ${formatEnergies(startEnergies.second)} eV\n")
-        append("full energy on end is ${endEnergy.eFormat()} eV\n")
-        append("energies on end is ${formatEnergies(endEnergies.second)} eV\n")
-        append("diff between enerfies is ${(startEnergy - endEnergy).eFormat()}\n")
-        append("\n")
-        append("number of simulation steps is $numberOfSteps\n")
-        append("\n")
-        append("number of jumps is ${sample.nJumps}\n")
 
-        if (endEnergy > startEnergy) {
-            append("\nWOOOOOOOOOOW\n\n")
-        }
-        append("$delimiter\n\n")
-    }.toString()
+    Logger.addLineBreak().addDelimiter()
+    Logger.info("time of working is ${(endTime - startTime) / 1000.0} seconds")
+    Logger.info("time of computation is ${(endTime - midTime) / 1000.0} seconds")
+    Logger.info("sample size is ${settings.x}x${settings.y}x${settings.z} with ${settings.n} particles per ring")
+    Logger.info("total number of particles is ${settings.x * settings.y * settings.z * settings.n}")
+    Logger.info("")
+    Logger.info("full energy on start is ${startEnergy.eFormat()} eV")
+    Logger.info("energies on start is ${formatEnergies(startEnergies.second)} eV")
+    Logger.info("full energy on end is ${endEnergy.eFormat()} eV")
+    Logger.info("energies on end is ${formatEnergies(endEnergies.second)} eV")
+    Logger.info("diff between enerfies is ${(startEnergy - endEnergy).eFormat()}")
+    Logger.info("")
+    Logger.info("number of simulation steps is $numberOfSteps")
+    Logger.info("")
+    Logger.info("number of jumps is ${sample.nJumps}")
 
+    if (endEnergy > startEnergy) {
+        Logger.info("\nWOOOOOOOOOOW\n")
+    }
+    Logger.addDelimiter()
+
+    val log = Logger.toString()
     print(log)
     File("$dataFolder/log.log").printWriter().use { out ->
         out.write(log)
