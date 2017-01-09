@@ -27,7 +27,15 @@ envs {
     packages = ['pip', '' +
             'setuptools']
 
-    conda 'python36_64', '3.6', ['numpy', 'matplotlib==2.0.0rc2'], true
+    conda 'python35_64', '3.5', ['numpy', 'matplotlib==1.5.3'], true
+}
+
+def pythonPath
+
+if (org.gradle.internal.os.OperatingSystem.current().windows) {
+    pythonPath = './build/envs/python35_64/python'
+} else {
+    pythonPath = './build/envs/python35_64/bin/python3'
 }
 
 repositories {
@@ -57,14 +65,6 @@ sourceSets {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '3.1'
-}
-
-def pythonPath
-
-if (org.gradle.internal.os.OperatingSystem.current().windows) {
-    pythonPath = './build/envs/python36_64/python'
-} else {
-    pythonPath = './build/envs/python36_64/bin/python3'
 }
 
 task create_and_draw(type: Exec, dependsOn: 'jar') {
