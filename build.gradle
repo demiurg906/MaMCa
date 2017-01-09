@@ -1,7 +1,7 @@
 apply plugin: 'idea'
 
 buildscript {
-    ext.kotlin_version = '1.0.5-2'
+    ext.kotlin_version = '1.0.6'
     repositories {
         mavenCentral()
         maven {url 'https://plugins.gradle.org/m2/'}
@@ -24,9 +24,10 @@ envs {
     bootstrapDirectory = new File(buildDir, 'pythons')
     envsDirectory = new File(buildDir, 'envs')
     minicondaVersion = 'latest'
-    packages = ['pip', 'setuptools']
+    packages = ['pip', '' +
+            'setuptools']
 
-    conda 'python35_64', '3.5', ['numpy', 'matplotlib'], true
+    conda 'python36_64', '3.6', ['numpy', 'matplotlib==2.0.0rc2'], true
 }
 
 repositories {
