@@ -250,6 +250,11 @@ def create_hysteresis_gif(*, settings_fname, borders=None,
 
 
 def create_momenta_gif(*, settings_fname: str):
+    """
+    Создает гифку из состояний образца между скачками моментов
+    :param settings_fname: путь к файлу с настройками
+    :return:
+    """
     settings = Settings(settings_fname)
     data_folder = '{}/{}/pictures'.format(settings.dataFolder, settings.name)
     momenta_template = '{}/moments/momenta*.png'.format(data_folder)

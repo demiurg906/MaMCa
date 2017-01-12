@@ -89,6 +89,10 @@ class Sample : Serializable {
             // радиус кольца
             val r = s.d / 2
 
+            // отклонение направления моментов в радианах
+            val loc_theta = Math.toRadians(s.loc_theta)
+            val loc_phi = Math.toRadians(s.loc_phi)
+
             // отклонение оси анизотропии в радианах
             val ot_theta = Math.toRadians(s.ot_theta)
             val ot_phi = Math.toRadians(s.ot_phi)
@@ -113,7 +117,18 @@ class Sample : Serializable {
                 )
 
                 // начальное положение момента
-                val m = Vector(1.0, randomTheta(), randomPhi(), polar = true)
+                val m: Vector
+                when (s.loc) {
+                // случайно в 3D
+                    0 -> m = Vector(1.0, randomTheta(), randomPhi(), polar = true)
+                // случайно в 2D
+                    1 -> m = Vector(1.0, PI / 2, randomPhi(), polar = true)
+                // задано
+                    2 -> m = Vector(1.0, loc_theta, loc_phi, polar = true)
+                    else -> throw IllegalArgumentException(
+                            "ot in settings must be 0..2, but ${s.ot} given "
+                    )
+                }
 
                 // ось анизотропии
                 val lma: Vector

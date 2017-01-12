@@ -25,9 +25,13 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     var viscosity: Double = 0.9, // коэффициент вязкости, 0 <= viscosity <= 1
                     val t: Double = 0.0, // температура [К]
 
-                    val ot: Int = 2, // расположение осей анизотропии
+                    val loc: Int = 0, // начальное расположение моментов
                     // 0 -- рандом в 3D, 1 -- рандом в 2D, 2 -- заданная ось
                     // отклонение оси анизотропии от оси z и оси x соответственно
+                    val loc_theta: Double = 90.0, // [градус]
+                    val loc_phi: Double = 0.0, // [градус]
+
+                    val ot: Int = 2, // расположение осей анизотропии (аналогично loc)
                     val ot_theta: Double = 90.0, // [градус]
                     val ot_phi: Double = 0.0, // [градус]
 
@@ -57,7 +61,7 @@ val booleanFields = setOf("load", "hysteresis")
 
 // количество полей в блоке, отделенном от остальных новой строкой
 // нужен, чтобы поля были логически разделены пустыми строками
-val newLines = listOf(4, 3, 3, 2, 2, 3, 3, 1, 1, 3, 3, 2)
+val newLines = listOf(4, 3, 3, 2, 2, 3, 3, 3, 1, 1, 3, 3, 2)
 
 fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()

@@ -23,6 +23,9 @@ class Settings:
         self._d['exchangeDistance'] = 4.0
         self._d['viscosity'] = 0.9
         self._d['t'] = 0.0
+        self._d['loc'] = 0
+        self._d['loc_theta'] = 90.0
+        self._d['loc_phi'] = 0.0
         self._d['ot'] = 2
         self._d['ot_theta'] = 90.0
         self._d['ot_phi'] = 0.0
@@ -155,6 +158,30 @@ class Settings:
     @t.setter
     def t(self, value):
         self._d['t'] = value
+
+    @property
+    def loc(self):
+        return self._d['loc']
+
+    @loc.setter
+    def loc(self, value):
+        self._d['loc'] = value
+
+    @property
+    def loc_theta(self):
+        return self._d['loc_theta']
+
+    @loc_theta.setter
+    def loc_theta(self, value):
+        self._d['loc_theta'] = value
+
+    @property
+    def loc_phi(self):
+        return self._d['loc_phi']
+
+    @loc_phi.setter
+    def loc_phi(self, value):
+        self._d['loc_phi'] = value
 
     @property
     def ot(self):
