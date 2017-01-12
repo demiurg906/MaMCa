@@ -56,6 +56,14 @@ fun main(args: Array<String>) {
  * создает все выходные папки, если их нет
  */
 fun prepareFolders(settings: Settings) {
+    val dataFolder = File("${settings.dataFolder}/${settings.name}")
+    if (dataFolder.exists()) {
+        if (dataFolder.isDirectory) {
+            FileUtils.cleanDirectory(dataFolder)
+        } else if (dataFolder.isFile) {
+            dataFolder.delete()
+        }
+    }
     val outFolders = mutableListOf(
             "${settings.dataFolder}/${settings.name}/out",
             "${settings.dataFolder}/${settings.name}/pictures"
