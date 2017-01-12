@@ -70,6 +70,8 @@ fun prepareFolders(settings: Settings) {
     )
     if (settings.hysteresis) {
         outFolders += "${settings.dataFolder}/${settings.name}/out/hyst"
+    } else {
+        outFolders += "${settings.dataFolder}/${settings.name}/pictures/moments"
     }
     outFolders.map(::File).filterNot(File::exists).forEach { it.mkdirs() }
 }
@@ -117,10 +119,8 @@ fun singleRun(settings: Settings) {
     }
     Logger.addDelimiter()
 
-    val log = Logger.toString()
-    print(log)
     File("$dataFolder/log.log").printWriter().use { out ->
-        out.write(log)
+        out.write(Logger.toString())
     }
 }
 

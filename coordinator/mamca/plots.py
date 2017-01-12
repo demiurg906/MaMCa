@@ -1,8 +1,12 @@
+import subprocess
+
 import numpy as np
 import os
 import shutil
 
 from functools import cmp_to_key, wraps
+
+import sys
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -245,6 +249,18 @@ def create_hysteresis_gif(*, settings_fname, borders=None,
                 text='B = ({}, {}, {})'.format(*b_fields[f]))
 
 
+def create_momenta_gif(*, settings_fname: str):
+    settings = Settings(settings_fname)
+    data_folder = '{}/{}/pictures'.format(settings.dataFolder, settings.name)
+    momenta_template = '{}/moments/momenta*.png'.format(data_folder)
+    exe = 'magick convert -delay 60 -loop 0 "{}" "{}/momenta.gif"'.format(momenta_template, data_folder)
+    try:
+        subprocess.run(exe, stdout=sys.stdout, stderr=sys.stderr, )
+    except FileNotFoundError:
+        print('You need install ImageMagick (http://www.imagemagick.org) for creating gifs')
+        print('magick must be in your classpath')
+
+
 def draw_all_3d_vectors_plots(*, settings_fname: str = None, borders: list = None,
                               negative_borders: bool = True, label: str = None,
                               save: bool = False, text: str = None,
@@ -296,7 +312,7 @@ def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
     data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
     filename = '{}/out/{}'.format(data_folder, momenta_filename)
     name = momenta_filename[:-4]
-    pic_dir = '{}/pictures'.format(data_folder)
+    pic_dir = '{}/pictures/moments'.format(data_folder)
 
     global _counter
     fig = plt.figure(_counter)

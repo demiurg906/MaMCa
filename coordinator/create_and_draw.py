@@ -18,4 +18,5 @@ if __name__ == '__main__':
             scale=8,
             save=True,
         )
+        create_momenta_gif(settings_fname=settings_fname)
     # end_of_drawing()
