@@ -256,12 +256,13 @@ def draw_all_3d_vectors_plots(*, settings_fname: str = None, borders: list = Non
     data_folder = '{}/{}/out'.format(settings.dataFolder, settings.name)
     for file in os.listdir(data_folder):
         if file.startswith('momenta'):
+            _, _, _, t = file[:-4].split('_')
             draw_3d_vectors_plot(settings_fname=settings_fname,
                                  borders=borders,
                                  negative_borders=negative_borders,
                                  label=label,
                                  save=save,
-                                 text=text,
+                                 text='t = {} s'.format(t),
                                  draw_particles=draw_particles,
                                  scale=scale,
                                  momenta_filename=file

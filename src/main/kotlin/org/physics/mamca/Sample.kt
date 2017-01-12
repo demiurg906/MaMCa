@@ -183,16 +183,16 @@ class Sample : Serializable {
          * функция, сохраняющая состояние образца после релаксации после прыжка для
          * негистерезисного запуска (для наблюдения релаксации системы)
          */
-        fun saveStateAfterJump(exactlyAfter: Boolean = false) {
+        fun saveStateAfterJump(t: Int, exactlyAfter: Boolean = false) {
             val id = if (exactlyAfter) 1 else 2
 
             if (!settings.hysteresis) {
-                saveState(outFolder!!, "momenta_${nJumps}_$id.txt")
+                saveState(outFolder!!, "momenta_${nJumps.format()}_${id}_${(t / S_TO_NS).format(9)}.txt")
             }
         }
 
         var res = processRelaxation()
-        saveStateAfterJump()
+        saveStateAfterJump(0)
         val startEnergy = res.first
 
                 if (settings.t > 0) {
@@ -206,9 +206,9 @@ class Sample : Serializable {
                 if (energyJumps()) {
                     Logger.info((t / S_TO_NS).format(9))
                     nJumps += 1
-                    saveStateAfterJump(true)
+                    saveStateAfterJump(t, true)
                     res = processRelaxation()
-                    saveStateAfterJump(false)
+                    saveStateAfterJump(t, false)
                 }
             }
         }

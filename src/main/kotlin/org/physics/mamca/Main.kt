@@ -85,7 +85,7 @@ fun singleRun(settings: Settings) {
 
     val sample = Sample(settings)
     sample.dumpToJsonFile(outFolder.canonicalPath, "sample.json")
-    sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta.at_start.txt")
+    sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta_00_1_${0.0.format(9)}.txt")
 
     val midTime = System.currentTimeMillis()
     val (startEnergies, endEnergies, numberOfSteps) = sample.processModel(outFolder.canonicalPath)

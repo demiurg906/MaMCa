@@ -52,3 +52,5 @@ fun formatEnergies(energies: Triple<Double, Double, Double>, k: Double = 1 / EV_
     val b = energies.third * k
     return "(an: ${an.eFormat(digits)}, int: ${int.eFormat(digits)}, B: ${b.eFormat(digits)})"
 }
+
+fun Int.format(digits: Int = DIGITS): String = java.lang.String.format(Locale.US, "%0${digits}d", this)
