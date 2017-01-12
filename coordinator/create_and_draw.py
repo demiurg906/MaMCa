@@ -12,7 +12,7 @@ if __name__ == '__main__':
             save=True
         )
     else:
-        draw_both_3d_vectors_plots(
+        draw_all_3d_vectors_plots(
             settings_fname=settings_fname,
             borders=[30, 30, 30],
             scale=8,

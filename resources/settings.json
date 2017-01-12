@@ -9,14 +9,14 @@
   "offset":4.0,
 
   "m":800.0,
-  "kan":0.05,
+  "kan":0.0165,
   "jex":5.0,
 
   "dipolDistance":30.0,
   "exchangeDistance":4.0,
 
   "viscosity":0.9,
-  "t":0.0,
+  "t":10.0,
 
   "ot":2,
   "ot_theta":90.0,
@@ -26,9 +26,9 @@
   "b_y":0.0,
   "b_z":0.0,
 
-  "time":1.0,
+  "time":1.0e-6,
 
-  "name":"default",
+  "name":"test",
 
   "precision":7,
   "load":false,
@@ -38,6 +38,5 @@
   "hysteresisSteps":7,
   "hysteresisLogScale":0.1,
 
-  "dataFolder":"./resources",
-  "momentaFileName":"momenta.txt"
+  "dataFolder":"./resources"
 }

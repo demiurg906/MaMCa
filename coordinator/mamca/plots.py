@@ -112,7 +112,7 @@ def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
     :param name: имя для скриншота
     """
     settings = Settings(settings_fname)
-    data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
+    data_folder = '{}/{}/pictures'.format(settings.dataFolder, settings.name)
     out_folder = '{}/out/hyst'.format(data_folder)
     pic_dir = data_folder
 
@@ -194,7 +194,7 @@ def create_hysteresis_gif(*, settings_fname, borders=None,
     :param(float) scale: масштаб для стрелочек
     """
     settings = Settings(settings_fname)
-    data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
+    data_folder = '{}/{}/pictures'.format(settings.dataFolder, settings.name)
     out_folder = '{}/out/hyst'.format(data_folder)
     pic_dir = data_folder
 
@@ -245,50 +245,35 @@ def create_hysteresis_gif(*, settings_fname, borders=None,
                 text='B = ({}, {}, {})'.format(*b_fields[f]))
 
 
-def draw_both_3d_vectors_plots(*, settings_fname: str = None, borders: list = None,
-                               negative_borders: bool = True, label: str = None,
-                               save: bool = False, text: str = None,
-                               draw_particles: bool = True, scale: float = 1):
+def draw_all_3d_vectors_plots(*, settings_fname: str = None, borders: list = None,
+                              negative_borders: bool = True, label: str = None,
+                              save: bool = False, text: str = None,
+                              draw_particles: bool = True, scale: float = 1):
     """
     Рисует графики состояний до и после оптимизации
-    :param settings_fname:
-    :param borders:
-    :param negative_borders:
-    :param label:
-    :param save:
-    :param name:
-    :param text:
-    :param draw_particles:
-    :param scale:
-    :return:
     """
-    draw_3d_vectors_plot(settings_fname=settings_fname,
-                         borders=borders,
-                         negative_borders=negative_borders,
-                         label=label,
-                         save=save,
-                         text=text,
-                         draw_particles=draw_particles,
-                         scale=scale,
-                         at_start=True
-                         )
-    draw_3d_vectors_plot(settings_fname=settings_fname,
-                         borders=borders,
-                         negative_borders=negative_borders,
-                         label=label,
-                         save=save,
-                         text=text,
-                         draw_particles=draw_particles,
-                         scale=scale,
-                         at_start=False
-                         )
+    settings = Settings(settings_fname)
+    data_folder = '{}/{}/out'.format(settings.dataFolder, settings.name)
+    for file in os.listdir(data_folder):
+        if file.startswith('momenta'):
+            draw_3d_vectors_plot(settings_fname=settings_fname,
+                                 borders=borders,
+                                 negative_borders=negative_borders,
+                                 label=label,
+                                 save=save,
+                                 text=text,
+                                 draw_particles=draw_particles,
+                                 scale=scale,
+                                 momenta_filename=file
+                                 )
 
 
 def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
                          negative_borders: bool = True, label: str = None,
                          save: bool = False, text: str = None,
                          draw_particles: bool = True, scale: float = 1,
-                         at_start: bool = False):
+                         momenta_filename: str
+                         ):
     """
     Рисует трехмерный график веторов
     :param settings_fname: путь к файлу с настройками, для отображения
@@ -301,20 +286,16 @@ def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
         если False, то [0, x, 0, y, 0, z]
     :param label: название графика
     :param(bool) save: сохранять ли график в файл
-    :param name: имя для скриншота
     :param text: текст для отображения на графике
     :param(bool) draw_particles: нужно ли отображать частицы
     :param(float) scale: масштаб стрелочек
-    :param(bool) at_start: рисовать ли состояние до оптимизации
+    :param(str) momenta_filename: путь к файлу с данными
     """
     settings = Settings(settings_fname)
     data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
-    filename = '{}/out/{}'.format(data_folder, settings.momentaFileName)
-    name = 'result'
-    if at_start:
-        filename = filename[:-4] + '.at_start.txt'
-        name = 'at_start'
-    pic_dir = data_folder
+    filename = '{}/out/{}'.format(data_folder, momenta_filename)
+    name = momenta_filename[:-4]
+    pic_dir = '{}/pictures'.format(data_folder)
 
     global _counter
     fig = plt.figure(_counter)

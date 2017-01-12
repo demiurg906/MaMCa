@@ -3,20 +3,25 @@ package org.physics.mamca.util
 object Logger {
     private val builder = StringBuilder()
 
-    val DELIMETER = "---------------------------------------------------"
+    val DELIMITER = "---------------------------------------------------"
 
     fun info(s: String): Logger {
-        builder.append(s).append("\n")
+        _info(s + "\n")
         return this
     }
 
+    private  fun _info(s: String) {
+        println(s)
+        builder.append(s)
+    }
+
     fun addDelimiter(): Logger {
-        builder.append(DELIMETER).append("\n")
+        _info(DELIMITER + "\n")
         return this
     }
 
     fun addLineBreak(): Logger {
-        builder.append("\n")
+        _info("\n")
         return this
     }
 

@@ -56,14 +56,14 @@ fun main(args: Array<String>) {
  * создает все выходные папки, если их нет
  */
 fun prepareFolders(settings: Settings) {
-    var outFolderPath =  "${settings.dataFolder}/${settings.name}/out"
+    val outFolders = mutableListOf(
+            "${settings.dataFolder}/${settings.name}/out",
+            "${settings.dataFolder}/${settings.name}/pictures"
+    )
     if (settings.hysteresis) {
-        outFolderPath += "/hyst"
+        outFolders += "${settings.dataFolder}/${settings.name}/out/hyst"
     }
-    val outFolder = File(outFolderPath)
-    if (!outFolder.exists()) {
-        outFolder.mkdirs()
-    }
+    outFolders.map(::File).filterNot(File::exists).forEach { it.mkdirs() }
 }
 
 /**
@@ -80,10 +80,10 @@ fun singleRun(settings: Settings) {
     sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta.at_start.txt")
 
     val midTime = System.currentTimeMillis()
-    val (startEnergies, endEnergies, numberOfSteps) = sample.processModel()
+    val (startEnergies, endEnergies, numberOfSteps) = sample.processModel(outFolder.canonicalPath)
     val startEnergy = startEnergies.first / EV_TO_DJ
     val endEnergy = endEnergies.first / EV_TO_DJ
-    sample.saveState(outFolder = outFolder.canonicalPath, filename = settings.momentaFileName)
+//    sample.saveState(outFolder = outFolder.canonicalPath, filename = settings.momentaFileName)
 
     val endTime = System.currentTimeMillis()
 

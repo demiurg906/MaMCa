@@ -5,10 +5,7 @@ import com.google.gson.reflect.TypeToken
 import org.apache.commons.io.FileUtils
 import org.physics.mamca.math.Vector
 import org.physics.mamca.math.abs
-import org.physics.mamca.util.pairs
-import org.physics.mamca.util.plus
-import org.physics.mamca.util.randomPhi
-import org.physics.mamca.util.randomTheta
+import org.physics.mamca.util.*
 import java.io.File
 import java.io.Serializable
 import java.lang.Math.cos
@@ -174,24 +171,48 @@ class Sample : Serializable {
      * основная функция, оптимизируящая энергию
      * @return (энергия до оптимизации, энергия после оптимизации, количество шагов оптимизации)
      */
-    fun processModel(): Triple<
+    fun processModel(outFolder: String? = null): Triple<
             Pair<Double, Triple<Double, Double, Double>>,
             Pair<Double, Triple<Double, Double, Double>>,
             Int> {
+        if ((outFolder == null) and !settings.hysteresis) {
+            throw IllegalStateException("outFolder can be null only in hysteresis run")
+        }
+
+        /**
+         * функция, сохраняющая состояние образца после релаксации после прыжка для
+         * негистерезисного запуска (для наблюдения релаксации системы)
+         */
+        fun saveStateAfterJump(exactlyAfter: Boolean = false) {
+            val id = if (exactlyAfter) 1 else 2
+
+            if (!settings.hysteresis) {
+                saveState(outFolder!!, "momenta_${nJumps}_$id.txt")
+            }
+        }
+
         var res = processRelaxation()
-        if (settings.t > 0) {
+        saveStateAfterJump()
+        val startEnergy = res.first
+
+                if (settings.t > 0) {
+            Logger.addDelimiter()
+            Logger.info("times of jumps [s]:\n")
             for (t in 0..settings.time.toInt() step JUMP_TIME) {
                 if (twoMinimums.isEmpty()) {
-                    println("oops, no minimums, t = ${t / S_TO_NS} s")
+                    Logger.info("oops, no minimums, t = ${(t / S_TO_NS).format(9)} s")
                     break
                 }
                 if (energyJumps()) {
-                    println("t is ${t / S_TO_NS} seconds")
+                    Logger.info((t / S_TO_NS).format(9))
+                    nJumps += 1
+                    saveStateAfterJump(true)
                     res = processRelaxation()
+                    saveStateAfterJump(false)
                 }
             }
         }
-        return res
+        return Triple(startEnergy, res.second, res.third)
     }
 
     fun energyJumps(): Boolean {

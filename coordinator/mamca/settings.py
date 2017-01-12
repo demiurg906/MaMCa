@@ -38,7 +38,6 @@ class Settings:
         self._d['hysteresisSteps'] = 7
         self._d['hysteresisLogScale'] = 0.1
         self._d['dataFolder'] = './resources'
-        self._d['momentaFileName'] = 'momenta.txt'
         if filename is not None:
             with open(filename) as f:
                 d = json.load(f)
@@ -277,14 +276,6 @@ class Settings:
     def dataFolder(self, value):
         self._d['dataFolder'] = value
 
-    @property
-    def momentaFileName(self):
-        return self._d['momentaFileName']
-
-    @momentaFileName.setter
-    def momentaFileName(self, value):
-        self._d['momentaFileName'] = value
-
     def __getitem__(self, key):
         return self._d[key]
 
@@ -296,5 +287,5 @@ class Settings:
             json.dump(self._d, f)
 
     def __str__(self):
-        return 'settings str not implemented'
+        return ''
 
