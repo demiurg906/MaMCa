@@ -31,7 +31,7 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val loc_theta: Double = 90.0, // [градус]
                     val loc_phi: Double = 0.0, // [градус]
 
-                    val ot: Int = 2, // расположение осей анизотропии (аналогично loc)
+                    val ot: Int = 0, // расположение осей анизотропии (аналогично loc)
                     val ot_theta: Double = 90.0, // [градус]
                     val ot_phi: Double = 0.0, // [градус]
 

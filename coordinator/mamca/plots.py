@@ -7,13 +7,19 @@ import shutil
 from functools import cmp_to_key, wraps
 
 import sys
+import matplotlib
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 from mamca.settings import Settings
 
+
+MU = '\u03BC'
+
 # счетчик для фигур
 _counter = 0
+
+matplotlib.rc('font', family='Arial')
 
 
 def _clear_folder(folder):
@@ -151,8 +157,8 @@ def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
     if label is None:
         label = 'M_{}(B_{})'.format(m_axis, b_axis)
     fig.canvas.set_window_title(label)
-    plt.xlabel('B_{}, magnetic field'.format(b_axis))
-    plt.ylabel('M_{}, magnetic moment'.format(m_axis))
+    plt.xlabel('B_{}, T'.format(b_axis))
+    plt.ylabel('M_{}, {}_B'.format(m_axis, MU))
 
     min_b, max_b = np.inf, -np.inf
     min_m, max_m = np.inf, -np.inf
@@ -164,7 +170,8 @@ def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
         if sign not in direction:
             continue
         b = float(b[axises[b_axis]])
-        m = get_full_moment('{}/{}'.format(out_folder, f))[axises[m_axis]]
+        # суммарный момент образца в магнетонах бора
+        m = get_full_moment('{}/{}'.format(out_folder, f))[axises[m_axis]] * settings.m
         min_b, max_b = min(min_b, b), max(max_b, b)
         min_m, max_m = min(min_m, m), max(max_m, m)
 
@@ -268,7 +275,7 @@ def create_momenta_gif(*, settings_fname: str):
 
 def draw_all_3d_vectors_plots(*, settings_fname: str = None, borders: list = None,
                               negative_borders: bool = True, label: str = None,
-                              save: bool = False, text: str = None,
+                              save: bool = False,
                               draw_particles: bool = True, scale: float = 1):
     """
     Рисует графики состояний до и после оптимизации
@@ -327,14 +334,25 @@ def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
     vectors, points = _read_vectors(filename)
     ax = fig.add_subplot(111, projection='3d')
     if borders is None:
-        mins, maxs = vectors.min(axis=0), vectors.max(axis=0)
-        x_min, x_max = min(mins[0], mins[3]), max(maxs[0], maxs[3])
-        y_min, y_max = min(mins[1], mins[4]), max(maxs[1], maxs[4])
-        z_min, z_max = min(mins[2], mins[5]), max(maxs[2], maxs[5])
+        # минимумы и максимумы координат
+        mins = points.min(axis=0)
+        maxs = points.max(axis=0)
+        # максимальное расстояние между крайними точками
+        l = max(maxs - mins)
+        # положение минимумов и максимумов на осях
+        # все расстояния равны максимальному
+        x_min = mins[0]
+        x_max = mins[0] + l
+
+        y_min = mins[1]
+        y_max = mins[1] + l
+        # TODO: т.к. пока все образцы плоские, z вычисляется таким образом
+        # для трехмерных образцов необходимо скорректировать
+        z_min = -l
+        z_max = mins[2] + l
+
+        # коэффициенты "растяжения"
         x_k, y_k, z_k = 1.1, 1.1, 1.1
-        if z_max - z_min < 1:
-            length = x_max - x_min
-            z_min, z_max = -length / 2, length / 2
         ax.set_xlim3d(x_min * x_k, x_max * x_k)
         ax.set_ylim3d(y_min * y_k, y_max * y_k)
         ax.set_zlim3d(z_min * z_k, z_max * z_k)
@@ -348,9 +366,9 @@ def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
             ax.set_xlim3d(borders[0], borders[1])
             ax.set_ylim3d(borders[2], borders[3])
             ax.set_zlim3d(borders[4], borders[5])
-    ax.set_xlabel('X axis')
-    ax.set_ylabel('Y axis')
-    ax.set_zlabel('Z axis')
+    ax.set_xlabel('x, nm')
+    ax.set_ylabel('y, nm')
+    ax.set_zlabel('z, nm')
 
     x1, y1, z1 = vectors[:, 0], vectors[:, 1], vectors[:, 2]
     x2, y2, z2 = vectors[:, 3], vectors[:, 4], vectors[:, 5]

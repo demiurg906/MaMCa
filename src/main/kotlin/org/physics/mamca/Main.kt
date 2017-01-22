@@ -7,6 +7,7 @@ import org.physics.mamca.math.div
 import org.physics.mamca.math.log
 import org.physics.mamca.util.*
 import java.io.File
+import java.io.IOException
 
 
 fun main(args: Array<String>) {
@@ -57,12 +58,20 @@ fun main(args: Array<String>) {
  */
 fun prepareFolders(settings: Settings) {
     val dataFolder = File("${settings.dataFolder}/${settings.name}")
-    if (dataFolder.exists()) {
-        if (dataFolder.isDirectory) {
-            FileUtils.cleanDirectory(dataFolder)
-        } else if (dataFolder.isFile) {
-            dataFolder.delete()
+    try {
+        if (dataFolder.exists()) {
+            if (dataFolder.isDirectory) {
+                FileUtils.cleanDirectory(dataFolder)
+            } else if (dataFolder.isFile) {
+                dataFolder.delete()
+            }
         }
+    } catch (e: IOException) {
+        if (e.message == null) {
+            throw e
+        }
+        println(e.message)
+        System.exit(1)
     }
     val outFolders = mutableListOf(
             "${settings.dataFolder}/${settings.name}/out",

@@ -322,13 +322,15 @@ class Sample : Serializable {
         val path = outFolder + File.separator + filename
         File(path).printWriter().use { out ->
             for (p in particles) {
+                // координтаты, [нм]
                 val x = p.loc.x
                 val y = p.loc.y
                 val z = p.loc.z
 
-                val mx = p.m.x
-                val my = p.m.y
-                val mz = p.m.z
+                // момент, безразмерный, нормированный
+                val mx = p.m.x / 2
+                val my = p.m.y / 2
+                val mz = p.m.z / 2
 
                 val x1 = x - mx
                 val x2 = x + mx
