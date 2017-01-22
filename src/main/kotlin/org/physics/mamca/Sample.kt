@@ -213,7 +213,7 @@ class Sample : Serializable {
                 if (settings.t > 0) {
             Logger.addDelimiter()
             Logger.info("times of jumps [s]:\n")
-            for (t in 0..settings.time.toInt() step JUMP_TIME) {
+            for (t in 0..settings.time.toInt() step settings.timeStep) {
                 if (twoMinimums.isEmpty()) {
                     Logger.info("oops, no minimums, t = ${(t / S_TO_NS).format(9)} s")
                     break

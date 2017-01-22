@@ -16,7 +16,11 @@
   "exchangeDistance":4.0,
 
   "viscosity":0.9,
-  "t":10.0,
+  "t":0.0,
+
+  "loc":0,
+  "loc_theta":90.0,
+  "loc_phi":0.0,
 
   "ot":2,
   "ot_theta":90.0,
@@ -26,9 +30,10 @@
   "b_y":0.0,
   "b_z":0.0,
 
-  "time":1.0e-6,
+  "time":1.0,
+  "timeStep":100,
 
-  "name":"low temperature",
+  "name":"default",
 
   "precision":7,
   "load":false,
@@ -38,5 +43,5 @@
   "hysteresisSteps":7,
   "hysteresisLogScale":0.1,
 
-  "dataFolder":"./resources"
+  "dataFolder":"./resources/data"
 }

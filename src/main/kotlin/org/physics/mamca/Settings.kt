@@ -15,7 +15,7 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val offset: Double = 4.0, // расстояние между клетками [нм]
 
                     val m: Double = 800.0, // значение момента [магнетон бора, шт]
-                    var kan: Double = 5.0e-2, // константа анизотропии [эВ]
+                    var kan: Double = 0.0165, // константа анизотропии [эВ]
                     var jex: Double = 5.0e0, // константа обмена [Тл^2 / эВ]
 
                     // расстояния, на которых чувтствуются взаимодействия:
@@ -40,6 +40,7 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val b_z: Double = 0.0, // поле по z [Тл]
 
                     var time: Double = 1.0, // время релаксации [с]
+                    val timeStep: Int = 100, // временной шаг [нс]
 
                     val name: String = "default", // имя модели (используется для графиков и логов)
 
@@ -61,7 +62,7 @@ val booleanFields = setOf("load", "hysteresis")
 
 // количество полей в блоке, отделенном от остальных новой строкой
 // нужен, чтобы поля были логически разделены пустыми строками
-val newLines = listOf(4, 3, 3, 2, 2, 3, 3, 3, 1, 1, 3, 3, 2)
+val newLines = listOf(4, 3, 3, 2, 2, 3, 3, 3, 2, 1, 3, 3, 2)
 
 fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()

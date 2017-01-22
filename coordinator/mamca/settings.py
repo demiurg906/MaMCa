@@ -17,7 +17,7 @@ class Settings:
         self._d['d'] = 60.0
         self._d['offset'] = 4.0
         self._d['m'] = 800.0
-        self._d['kan'] = 0.05
+        self._d['kan'] = 0.0165
         self._d['jex'] = 5.0
         self._d['dipolDistance'] = 30.0
         self._d['exchangeDistance'] = 4.0
@@ -33,6 +33,7 @@ class Settings:
         self._d['b_y'] = 0.0
         self._d['b_z'] = 0.0
         self._d['time'] = 1.0
+        self._d['timeStep'] = 100
         self._d['name'] = 'default'
         self._d['precision'] = 7
         self._d['load'] = False
@@ -40,7 +41,7 @@ class Settings:
         self._d['hysteresis'] = False
         self._d['hysteresisSteps'] = 7
         self._d['hysteresisLogScale'] = 0.1
-        self._d['dataFolder'] = './resources'
+        self._d['dataFolder'] = './resources/data'
         if filename is not None:
             with open(filename) as f:
                 d = json.load(f)
@@ -238,6 +239,14 @@ class Settings:
     @time.setter
     def time(self, value):
         self._d['time'] = value
+
+    @property
+    def timeStep(self):
+        return self._d['timeStep']
+
+    @timeStep.setter
+    def timeStep(self, value):
+        self._d['timeStep'] = value
 
     @property
     def name(self):
