@@ -51,7 +51,7 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val hysteresisSteps: Int = 7, // количество шагов гистерезиса в ветке от нуля до края
                     val hysteresisLogScale: Double = 0.1, // доля линейной области от всего диапазона поля
 
-                    val dataFolder: String = "./resources" // путь к папке для выходных данных
+                    val dataFolder: String = "./resources/data" // путь к папке для выходных данных
 )
 
 // списки с полями типа string и boolean
