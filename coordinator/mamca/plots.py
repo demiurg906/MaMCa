@@ -116,9 +116,9 @@ def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
     :param name: имя для скриншота
     """
     settings = Settings(settings_fname)
-    data_folder = '{}/{}/pictures'.format(settings.dataFolder, settings.name)
+    data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
     out_folder = '{}/out/hyst'.format(data_folder)
-    pic_dir = data_folder
+    pic_dir = data_folder + '/pictures'
 
     if direction is None:
         direction = {'fst', 'pos', 'neg'}
