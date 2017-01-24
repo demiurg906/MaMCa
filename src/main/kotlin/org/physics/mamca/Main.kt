@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils
 import org.physics.mamca.math.Vector
 import org.physics.mamca.math.div
 import org.physics.mamca.math.log
+import org.physics.mamca.math.rank
 import org.physics.mamca.util.*
 import java.io.File
 import java.io.IOException
@@ -75,13 +76,8 @@ fun prepareFolders(settings: Settings) {
     }
     val outFolders = mutableListOf(
             "${settings.dataFolder}/${settings.name}/out",
-            "${settings.dataFolder}/${settings.name}/pictures"
+            "${settings.dataFolder}/${settings.name}/pictures/moments"
     )
-    if (settings.hysteresis) {
-        outFolders += "${settings.dataFolder}/${settings.name}/out/hyst"
-    } else {
-        outFolders += "${settings.dataFolder}/${settings.name}/pictures/moments"
-    }
     outFolders.map(::File).filterNot(File::exists).forEach { it.mkdirs() }
 }
 
@@ -138,12 +134,9 @@ fun hysteresisRun(settings: Settings) {
 
     val dataFolder ="${settings.dataFolder}/${settings.name}"
     val outFolder = File("$dataFolder/out")
-    val outHystFolder = File("$dataFolder/out/hyst")
-    FileUtils.cleanDirectory(outHystFolder)
+    FileUtils.cleanDirectory(outFolder)
 
-    val sample = Sample(settings)
-    sample.dumpToJsonFile(outFolder.canonicalPath, "sample.json")
-    sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta_at_start.txt")
+
 
     val k = settings.hysteresisSteps
     val n = (2.5 * log(1 / settings.hysteresisLogScale, 1 + 4.0 / k)).toInt()
@@ -155,6 +148,13 @@ fun hysteresisRun(settings: Settings) {
     val bLinStep = minLogB / k
     minLogB = switchZerosToOnes(minLogB)
     val bLogStep = switchZerosToOnes(maxB / minLogB) % (1.0 / (n - 1))
+
+    var stepIndex = 1
+    val digitsOfIndex = rank(numberOfSteps)
+
+    val sample = Sample(settings)
+    sample.dumpToJsonFile(outFolder.canonicalPath, "sample.json")
+    sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta_${0.format(digitsOfIndex)}_fst_0.0_0.0_0.0.txt")
 
     fun step(i: Int, inc: Boolean, direction: String) {
         if (i < n - 1) {
@@ -172,7 +172,10 @@ fun hysteresisRun(settings: Settings) {
             sample.b /= (1.0 / bLogStep) // костыльное поэлементное перемножение двух векторов
         }
         sample.processModel()
-        sample.saveState(outHystFolder.canonicalPath, "hyst,$direction,${sample.b.x.format(2)},${sample.b.y.format(2)},${sample.b.z.format(2)}.txt")
+        sample.saveState(
+                outFolder.canonicalPath,
+                "momenta_${stepIndex.format(digitsOfIndex)}_${direction}_${sample.b.x.format(2)}_${sample.b.y.format(2)}_${sample.b.z.format(2)}.txt")
+        stepIndex += 1
     }
 
     println("Hysteresis cycle started")

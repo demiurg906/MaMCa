@@ -19,3 +19,15 @@ fun isKollinear(a: Vector, b: Vector): Boolean = equalsDouble(abs(a % b), 0.0)
 enum class Axis {
     X, Y, Z
 }
+
+fun rank(x: Int): Int {
+    var res = 0
+    var n = x
+    while (n != 0) {
+        n /= 10
+        res += 1
+    }
+    if (res == 0)
+        res = 1
+    return res
+}

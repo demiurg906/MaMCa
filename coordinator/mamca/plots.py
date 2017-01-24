@@ -1,42 +1,27 @@
-import subprocess
-
 import numpy as np
 import os
-import shutil
-
-from functools import cmp_to_key, wraps
-
 import sys
-import matplotlib
+import subprocess
+
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from mamca.settings import Settings
+from .settings import Settings
+from .util import which
 
-
+# греческая mu в utf-8 кодировке
 MU = '\u03BC'
 
 # счетчик для фигур
 _counter = 0
 
-matplotlib.rc('font', family='Arial')
+# установка семейства шрифтов для корректного отображения
+plt.rc('font', family='Arial')
 
-
-def _clear_folder(folder):
-    """
-    Удаляет содержимое папки
-    :param folder: путь к папке
-    :return:
-    """
-    for the_file in os.listdir(folder):
-        file_path = os.path.join(folder, the_file)
-        try:
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print(e)
+use_tex = which('tex') is not None
+# если установлен Тех, то импользовать его при рендере меток
+if use_tex:
+    plt.rc('text', usetex=True)
 
 
 def _get_lines(filename, skip=0):
@@ -67,43 +52,29 @@ def _read_vectors(filename):
 
 
 def draw_all_hyst_plots(*, settings_fname, b_axis, m_axis, label=None, borders=None,
-                        filter=None, save=False):
+                        area=None):
     """
     Рисует три графика гистерезиса -- по одному на каждую ветвь и общий
     """
-    draw_hyst_plot(settings_fname=settings_fname,
-                   b_axis=b_axis, m_axis=m_axis,
-                   label=label, borders=borders,
-                   filter=filter, save=save,
-                   direction=None,
-                   name='0_hyst_plot'
-                   )
-    draw_hyst_plot(settings_fname=settings_fname,
-                   b_axis=b_axis, m_axis=m_axis,
-                   label=label, borders=borders,
-                   filter=filter, save=save,
-                   direction='fst',
-                   name='1_hyst_plot_fst'
-                   )
-    draw_hyst_plot(settings_fname=settings_fname,
-                   b_axis=b_axis, m_axis=m_axis,
-                   label=label, borders=borders,
-                   filter=filter, save=save,
-                   direction='neg',
-                   name='2_hyst_plot_neg'
-                   )
-    draw_hyst_plot(settings_fname=settings_fname,
-                   b_axis=b_axis, m_axis=m_axis,
-                   label=label, borders=borders,
-                   filter=filter, save=save,
-                   direction='pos',
-                   name='3_hyst_plot_pos'
-                   )
+    data = (
+        (None, '0_hyst_plot'),
+        ('fst', '1_hyst_plot_fst'),
+        ('neg', '2_hyst_plot_neg'),
+        ('pos', '3_hyst_plot_pos')
+    )
+    for direction, name in data:
+        draw_hyst_plot(
+            settings_fname=settings_fname,
+            b_axis=b_axis, m_axis=m_axis,
+            label=label, borders=borders,
+            area=area,
+            direction=direction,
+            name=name
+        )
 
 
 def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
-                   direction=None, filter=None,
-                   save=False, name=None):
+                   direction=None, area=None, name=None):
     """
     Рисует петлю гистерезиса
     :param settings_fname: путь к файлу с настройками, для отображения
@@ -114,16 +85,15 @@ def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
     :param borders: диапазон поля ([min_b, max_b])
     :param direction: множество, определяющее, какие ветви гистерезиса
         отрисовывать ({'fst', 'neg', 'pos'})
-    :param filter: массив, определяющий, какую часть частиц использовать.
+    :param area: массив, определяющий, какую часть частиц использовать.
         использовать только для систем, лежащих в плоскости.
         формат: [dn_x, dn_y, n_x, n_y] -- dn_x и dn_y -- сколько частиц
         отрезать с обеих сторон, n_x и n_y -- сколько частиц всего
-    :param(bool) save: сохранять ли график в файл
     :param name: имя для скриншота
     """
     settings = Settings(settings_fname)
     data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
-    out_folder = '{}/out/hyst'.format(data_folder)
+    out_folder = '{}/out'.format(data_folder)
     pic_dir = data_folder + '/pictures'
 
     if direction is None:
@@ -131,129 +101,90 @@ def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
     axises = {'x': 0, 'y': 1, 'z': 2}
 
     def get_full_moment(file):
+        """
+        читает моменты частиц образца из файла и суммирует их
+        """
         vs, points = _read_vectors(file)
-        if filter is None:
+        # суммировать все моменты
+        if area is None:
             return sum(vs[:, 3] - vs[:, 0]), \
                    sum(vs[:, 4] - vs[:, 1]), \
                    sum(vs[:, 5] - vs[:, 2])
         else:
-            dx, dy, nx, ny = filter[0], filter[1], filter[2], filter[3]
+            # суммировать только моменты из центра образца,
+            # в соответсвии с параметров filter
+            dx, dy, nx, ny = area[0], area[1], area[2], area[3]
             left = [dx, dy, -int(2e10)]
             right = [nx - dx, ny - dy, int(2e10)]
             res = [0, 0, 0]
             for i in range(points.shape[0]):
-                b = True
+                in_area = True
                 for j in range(3):
                     if not (left[j] <= points[i, j] < right[j]):
-                        b = False
-                if b:
+                        in_area = False
+                if in_area:
                     for j in range(3):
                         res[j] += vs[i, j + 3] - vs[i, j]
             return res[0], res[1], res[2]
 
     global _counter
-    fig = plt.figure(_counter)
+    fig = plt.figure(0)
     _counter += 1
-    if label is None:
-        label = 'M_{}(B_{})'.format(m_axis, b_axis)
+
+    # подписи на графике
+    if use_tex:
+        if label is None:
+            label = r'$M_{}(B_{})$'.format(m_axis, b_axis)
+        plt.xlabel(r'$B_{}, T$'.format(b_axis))
+        plt.ylabel(r'$M_{}, \mu_B$'.format(m_axis))
+    else:
+        if label is None:
+            label = 'M_{}(B_{})'.format(m_axis, b_axis)
+        plt.xlabel('B_{}, T'.format(b_axis))
+        plt.ylabel('M_{}, {}_B'.format(m_axis, MU))
     fig.canvas.set_window_title(label)
-    plt.xlabel('B_{}, T'.format(b_axis))
-    plt.ylabel('M_{}, {}_B'.format(m_axis, MU))
 
     min_b, max_b = np.inf, -np.inf
     min_m, max_m = np.inf, -np.inf
     for f in os.listdir(out_folder):
         try:
-            s, sign, *b = f[:-4].split(',')
+            s, n, sign, *b = f[:-4].split('_')
         except ValueError:
             continue
         if sign not in direction:
             continue
         b = float(b[axises[b_axis]])
+
         # суммарный момент образца в магнетонах бора
         m = get_full_moment('{}/{}'.format(out_folder, f))[axises[m_axis]] * settings.m
+
+        # вычисление границ поля
         min_b, max_b = min(min_b, b), max(max_b, b)
+
+        # вычисление границ момента
         min_m, max_m = min(min_m, m), max(max_m, m)
 
         color = {'pos': 'r', 'neg': 'b', 'fst': 'g'}
         plt.scatter(b, m, color=color[sign])
+
+    # выравнивание границ поля и момента, чтобы график был симметричным по обоим осям
+    max_b = max(abs(min_b), abs(max_b))
+    min_b = -max_b
+    max_m = max(abs(min_m), abs(max_m))
+    min_m = -max_m
+
+    # установка границ
     if borders is not None:
         min_b, max_b = borders[0], borders[1]
     axis = [min_b, max_b, min_m, max_m]
     plt.axis(list(map(lambda x: x * 1.1, axis)))
-    if settings_fname is not None:
-        plt.text(min_b, max_m / 3, str(Settings(settings_fname)))
-    if save:
-        if name is None:
-            name = 'fig_{}'.format(_counter)
-        plt.savefig('{}/{}.png'.format(pic_dir, name), format='png')
-        plt.clf()
 
-
-def create_hysteresis_gif(*, settings_fname, borders=None,
-                          negative_borders=False, clear=True,
-                          show=False, is3d=True, scale=1):
-    """
-    Рисует набор трехмерных графиков для цикла гистерезиса
-    :param settings_fname: путь к файлу с настройками
-    :param borders: границы графиков в формате borders функции
-        draw_3d_vectors_plot
-    :param(bool) negative_borders: параметр для draw_3d_vectors_plot
-    :param(bool) clear: очищать ли папку со скриншотами перед сохранением
-    :param(bool) show: отображать ли окна с графиками
-    :param(bool) is3d: рисовать трехмерный график или двумерный в осяц x y
-    :param(float) scale: масштаб для стрелочек
-    """
-    settings = Settings(settings_fname)
-    data_folder = '{}/{}/pictures'.format(settings.dataFolder, settings.name)
-    out_folder = '{}/out/hyst'.format(data_folder)
-    pic_dir = data_folder
-
-    names = []
-    b_fields = {}
-    signs = {'fst': 0, 'neg': 1, 'pos': 2}
-    files = []
-
-    for f in os.listdir(out_folder):
-        try:
-            _, sign, *b = f[:-4].split(',')
-        except ValueError:
-            continue
-        b = list(map(lambda x: int(float(x)), b))
-        names.append([signs[sign], *b, f])
-        b_fields[f] = b
-        files.append(f)
-
-    def cmp(x, y):
-        if x[0] != y[0]:
-            return x[0] - y[0]
-        sgn = x[0]
-        for i in range(1, 4):
-            if x[i] != y[i]:
-                return y[i] - x[i] if sgn == 1 else x[i] - y[i]
-        return 0
-
-    names.sort(key=cmp_to_key(cmp))
-    d_names = {x[4]: ('{}_{}_{}_{}_{}'.format(x[0], i, x[1], x[2], x[3]))
-               for i, x in enumerate(names)}
-    if not os.path.exists(pic_dir):
-        os.mkdir(pic_dir)
-    if clear:
-        _clear_folder(pic_dir)
-    for f in files:
-        if is3d:
-            draw_3d_vectors_plot(
-                '{}/{}'.format(out_folder, f), borders=borders,
-                negative_borders=negative_borders, save=not show,
-                pic_dir=pic_dir, name=d_names[f],
-                text='B = ({}, {}, {})'.format(*b_fields[f]),
-                draw_particles=False, scale=scale)
-        else:
-            draw_xy_vectors_plot(
-                '{}/{}'.format(out_folder, f), borders=borders,
-                negative_borders=negative_borders, save=not show,
-                pic_dir=pic_dir, name=d_names[f],
-                text='B = ({}, {}, {})'.format(*b_fields[f]))
+    # if settings_fname is not None:
+    #     plt.text(min_b, max_m / 3, str(Settings(settings_fname)))
+    if name is None:
+        name = 'fig_{}'.format(_counter)
+    plt.savefig('{}/{}.png'.format(pic_dir, name), format='png')
+    plt.clf()
 
 
 def create_momenta_gif(*, settings_fname: str):
@@ -275,8 +206,7 @@ def create_momenta_gif(*, settings_fname: str):
 
 def draw_all_3d_vectors_plots(*, settings_fname: str = None, borders: list = None,
                               negative_borders: bool = True, label: str = None,
-                              save: bool = False,
-                              draw_particles: bool = True, scale: float = 1):
+                              scale: float = 1):
     """
     Рисует графики состояний до и после оптимизации
     """
@@ -284,23 +214,26 @@ def draw_all_3d_vectors_plots(*, settings_fname: str = None, borders: list = Non
     data_folder = '{}/{}/out'.format(settings.dataFolder, settings.name)
     for file in os.listdir(data_folder):
         if file.startswith('momenta'):
-            _, _, _, t = file[:-4].split('_')
-            draw_3d_vectors_plot(settings_fname=settings_fname,
-                                 borders=borders,
-                                 negative_borders=negative_borders,
-                                 label=label,
-                                 save=save,
-                                 text='t = {} s'.format(t),
-                                 draw_particles=draw_particles,
-                                 scale=scale,
-                                 momenta_filename=file
-                                 )
+            if settings.hysteresis:
+                _, _, _, bx, by, bz = file[:-4].split('_')
+                text = 'B({}, {}, {})'.format(bx, by, bz)
+            else:
+                _, _, _, t = file[:-4].split('_')
+                text = 't = {} s'.format(t)
+            draw_3d_vectors_plot(
+                settings_fname=settings_fname,
+                borders=borders,
+                negative_borders=negative_borders,
+                label=label,
+                text=text,
+                scale=scale,
+                momenta_filename=file
+            )
 
 
 def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
                          negative_borders: bool = True, label: str = None,
-                         save: bool = False, text: str = None,
-                         draw_particles: bool = True, scale: float = 1,
+                         text: str = None, scale: float = 1,
                          momenta_filename: str
                          ):
     """
@@ -309,14 +242,12 @@ def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
         их на графике
     :param borders: массив границ графика.
         формат: либо [x, y, z] либо [x1, x2, y1, y2, z1, z2]
-    :param negative_borders: если формат массива borders [x, y, z],
+    :param(bool) negative_borders: если формат массива borders [x, y, z],
         то этот параметр определяет границы.
         Если True, то границы будут [-x, x, -y, y, -z, z],
         если False, то [0, x, 0, y, 0, z]
-    :param label: название графика
-    :param(bool) save: сохранять ли график в файл
-    :param text: текст для отображения на графике
-    :param(bool) draw_particles: нужно ли отображать частицы
+    :param(str) label: название графика
+    :param(str) text: текст для отображения на графике
     :param(float) scale: масштаб стрелочек
     :param(str) momenta_filename: путь к файлу с данными
     """
@@ -327,7 +258,7 @@ def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
     pic_dir = '{}/pictures/moments'.format(data_folder)
 
     global _counter
-    fig = plt.figure(_counter)
+    fig = plt.figure(0)
     _counter += 1
     if label is not None:
         fig.canvas.set_window_title(str(label))
@@ -366,16 +297,20 @@ def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
             ax.set_xlim3d(borders[0], borders[1])
             ax.set_ylim3d(borders[2], borders[3])
             ax.set_zlim3d(borders[4], borders[5])
+
+    # подписи осей
     ax.set_xlabel('x, nm')
     ax.set_ylabel('y, nm')
     ax.set_zlabel('z, nm')
 
+    # координаты стрелок моментов
     x1, y1, z1 = vectors[:, 0], vectors[:, 1], vectors[:, 2]
     x2, y2, z2 = vectors[:, 3], vectors[:, 4], vectors[:, 5]
     u, v, w = x2 - x1, y2 - y1, z2 - z1
 
-    # scaling
+    # scaling моментов
     # уебался, пока разбирался, как масштабировать эти чертовы стрелочки
+    # вроде как криво работает в версиях matplotlib'а выше 1.5.8 (и, возможно, ниже)
     k = (scale - 1) / 2
     dx, dy, dz = u * k, v * k, w * k
     x1 -= dx
@@ -386,221 +321,17 @@ def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
     z2 += dz
     u, v, w = x2 - x1, y2 - y1, z2 - z1
 
-    ax.quiver(x1, y1, z1, u, v, w, length=scale * 2, pivot='tail', arrow_length_ratio=0.2)  # 0.5
+    # рисование моментов
+    ax.quiver(x1, y1, z1, u, v, w, length=scale * 2, pivot='tail', arrow_length_ratio=0.2)
 
-    if draw_particles:
-        x, y, z = points[:, 0], points[:, 1], points[:, 2]
-        ax.scatter(x, y, z, c='r')
+    # рисование частиц
+    x, y, z = points[:, 0], points[:, 1], points[:, 2]
+    ax.scatter(x, y, z, c='r')
 
-    # ax.text2D(0.05, 0.65, str(settings),
-    #           transform=ax.transAxes)
     if text is not None:
         ax.text2D(0.05, 0.65, text, transform=ax.transAxes)
 
-    if save:
-        if name is None:
-            name = 'fig_{}'.format(_counter)
-        plt.savefig('{}/{}.png'.format(pic_dir, name), format='png')
-        plt.clf()
-
-
-def _draw_vectors_plot(filename, label, x, y, borders=None,
-                       negative_borders=False,
-                       save=False, pic_dir='Screenshots',
-                       name=None, text=None):
-    """
-    Рисует двумерный график в заданных осях
-    :param filename: путь к файлу с даннми
-    :param label: название графика
-    :param x: ось абсцисс (x -- 0, y -- 1, z -- 2)
-    :param y: ось ординат (x -- 0, y -- 1, z -- 2)
-    :param borders: массив границ графика.
-        формат: либо [x, y, z] либо [x1, x2, y1, y2, z1, z2]
-    :param negative_borders: если формат массива borders [x, y, z],
-        то этот параметр определяет границы.
-        Если True, то границы будут [-x, x, -y, y, -z, z],
-        если False, то [0, x, 0, y, 0, z]
-    :param(bool) save: сохранять ли график в файл
-    :param pic_dir: путь к папке для сохранения скриншотов
-    :param name: имя для скриншота
-    :param text: текст для отображения на графике
-    """
-    global _counter
-    fig = plt.figure(_counter)
-    _counter += 1
-    if label is not None:
-        fig.canvas.set_window_title(label)
-    # индексы с нужными осями
-    x1, y1, x2, y2 = x, y, x + 3, y + 3
-    vectors, points = _read_vectors(filename)
-    # минимальные и максимальные значения
-    if borders is None:
-        mins, maxs = vectors.min(axis=0), vectors.max(axis=0)
-        axis = [min(mins[x1], mins[x2]), max(maxs[x1], maxs[x2]),
-                min(mins[y1], mins[y2]), max(maxs[y1], maxs[y2])]
-    else:
-        if len(borders) == 2:
-            k = -1 if negative_borders else 0
-            axis = [borders[0] * k, borders[0],
-                    borders[1] * k, borders[1]]
-        else:
-            axis = borders
-
-    # масштаб осей
-    plt.axis(list(map(lambda k: k * 1.1, axis)))
-    # подписи оскй
-    axises = {0: 'x', 1: 'y', 2: 'z'}
-    plt.xlabel(axises[x])
-    plt.ylabel(axises[y])
-    # рисование стрелок
-    ax = plt.axes()
-    for v in vectors:
-        ax.arrow(v[x1], v[y1], v[x2] - v[x1], v[y2] - v[y1])
-
-    if text is not None:
-        ax.text(0.05, 0.65, text, transform=ax.transAxes)
-
-    if save:
-        if name is None:
-            name = 'fig_{}'.format(_counter)
-        plt.savefig('{}/{}.png'.format(pic_dir, name), format='png')
-        plt.clf()
-
-
-def draw_xy_vectors_plot(filename, label=None, borders=None,
-                         negative_borders=False,
-                         save=False, pic_dir='Screenshots',
-                         name=None, text=None):
-    """
-    Рисует двумерный график в заданных осях
-    :param filename: путь к файлу с даннми
-    :param label: название графика
-    :param x: ось абсцисс (x -- 0, y -- 1, z -- 2)
-    :param y: ось ординат (x -- 0, y -- 1, z -- 2)
-    :param borders: массив границ графика.
-        формат: либо [x, y, z] либо [x1, x2, y1, y2, z1, z2]
-    :param negative_borders: если формат массива borders [x, y, z],
-        то этот параметр определяет границы.
-        Если True, то границы будут [-x, x, -y, y, -z, z],
-        если False, то [0, x, 0, y, 0, z]
-    :param(bool) save: сохранять ли график в файл
-    :param pic_dir: путь к папке для сохранения скриншотов
-    :param name: имя для скриншота
-    :param text: текст для отображения на графике
-    """
-    _draw_vectors_plot(filename, label, 0, 1, borders, negative_borders,
-                       save, pic_dir, name, text)
-
-
-def draw_xz_vectors_plot(filename, label=None, borders=None,
-                         negative_borders=False,
-                         save=False, pic_dir='Screenshots',
-                         name=None, text=None):
-    """
-    Рисует двумерный график в заданных осях
-    :param filename: путь к файлу с даннми
-    :param label: название графика
-    :param x: ось абсцисс (x -- 0, y -- 1, z -- 2)
-    :param y: ось ординат (x -- 0, y -- 1, z -- 2)
-    :param borders: массив границ графика.
-        формат: либо [x, y, z] либо [x1, x2, y1, y2, z1, z2]
-    :param negative_borders: если формат массива borders [x, y, z],
-        то этот параметр определяет границы.
-        Если True, то границы будут [-x, x, -y, y, -z, z],
-        если False, то [0, x, 0, y, 0, z]
-    :param(bool) save: сохранять ли график в файл
-    :param pic_dir: путь к папке для сохранения скриншотов
-    :param name: имя для скриншота
-    :param text: текст для отображения на графике
-    """
-    _draw_vectors_plot(filename, label, 0, 2, borders, negative_borders,
-                       save, pic_dir, name, text)
-
-
-def draw_yz_vectors_plot(filename, label=None, borders=None,
-                         negative_borders=False,
-                         save=False, pic_dir='Screenshots',
-                         name=None, text=None):
-    """
-    Рисует двумерный график в заданных осях
-    :param filename: путь к файлу с даннми
-    :param label: название графика
-    :param x: ось абсцисс (x -- 0, y -- 1, z -- 2)
-    :param y: ось ординат (x -- 0, y -- 1, z -- 2)
-    :param borders: массив границ графика.
-        формат: либо [x, y, z] либо [x1, x2, y1, y2, z1, z2]
-    :param negative_borders: если формат массива borders [x, y, z],
-        то этот параметр определяет границы.
-        Если True, то границы будут [-x, x, -y, y, -z, z],
-        если False, то [0, x, 0, y, 0, z]
-    :param(bool) save: сохранять ли график в файл
-    :param pic_dir: путь к папке для сохранения скриншотов
-    :param name: имя для скриншота
-    :param text: текст для отображения на графике
-    """
-    _draw_vectors_plot(filename, label, 1, 2, borders, negative_borders,
-                       save, pic_dir, name, text)
-
-
-def draw_all_2d_vectors_plots(filename, label=None):
-    """
-    Рисует графики векторов во всех плоскостях
-    :param filename: путь к файлу с данными
-    :param label: название графика
-    """
-    if label is None:
-        labels = ['xy', 'yz', 'xz']
-    else:
-        labels = [label, label, label]
-    draw_xy_vectors_plot(filename, labels[0])
-    draw_yz_vectors_plot(filename, labels[1])
-    draw_xz_vectors_plot(filename, labels[2])
-
-
-def draw_multiple_plots_for_cycle(out_folder, parameter_name, start, end, step,
-                                  addition=True,
-                                  settings_fname=None, borders=None,
-                                  negative_borders=False,
-                                  save=False, pic_dir='Screenshots'):
-    """
-    Рисует набор графиков для данных с одним изменяющимся параметром
-    :param out_folder: путь к папке с данными
-    :param parameter_name: параметр, который менялся
-    :param start: начальное значение параметра
-    :param end: конечное значение параметра
-    :param step: шаг изменения параметра
-    :param(bool) addition: переменная, определяющая, как изменялся параметр.
-        Если True, то new_value = old_value + step
-        Если False, то new_value = old_value * step
-    :param settings_fname: путь к файлу с настройками, для отображения
-        их на графике
-    :param borders: массив границ графика.
-        формат: либо [x, y, z] либо [x1, x2, y1, y2, z1, z2]
-    :param negative_borders: если формат массива borders [x, y, z],
-        то этот параметр определяет границы.
-        Если True, то границы будут [-x, x, -y, y, -z, z],
-        если False, то [0, x, 0, y, 0, z]
-    :param(bool) save: сохранять ли график в файл
-    :param pic_dir: путь к папке для сохранения скриншотов
-    """
-    template = parameter_name + ',{}.txt'
-    value = start
-    while value <= end:
-        name = '{} = {}'.format(parameter_name, value)
-        draw_3d_vectors_plot(
-            '{}/{}'.format(out_folder, template.format(value)), settings_fname,
-            label=name, borders=borders, negative_borders=negative_borders,
-            save=save, pic_dir=pic_dir, name=name)
-        if addition:
-            value += step
-        else:
-            value *= step
-
-
-# Используется для рисования всех созданных графиков
-def end_of_drawing():
-    """
-    Необходимо вызывать после вызова всех процедур рисования для отображения
-        нарисованных графиков (если не был выбран режим сохранения в файл)
-    """
-    plt.show()
+    if name is None:
+        name = 'fig_{}'.format(_counter)
+    plt.savefig('{}/{}.png'.format(pic_dir, name), format='png')
+    plt.clf()
