@@ -1,3 +1,6 @@
+import simpleaudio as sa
+
+
 def which(program):
     """
     Функция ищет путь к программе в системном PATH
@@ -28,3 +31,10 @@ def which(program):
                     return exe_fpath
 
     return None
+
+
+def play_notification():
+    notification = './resources/notifications/office-2.wav'
+    wave_obj = sa.WaveObject.from_wave_file(notification)
+    play_obj = wave_obj.play()
+    play_obj.wait_done()

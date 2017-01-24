@@ -12,8 +12,7 @@ if __name__ == '__main__':
         )
     draw_all_3d_vectors_plots(
         settings_fname=settings_fname,
-        # borders=[30, 30, 30],
         scale=8,
     )
     create_momenta_gif(settings_fname=settings_fname)
-    # end_of_drawing()
+    play_notification()
