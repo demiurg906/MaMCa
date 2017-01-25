@@ -27,7 +27,7 @@ envs {
     packages = ['pip', '' +
             'setuptools']
 
-    conda 'python35_64', '3.5', ['numpy', 'matplotlib==1.5.3'], true
+    conda 'python35_64', '3.5', ['numpy', 'matplotlib==1.5.3', 'simpleaudio'], true
 }
 
 def pythonPath
