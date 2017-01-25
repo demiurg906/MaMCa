@@ -196,12 +196,21 @@ def create_momenta_gif(*, settings_fname: str):
     settings = Settings(settings_fname)
     data_folder = '{}/{}/pictures'.format(settings.dataFolder, settings.name)
     momenta_template = '{}/moments/momenta*.png'.format(data_folder)
-    exe = 'magick convert -delay 60 -loop 0 "{}" "{}/momenta.gif"'.format(momenta_template, data_folder)
-    try:
-        subprocess.run(exe, stdout=sys.stdout, stderr=sys.stderr, )
-    except FileNotFoundError:
+    # поиск утилиты convert
+    # под windows есть системная утилита convert,
+    # поэтому запуск осуществляется посредством 'magick convert'
+    if 'win' in sys.platform:
+        exe = which('magick')
+        if exe is not None:
+            exe += ' convert'
+    else:
+        exe = which('convert')
+    if exe is None:
         print('You need install ImageMagick (http://www.imagemagick.org) for creating gifs')
         print('magick must be in your classpath')
+        return
+    exe += ' -delay 60 -loop 0 "{}" "{}/momenta.gif"'.format(momenta_template, data_folder)
+    subprocess.run(exe, stdout=sys.stdout, stderr=sys.stderr, )
 
 
 def draw_all_3d_vectors_plots(*, settings_fname: str = None, borders: list = None,
