@@ -123,56 +123,40 @@ class Vector {
         return res
     }
 
-    operator fun unaryPlus(): Vector {
-        return Vector(x, y, z)
-    }
+    operator fun unaryPlus(): Vector = Vector(x, y, z)
 
-    operator fun unaryMinus(): Vector {
-        return Vector(-x, -y, -z)
-    }
+    operator fun unaryMinus(): Vector = Vector(-x, -y, -z)
 
-    operator fun plus(other: Vector): Vector {
-        return Vector(this.x + other.x, this.y + other.y, this.z + other.z)
-    }
+    operator fun plus(other: Vector): Vector = Vector(this.x + other.x, this.y + other.y, this.z + other.z)
 
-    operator fun minus(other: Vector): Vector {
-        return Vector(this.x - other.x, this.y - other.y, this.z - other.z)
-    }
+    operator fun minus(other: Vector): Vector = Vector(this.x - other.x, this.y - other.y, this.z - other.z)
 
     /**
      * скалярное произведение векторов
      */
-    operator fun times(other: Vector): Double {
-        return this.x * other.x + this.y * other.y + this.z * other.z
-    }
+    operator fun times(other: Vector): Double = this.x * other.x + this.y * other.y + this.z * other.z
 
-    operator fun times(c: Double): Vector {
-        return Vector(x * c, y * c, z * c)
-    }
+    operator fun times(c: Double): Vector = Vector(x * c, y * c, z * c)
 
-    operator fun div(c: Int): Vector {
-        return Vector(x / c, y / c, z / c)
-    }
+    operator fun  times(c: Int): Vector = Vector(x * c, y * c, z * c)
 
-    operator fun div(c: Double): Vector {
-        return Vector(x / c, y / c, z / c)
-    }
+    operator fun div(c: Int): Vector = Vector(x / c, y / c, z / c)
+
+    operator fun div(c: Double): Vector = Vector(x / c, y / c, z / c)
 
     /**
      * поэлементное деление векторов
      */
-    operator fun div(other: Vector): Vector {
-        return Vector(x / other.x, y / other.y, z / other.z)
-    }
+    operator fun div(other: Vector): Vector = Vector(x / other.x, y / other.y, z / other.z)
 
     /**
      * векторное произведение веторов
      */
-    operator fun mod(other: Vector): Vector {
-        return Vector(this.y * other.z - this.z * other.y,
-                this.z * other.x - this.x * other.z,
-                this.x * other.y - this.y * other.x)
-    }
+    operator fun mod(other: Vector): Vector = Vector(
+            this.y * other.z - this.z * other.y,
+            this.z * other.x - this.x * other.z,
+            this.x * other.y - this.y * other.x
+    )
 
     /**
      * возведение всех элементов вектора в степень c
@@ -193,9 +177,7 @@ class Vector {
     /**
      * возвращает ненаправленное значение угла между двумя векторами
      */
-    fun angleTo(other: Vector): Double {
-        return Math.acos(this * other)
-    }
+    fun angleTo(other: Vector): Double = Math.acos(this * other)
 
     /**
      * возвращает декартовы координаты в виде списка
@@ -228,9 +210,8 @@ class Vector {
         return result
     }
 
-    override fun toString(): String {
-        return "(${x.eFormat(2)}, ${y.eFormat(2)}, ${z.eFormat(2)})"
-    }
+    override fun toString(): String =
+            "(${x.eFormat(2)}, ${y.eFormat(2)}, ${z.eFormat(2)})"
 
     /**
      * сериализация вектора в json строку
