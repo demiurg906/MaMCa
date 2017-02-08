@@ -23,7 +23,7 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val exchangeDistance: Double = 4.0, // обменное, [нм]
 
                     var viscosity: Double = 0.9, // коэффициент вязкости, 0 <= viscosity <= 1
-                    val t: Double = 0.0, // температура [К]
+                    var t: Double = 0.0, // температура [К]
 
                     val loc: Int = 0, // начальное расположение моментов
                     // 0 -- рандом в 3D, 1 -- рандом в 2D, 2 -- заданная ось
@@ -46,11 +46,12 @@ data class Settings(val x: Int = 1, // количество клеток по x
 
                     val precision: Int = 7, // точность (количество шагов симуляции)
                     var load: Boolean = false, // загружать ли предыдущее состояние
-                    var jsonPath: String = "./resources/out/sample.json", // путь к сохраненному состоянию
+                    var jsonPath: String = "./resources/data/default/out/sample.json", // путь к сохраненному состоянию
 
                     val hysteresis: Boolean = false, // нужно ли запускать в режиме гистерезиса
                     val hysteresisSteps: Int = 7, // количество шагов гистерезиса в ветке от нуля до края
-                    val hysteresisLogScale: Double = 0.1, // доля линейной области от всего диапазона поля
+                    val hysteresisDenseSteps: Int = 2, // количество больших шагов в частой области
+                    val hysteresisDenseMultiplier: Int = 2, // отношение шага в обычной области к шагу в частой области
 
                     val dataFolder: String = "./resources/data" // путь к папке для выходных данных
 )
@@ -62,7 +63,7 @@ val booleanFields = setOf("load", "hysteresis")
 
 // количество полей в блоке, отделенном от остальных новой строкой
 // нужен, чтобы поля были логически разделены пустыми строками
-val newLines = listOf(4, 3, 3, 2, 2, 3, 3, 3, 2, 1, 3, 3, 2)
+val newLines = listOf(4, 3, 3, 2, 2, 3, 3, 3, 2, 1, 3, 4, 2)
 
 fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()

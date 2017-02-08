@@ -3,8 +3,7 @@ package org.physics.mamca
 import org.apache.commons.cli.*
 import org.apache.commons.io.FileUtils
 import org.physics.mamca.math.Vector
-import org.physics.mamca.math.div
-import org.physics.mamca.math.log
+import org.physics.mamca.math.abs
 import org.physics.mamca.math.rank
 import org.physics.mamca.util.*
 import java.io.File
@@ -44,10 +43,18 @@ fun main(args: Array<String>) {
     prepareFolders(settings)
     createSettingsJson("${settings.dataFolder}/${settings.name}/settings.json", settings)
 
+    val startTime = System.currentTimeMillis()
     if (!settings.hysteresis) {
         singleRun(settings)
     } else {
         hysteresisRun(settings)
+    }
+    val endTime = System.currentTimeMillis()
+    Logger.addDelimiter().
+            info("time of working is ${(endTime - startTime) / 1000.0} seconds").
+            addDelimiter()
+    File("${settings.dataFolder}/${settings.name}/log.log").printWriter().use { out ->
+        out.write(Logger.toString())
     }
 
     Sound.playSound("./resources/notifications/arpeggio.wav").join()
@@ -85,7 +92,7 @@ fun prepareFolders(settings: Settings) {
  * Запускает один цикл симуляции
  */
 fun singleRun(settings: Settings) {
-    val startTime = System.currentTimeMillis()
+
 
     val dataFolder ="${settings.dataFolder}/${settings.name}"
     val outFolder = File("$dataFolder/out")
@@ -94,18 +101,13 @@ fun singleRun(settings: Settings) {
     sample.dumpToJsonFile(outFolder.canonicalPath, "sample.json")
     sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta_00_1_${0.0.format(9)}.txt")
 
-    val midTime = System.currentTimeMillis()
     val (startEnergies, endEnergies, numberOfSteps) = sample.processModel(outFolder.canonicalPath)
     val startEnergy = startEnergies.first / EV_TO_DJ
     val endEnergy = endEnergies.first / EV_TO_DJ
 //    sample.saveState(outFolder = outFolder.canonicalPath, filename = settings.momentaFileName)
 
-    val endTime = System.currentTimeMillis()
-
 
     Logger.addLineBreak().addDelimiter()
-    Logger.info("time of working is ${(endTime - startTime) / 1000.0} seconds")
-    Logger.info("time of computation is ${(endTime - midTime) / 1000.0} seconds")
     Logger.info("sample size is ${settings.x}x${settings.y}x${settings.z} with ${settings.n} particles per ring")
     Logger.info("total number of particles is ${settings.x * settings.y * settings.z * settings.n}")
     Logger.info("")
@@ -123,10 +125,6 @@ fun singleRun(settings: Settings) {
         Logger.info("\nWOOOOOOOOOOW\n")
     }
     Logger.addDelimiter()
-
-    File("$dataFolder/log.log").printWriter().use { out ->
-        out.write(Logger.toString())
-    }
 }
 
 fun hysteresisRun(settings: Settings) {
@@ -137,17 +135,19 @@ fun hysteresisRun(settings: Settings) {
     FileUtils.cleanDirectory(outFolder)
 
 
-
     val k = settings.hysteresisSteps
-    val n = (2.5 * log(1 / settings.hysteresisLogScale, 1 + 4.0 / k)).toInt()
+    val n = settings.hysteresisDenseSteps * settings.hysteresisDenseMultiplier
 
     val numberOfSteps = 2 * (n + k) - 1
 
     val maxB = Vector(settings.b_x, settings.b_y, settings.b_z)
-    var minLogB = maxB * settings.hysteresisLogScale
-    val bLinStep = minLogB / k
-    minLogB = switchZerosToOnes(minLogB)
-    val bLogStep = switchZerosToOnes(maxB / minLogB) % (1.0 / (n - 1))
+    val borderB = maxB * settings.hysteresisDenseSteps / settings.hysteresisSteps
+
+    val bLinStep = maxB / k
+    val bDenseStep = bLinStep / settings.hysteresisDenseMultiplier
+
+    val defaultTime = settings.time
+    val denseTime = settings.time / settings.hysteresisDenseMultiplier
 
     var stepIndex = 1
     val digitsOfIndex = rank(numberOfSteps)
@@ -156,21 +156,26 @@ fun hysteresisRun(settings: Settings) {
     sample.dumpToJsonFile(outFolder.canonicalPath, "sample.json")
     sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta_${0.format(digitsOfIndex)}_fst_0.0_0.0_0.0.txt")
 
-    fun step(i: Int, inc: Boolean, direction: String) {
-        if (i < n - 1) {
-            settings.viscosity = 0.5
-            sample.b /= bLogStep
-        } else if (i in n - 1 until n - 1 + 2 * k) {
-            settings.viscosity = 0.05
-            if (inc) {
-                sample.b += bLinStep
-            } else {
-                sample.b -= bLinStep
-            }
+    fun step(inc: Boolean, direction: String) {
+        val stepVal: Vector
+        if (abs(sample.b) < abs(borderB)) {
+            stepVal = bDenseStep
+            settings.time = denseTime
         } else {
-            settings.viscosity = 0.5
-            sample.b /= (1.0 / bLogStep) // костыльное поэлементное перемножение двух векторов
+            stepVal = bLinStep
+            settings.time = defaultTime
         }
+
+        if (inc) {
+            sample.b += stepVal
+        } else {
+            sample.b -= stepVal
+        }
+
+        Logger.info("b: ${sample.b}").
+                info("step: $stepVal").
+                info("i: $stepIndex").
+                addDelimiter()
         sample.processModel()
         sample.saveState(
                 outFolder.canonicalPath,
@@ -190,7 +195,7 @@ fun hysteresisRun(settings: Settings) {
     println("")
 
     for (i in numberOfSteps / 2 until numberOfSteps) {
-        step(i, true, "fst")
+        step(true, "fst")
     }
 
     sample.b = maxB
@@ -199,7 +204,7 @@ fun hysteresisRun(settings: Settings) {
     println("")
 
     for (i in 1..numberOfSteps) {
-        step(i, false, "neg")
+        step(false, "neg")
     }
 
     sample.b = -maxB
@@ -208,21 +213,10 @@ fun hysteresisRun(settings: Settings) {
     println("")
 
     for (i in 1..numberOfSteps) {
-        step(i, true, "pos")
+        step(true, "pos")
     }
 
     println("Generation of hysteresis cycle complete")
     val endTime = System.currentTimeMillis()
     println("time of working is ${(endTime - startTime) / 1000.0} seconds")
-}
-
-fun switchZerosToOnes(v: Vector): Vector {
-    var res = v
-    if (equalsDouble(res.x, 0.0))
-        res += Vector(1.0, 0.0, 0.0)
-    if (equalsDouble(res.y, 0.0))
-        res += Vector(0.0, 1.0, 0.0)
-    if (equalsDouble(res.z, 0.0))
-        res += Vector(0.0, 0.0, 1.0)
-    return res
 }

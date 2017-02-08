@@ -26,22 +26,23 @@
   "ot_theta":90.0,
   "ot_phi":0.0,
 
-  "b_x":10.0,
+  "b_x":0.0,
   "b_y":0.0,
   "b_z":0.0,
 
   "time":1.0,
   "timeStep":100,
 
-  "name":"test",
+  "name":"default",
 
   "precision":7,
   "load":false,
-  "jsonPath":"./resources/out/sample.json",
+  "jsonPath":"./resources/data/default/out/sample.json",
 
-  "hysteresis":true,
+  "hysteresis":false,
   "hysteresisSteps":7,
-  "hysteresisLogScale":0.1,
+  "hysteresisDenseSteps":2,
+  "hysteresisDenseMultiplier":2,
 
   "dataFolder":"./resources/data"
 }

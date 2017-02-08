@@ -26,7 +26,7 @@ class Settings:
         self._d['loc'] = 0
         self._d['loc_theta'] = 90.0
         self._d['loc_phi'] = 0.0
-        self._d['ot'] = 2
+        self._d['ot'] = 0
         self._d['ot_theta'] = 90.0
         self._d['ot_phi'] = 0.0
         self._d['b_x'] = 0.0
@@ -40,7 +40,8 @@ class Settings:
         self._d['jsonPath'] = './resources/out/sample.json'
         self._d['hysteresis'] = False
         self._d['hysteresisSteps'] = 7
-        self._d['hysteresisLogScale'] = 0.1
+        self._d['hysteresisDenseSteps'] = 2
+        self._d['hysteresisDenseMultiplier'] = 2
         self._d['dataFolder'] = './resources/data'
         if filename is not None:
             with open(filename) as f:
@@ -297,12 +298,20 @@ class Settings:
         self._d['hysteresisSteps'] = value
 
     @property
-    def hysteresisLogScale(self):
-        return self._d['hysteresisLogScale']
+    def hysteresisDenseSteps(self):
+        return self._d['hysteresisDenseSteps']
 
-    @hysteresisLogScale.setter
-    def hysteresisLogScale(self, value):
-        self._d['hysteresisLogScale'] = value
+    @hysteresisDenseSteps.setter
+    def hysteresisDenseSteps(self, value):
+        self._d['hysteresisDenseSteps'] = value
+
+    @property
+    def hysteresisDenseMultiplier(self):
+        return self._d['hysteresisDenseMultiplier']
+
+    @hysteresisDenseMultiplier.setter
+    def hysteresisDenseMultiplier(self, value):
+        self._d['hysteresisDenseMultiplier'] = value
 
     @property
     def dataFolder(self):
