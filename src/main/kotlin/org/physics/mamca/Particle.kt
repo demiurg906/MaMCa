@@ -116,7 +116,7 @@ class Particle {
             m.normalize()
         }
 
-        val a = 4 * sample.settings.kan
+        val a = 4 * sample.vKan
         val b = abs(bEff) * sample.momentaValue * sin(theta)
         val c = 2 * abs(bEff) * sample.momentaValue * cos(theta)
 
@@ -195,14 +195,14 @@ class Particle {
     /**
      * расчитывает энергию момента
      */
-    fun computeEnergy(): Double = sample.settings.kan * sqr(abs(m % lma)) + sample.momentaValue * ((m * bEff) - (abs(m) * abs(bEff)))
+    fun computeEnergy(): Double = sample.vKan * sqr(abs(m % lma)) + sample.momentaValue * ((m * bEff) - (abs(m) * abs(bEff)))
 
     /**
      * расчитывает энергии анизотропии, внешнего поля и взаимодействий
      * @return (eAnisotropy, eInteraction, eField)
      */
     fun computeEnergies(): Triple<Double, Double, Double>{
-        val eAn = sample.settings.kan * sqr(abs(m % lma))
+        val eAn = sample.vKan * sqr(abs(m % lma))
         val eBeff = (- (m * bEff) + (abs(m) * abs(bEff))) * sample.momentaValue
         val eB = (- m * sample.b + (abs(m) * abs(sample.b))) * sample.momentaValue
         return Triple(eAn, eBeff - eB, eB)
@@ -214,7 +214,7 @@ class Particle {
      * @param theta угол между осью анизотропии и эффективным полем
      */
     fun computeEnergyInPlane(phi: Double, theta: Double): Double =
-            sample.settings.kan * sqr(sin(phi)) - abs(bEff) * sample.momentaValue * (cos(phi - theta) - 1)
+            sample.vKan * sqr(sin(phi)) - abs(bEff) * sample.momentaValue * (cos(phi - theta) - 1)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

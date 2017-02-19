@@ -24,6 +24,7 @@ class Sample : Serializable {
     var twoMinimums: MutableSet<Particle> = mutableSetOf()
 
     val KT: Double
+    val vKan: Double // константа анизотропиии на объем частицы
     val random = Random()
 
     var nJumps = 0
@@ -37,6 +38,7 @@ class Sample : Serializable {
         settings = Settings()
         this.momentaValue = 0.0
         this.KT = 1.0
+        this.vKan = 1.0
     }
 
     /**
@@ -48,6 +50,7 @@ class Sample : Serializable {
         this.settings = Settings()
         this.momentaValue = 0.0
         this.KT = 1.0
+        this.vKan = 1.0
     }
 
     /**
@@ -63,6 +66,7 @@ class Sample : Serializable {
         settings.time *= S_TO_NS
 
         this.KT = settings.t * K
+        this.vKan = settings.kan * 4 * PI * Math.pow(settings.r, 3.0)
 
         b = Vector(settings.b_x, settings.b_y, settings.b_z)
 
@@ -85,7 +89,8 @@ class Sample : Serializable {
             // угол между соседними частицами в кольце
             val alpha = PI2 / s.n
             // расстояние между центрами соседних колец
-            val delta = s.d + s.offset
+            val delta_x = s.d + s.offset_x
+            val delta_y = s.d + s.offset_y
             // радиус кольца
             val r = s.d / 2
 
@@ -111,9 +116,9 @@ class Sample : Serializable {
 
                 // координаты частицы
                 val loc = Vector(
-                        x * delta + r * cos(beta),
-                        y * delta + r * sin(beta),
-                        z * (1 + s.offset)
+                        x * delta_x + r * cos(beta),
+                        y * delta_y + r * sin(beta),
+                        z * (1 + s.offset_z)
                 )
 
                 // начальное положение момента
@@ -176,9 +181,12 @@ class Sample : Serializable {
             }
 
             // проверка, что кольца на досточном расстоянии друг от друга
-            if ((r * 2 > offset) and (x * y * z > 1)) {
-                println("WARNNIG: rings overlap")
+            listOf(offset_x, offset_y, offset_z).forEach { offset ->
+                if ((r * 2 > offset) and (x * y * z > 1)) {
+                    println("WARNNIG: rings overlap")
+                }
             }
+
         }
     }
 
