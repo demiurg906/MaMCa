@@ -15,8 +15,12 @@ MU = '\u03BC'
 # счетчик для фигур
 _counter = 0
 
+figsize = (20, 20)
+
 # установка семейства шрифтов для корректного отображения
-plt.rc('font', family='Arial')
+font = {'family': 'Arial',
+        'size': 32}
+plt.rc('font', **font)
 
 use_tex = which('tex') is not None
 # если установлен Тех, то импользовать его при рендере меток
@@ -128,7 +132,7 @@ def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
             return res[0], res[1], res[2]
 
     global _counter
-    fig = plt.figure(0)
+    fig = plt.figure(0, figsize=figsize)
     _counter += 1
 
     # подписи на графике
@@ -213,14 +217,15 @@ def create_momenta_gif(*, settings_fname: str):
     subprocess.run(exe, stdout=sys.stdout, stderr=sys.stderr, )
 
 
-def draw_all_3d_vectors_plots(*, settings_fname: str = None, borders: list = None,
-                              negative_borders: bool = True, label: str = None,
-                              scale: float = 1):
+def draw_all_vectors_plots(*, settings_fname: str = None, borders: list = None,
+                           negative_borders: bool = True, label: str = None,
+                           scale: float = 1, draw_points: bool = True):
     """
     Рисует графики состояний до и после оптимизации
     """
     settings = Settings(settings_fname)
     data_folder = '{}/{}/out'.format(settings.dataFolder, settings.name)
+
     for file in os.listdir(data_folder):
         if file.startswith('momenta'):
             if settings.hysteresis:
@@ -229,24 +234,30 @@ def draw_all_3d_vectors_plots(*, settings_fname: str = None, borders: list = Non
             else:
                 _, _, _, t = file[:-4].split('_')
                 text = 't = {} s'.format(t)
-            draw_3d_vectors_plot(
-                settings_fname=settings_fname,
-                borders=borders,
-                negative_borders=negative_borders,
-                label=label,
-                text=text,
-                scale=scale,
-                momenta_filename=file
-            )
+
+            kwargs = {'settings_fname': settings_fname,
+                      'borders': borders,
+                      'negative_borders': negative_borders,
+                      'label': label,
+                      'text': text,
+                      'scale': scale,
+                      'momenta_filename': file,
+                      'draw_points': draw_points
+                      }
+            if settings.is2dPlot:
+                draw_2d_vectors_plot(**kwargs)
+            else:
+                draw_3d_vectors_plot(**kwargs)
 
 
 def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
                          negative_borders: bool = True, label: str = None,
                          text: str = None, scale: float = 1,
-                         momenta_filename: str
+                         momenta_filename: str, draw_points: bool = True
                          ):
     """
     Рисует трехмерный график веторов
+    :param draw_points: рисовать ли сами частицы (точками)
     :param settings_fname: путь к файлу с настройками, для отображения
         их на графике
     :param borders: массив границ графика.
@@ -267,7 +278,7 @@ def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
     pic_dir = '{}/pictures/moments'.format(data_folder)
 
     global _counter
-    fig = plt.figure(0)
+    fig = plt.figure(0, figsize=figsize)
     _counter += 1
     if label is not None:
         fig.canvas.set_window_title(str(label))
@@ -333,12 +344,103 @@ def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
     # рисование моментов
     ax.quiver(x1, y1, z1, u, v, w, length=scale * 2, pivot='tail', arrow_length_ratio=0.2)
 
-    # рисование частиц
-    x, y, z = points[:, 0], points[:, 1], points[:, 2]
-    ax.scatter(x, y, z, c='r')
+    if draw_points:
+        # рисование частиц
+        x, y, z = points[:, 0], points[:, 1], points[:, 2]
+        ax.scatter(x, y, z, c='r')
 
     if text is not None:
-        ax.text2D(0.05, 0.65, text, transform=ax.transAxes)
+        ax.text2D(0.005, -0.07, text, transform=ax.transAxes)
+
+    if name is None:
+        name = 'fig_{}'.format(_counter)
+    plt.savefig('{}/{}.png'.format(pic_dir, name), format='png')
+    plt.clf()
+
+
+def draw_2d_vectors_plot(*, settings_fname: str = None, borders: list = None,
+                         negative_borders: bool = True, label: str = None,
+                         text: str = None, scale: float = 1,
+                         momenta_filename: str, draw_points: bool = True):
+    settings = Settings(settings_fname)
+    data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
+    filename = '{}/out/{}'.format(data_folder, momenta_filename)
+    name = momenta_filename[:-4]
+    pic_dir = '{}/pictures/moments'.format(data_folder)
+    global _counter
+    fig = plt.figure(0, figsize=figsize)
+    _counter += 1
+    if label is not None:
+        fig.canvas.set_window_title(label)
+
+    axes = {'x': 0, 'y': 1, 'z': 2}
+    x = settings.xAxis
+    y = settings.yAxis
+
+    # индексы с нужными осями
+    x1, y1, x2, y2 = axes[x], axes[y], axes[x] + 3, axes[y] + 3
+    vectors, points = _read_vectors(filename)
+
+    if borders is None:
+        # минимумы и максимумы координат
+        mins = points.min(axis=0)
+        maxs = points.max(axis=0)
+        # максимальное расстояние между крайними точками
+        l = max(maxs - mins)
+
+        x_min = mins[x1]
+        x_max = x_min + l
+
+        y_min = mins[y1]
+        y_max = y_min + l
+
+        delta = l * 0.05
+
+        axis = [x_min - delta, x_max + delta,
+                y_min - delta, y_max + delta]
+    else:
+        if len(borders) == 2:
+            k = -1 if negative_borders else 0
+            axis = [borders[0] * k, borders[0],
+                    borders[1] * k, borders[1]]
+        else:
+            axis = borders
+
+    # масштаб осей
+    plt.axis(list(map(lambda f: f * 1.1, axis)))
+    # подписи оскй
+    plt.xlabel('{}, nm'.format(x))
+    plt.ylabel('{}, nm'.format(y))
+
+    # координаты стрелок моментов
+    x1_v, y1_v = vectors[:, x1], vectors[:, y1]
+    x2_v, y2_v = vectors[:, x2], vectors[:, y2]
+    u, v = x2_v - x1_v, y2_v - y1_v
+
+    # scaling моментов
+    # уебался, пока разбирался, как масштабировать эти чертовы стрелочки
+    # вроде как криво работает в версиях matplotlib'а выше 1.5.8 (и, возможно, ниже)
+    k = (scale - 1) / 2
+    dx, dy = u * k, v * k
+    x1_v -= dx
+    y1_v -= dy
+    x2_v += dx
+    y2_v += dy
+    u, v = x2_v - x1_v, y2_v - y1_v
+
+    # рисование моментов
+    ax = plt.axes()
+    ax.quiver(x1_v, y1_v, u, v, pivot='tail')  # , arrow_length_ratio=0.2, length=scale * 2)
+    # for v in vectors:
+    #     ax.arrow(v[x1], v[y1], v[x2] - v[x1], v[y2] - v[y1])
+
+    if draw_points:
+        # рисование частиц
+        x_p, y_p = points[:, axes[x]], points[:, axes[y]]
+        ax.scatter(x_p, y_p, c='r')
+
+    if text is not None:
+        ax.text(0.005, -0.07, text, transform=ax.transAxes)
 
     if name is None:
         name = 'fig_{}'.format(_counter)

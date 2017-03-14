@@ -55,17 +55,21 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val hysteresisDenseSteps: Int = 2, // количество больших шагов в частой области
                     val hysteresisDenseMultiplier: Int = 2, // отношение шага в обычной области к шагу в частой области
 
+                    val is2dPlot: Boolean = true, // рисовать трехмерные графики или двумерные
+                    val xAxis: String = "x", // координата по оси абсциис (2D график)
+                    val yAxis: String = "y", // координата по оси ординат (2D график)
+
                     val dataFolder: String = "./resources/data" // путь к папке для выходных данных
 )
 
 // списки с полями типа string и boolean
 // костыль
-val stringFields = setOf("name", "jsonPath", "dataFolder", "outFolder", "picFolder", "logFolder")
-val booleanFields = setOf("load", "hysteresis")
+val stringFields = setOf("name", "jsonPath", "dataFolder", "outFolder", "picFolder", "logFolder", "xAxis", "yAxis")
+val booleanFields = setOf("load", "hysteresis", "is2dPlot")
 
 // количество полей в блоке, отделенном от остальных новой строкой
 // нужен, чтобы поля были логически разделены пустыми строками
-val newLines = listOf(4, 5, 3, 2, 2, 3, 3, 3, 2, 1, 3, 4, 2)
+val newLines = listOf(4, 5, 3, 2, 2, 3, 3, 3, 2, 1, 3, 4, 3, 2)
 
 fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()

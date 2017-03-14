@@ -10,9 +10,12 @@ if __name__ == '__main__':
             b_axis='x',
             m_axis='x'
         )
-    draw_all_3d_vectors_plots(
+    draw_all_vectors_plots(
         settings_fname=settings_fname,
-        scale=8,
+        scale=4,
+        draw_points=False
     )
     create_momenta_gif(settings_fname=settings_fname)
     play_notification()
+
+#  0.03

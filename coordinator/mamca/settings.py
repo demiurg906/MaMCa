@@ -13,11 +13,13 @@ class Settings:
         self._d['y'] = 1
         self._d['z'] = 1
         self._d['n'] = 50
-        self._d['r'] = 1.5
+        self._d['r'] = 1.25
         self._d['d'] = 60.0
-        self._d['offset'] = 4.0
+        self._d['offset_x'] = 4.0
+        self._d['offset_y'] = 4.0
+        self._d['offset_z'] = 4.0
         self._d['m'] = 800.0
-        self._d['kan'] = 0.0165
+        self._d['kan'] = 8000.0
         self._d['jex'] = 5.0
         self._d['dipolDistance'] = 30.0
         self._d['exchangeDistance'] = 4.0
@@ -37,11 +39,14 @@ class Settings:
         self._d['name'] = 'default'
         self._d['precision'] = 7
         self._d['load'] = False
-        self._d['jsonPath'] = './resources/out/sample.json'
+        self._d['jsonPath'] = './resources/data/default/out/sample.json'
         self._d['hysteresis'] = False
         self._d['hysteresisSteps'] = 7
         self._d['hysteresisDenseSteps'] = 2
         self._d['hysteresisDenseMultiplier'] = 2
+        self._d['is2dPlot'] = True
+        self._d['xAxis'] = 'x'
+        self._d['yAxis'] = 'y'
         self._d['dataFolder'] = './resources/data'
         if filename is not None:
             with open(filename) as f:
@@ -98,12 +103,28 @@ class Settings:
         self._d['d'] = value
 
     @property
-    def offset(self):
-        return self._d['offset']
+    def offset_x(self):
+        return self._d['offset_x']
 
-    @offset.setter
-    def offset(self, value):
-        self._d['offset'] = value
+    @offset_x.setter
+    def offset_x(self, value):
+        self._d['offset_x'] = value
+
+    @property
+    def offset_y(self):
+        return self._d['offset_y']
+
+    @offset_y.setter
+    def offset_y(self, value):
+        self._d['offset_y'] = value
+
+    @property
+    def offset_z(self):
+        return self._d['offset_z']
+
+    @offset_z.setter
+    def offset_z(self, value):
+        self._d['offset_z'] = value
 
     @property
     def m(self):
@@ -312,6 +333,30 @@ class Settings:
     @hysteresisDenseMultiplier.setter
     def hysteresisDenseMultiplier(self, value):
         self._d['hysteresisDenseMultiplier'] = value
+
+    @property
+    def is2dPlot(self):
+        return self._d['is2dPlot']
+
+    @is2dPlot.setter
+    def is2dPlot(self, value):
+        self._d['is2dPlot'] = value
+
+    @property
+    def xAxis(self):
+        return self._d['xAxis']
+
+    @xAxis.setter
+    def xAxis(self, value):
+        self._d['xAxis'] = value
+
+    @property
+    def yAxis(self):
+        return self._d['yAxis']
+
+    @yAxis.setter
+    def yAxis(self, value):
+        self._d['yAxis'] = value
 
     @property
     def dataFolder(self):

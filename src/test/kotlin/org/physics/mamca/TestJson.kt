@@ -55,6 +55,7 @@ class TestJson {
                 "name",
                 6, true, "json_path",
                 true, 8, 9, 10,
+                false, "y", "z",
                 "data_path"
 
         )
