@@ -3,8 +3,6 @@ package org.physics.mamca
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import org.physics.mamca.math.*
-import org.physics.mamca.util.Mathematica
-import org.physics.mamca.util.eFormat
 import org.physics.mamca.util.equalsDouble
 import java.lang.Math.*
 import java.lang.reflect.Type
@@ -116,15 +114,14 @@ class Particle {
             m.normalize()
         }
 
+        // минимумы -- корни уравнения b*x^4 + (c-a)x^3 + (c+a)x-b = 0
+        // параметры уравнения
         val a = 4 * sample.vKan
-        val b = abs(bEff) * sample.momentaValue * sin(theta)
-        val c = 2 * abs(bEff) * sample.momentaValue * cos(theta)
-
-        // уравнение четвертой степени
-        val expr = "${b.eFormat(MATH_DIGITS)} x^4 + ${(c-a).eFormat(MATH_DIGITS)} x^3 + ${(c+a).eFormat(MATH_DIGITS)} x - ${b.eFormat(MATH_DIGITS)} == 0"
+        val b = abs(bEff) * sin(theta)
+        val c = 2 * abs(bEff) * cos(theta)
 
         // корни уравнения (с переходом от x к phi)
-        val roots = Mathematica.findRoots(expr).map { 2 * atan(it) }
+        val roots = solveEquation(a, b, c).map { 2 * atan(it) }
 
         // энергия в экстремумах
         val energies = roots.map { computeEnergyInPlane(it, theta)}
@@ -195,14 +192,15 @@ class Particle {
     /**
      * расчитывает энергию момента
      */
-    fun computeEnergy(): Double = sample.vKan * sqr(abs(m % lma)) + sample.momentaValue * ((m * bEff) - (abs(m) * abs(bEff)))
+    fun computeEnergy(): Double =
+            sample.momentaValue * (sample.vKan * sqr(abs(m % lma)) + (m * bEff) - (abs(m) * abs(bEff)))
 
     /**
      * расчитывает энергии анизотропии, внешнего поля и взаимодействий
      * @return (eAnisotropy, eInteraction, eField)
      */
     fun computeEnergies(): Triple<Double, Double, Double>{
-        val eAn = sample.vKan * sqr(abs(m % lma))
+        val eAn = sample.vKan * sqr(abs(m % lma)) * sample.momentaValue
         val eBeff = (- (m * bEff) + (abs(m) * abs(bEff))) * sample.momentaValue
         val eB = (- m * sample.b + (abs(m) * abs(sample.b))) * sample.momentaValue
         return Triple(eAn, eBeff - eB, eB)
@@ -214,7 +212,7 @@ class Particle {
      * @param theta угол между осью анизотропии и эффективным полем
      */
     fun computeEnergyInPlane(phi: Double, theta: Double): Double =
-            sample.vKan * sqr(sin(phi)) - abs(bEff) * sample.momentaValue * (cos(phi - theta) - 1)
+            (sample.vKan * sqr(sin(phi)) - abs(bEff) * (cos(phi - theta) - 1)) * sample.momentaValue
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -225,11 +223,6 @@ class Particle {
         if (loc != other.loc) return false
         if (m != other.m) return false
         if (lma != other.lma) return false
-//        if (sample != other.sample) return false
-//        if (neighborsInitialized != other.neighborsInitialized) return false
-//        if (dipolParticles != other.dipolParticles) return false
-//        if (exchangeParticles != other.exchangeParticles) return false
-
         return true
     }
 
@@ -237,10 +230,6 @@ class Particle {
         var result = loc.hashCode()
         result = 31 * result + m.hashCode()
         result = 31 * result + lma.hashCode()
-//        result = 31 * result + sample.hashCode()
-//        result = 31 * result + neighborsInitialized.hashCode()
-//        result = 31 * result + dipolParticles.hashCode()
-//        result = 31 * result + exchangeParticles.hashCode()
         return result
     }
 
