@@ -48,6 +48,7 @@ class Settings:
         self._d['xAxis'] = 'x'
         self._d['yAxis'] = 'y'
         self._d['dataFolder'] = './resources/data'
+        self._d['memory'] = 2048
         if filename is not None:
             with open(filename) as f:
                 d = json.load(f)
@@ -365,6 +366,14 @@ class Settings:
     @dataFolder.setter
     def dataFolder(self, value):
         self._d['dataFolder'] = value
+
+    @property
+    def memory(self):
+        return self._d['memory']
+
+    @memory.setter
+    def memory(self, value):
+        self._d['memory'] = value
 
     def __getitem__(self, key):
         return self._d[key]

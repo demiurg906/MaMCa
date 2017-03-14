@@ -46,5 +46,11 @@
   "hysteresisDenseSteps":2,
   "hysteresisDenseMultiplier":2,
 
-  "dataFolder":"./resources/data"
+  "is2dPlot":true,
+  "xAxis":"x",
+  "yAxis":"y",
+
+  "dataFolder":"./resources/data",
+
+  "memory":2048
 }

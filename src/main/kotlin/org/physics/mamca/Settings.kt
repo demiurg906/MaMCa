@@ -59,7 +59,9 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val xAxis: String = "x", // координата по оси абсциис (2D график)
                     val yAxis: String = "y", // координата по оси ординат (2D график)
 
-                    val dataFolder: String = "./resources/data" // путь к папке для выходных данных
+                    val dataFolder: String = "./resources/data", // путь к папке для выходных данных
+
+                    val memory: Int = 2048 // количество памяти, выделяемой для java-машины
 )
 
 // списки с полями типа string и boolean
@@ -69,7 +71,7 @@ val booleanFields = setOf("load", "hysteresis", "is2dPlot")
 
 // количество полей в блоке, отделенном от остальных новой строкой
 // нужен, чтобы поля были логически разделены пустыми строками
-val newLines = listOf(4, 5, 3, 2, 2, 3, 3, 3, 2, 1, 3, 4, 3, 2)
+val newLines = listOf(4, 5, 3, 2, 2, 3, 3, 3, 2, 1, 3, 4, 3, 1, 2)
 
 fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()
