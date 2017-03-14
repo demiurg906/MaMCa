@@ -152,7 +152,7 @@ class Vector {
     /**
      * векторное произведение веторов
      */
-    operator fun mod(other: Vector): Vector = Vector(
+    operator fun rem(other: Vector): Vector = Vector(
             this.y * other.z - this.z * other.y,
             this.z * other.x - this.x * other.z,
             this.x * other.y - this.y * other.x
@@ -161,7 +161,7 @@ class Vector {
     /**
      * возведение всех элементов вектора в степень c
      */
-    operator fun mod(c: Double): Vector = Vector(pow(x, c), pow(y, c), pow(z, c))
+    operator fun rem(c: Double): Vector = Vector(pow(x, c), pow(y, c), pow(z, c))
 
     /**
      * возвращает направленное значение угла между двумя векторами
