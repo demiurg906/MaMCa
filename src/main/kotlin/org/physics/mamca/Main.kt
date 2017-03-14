@@ -172,6 +172,10 @@ fun hysteresisRun(settings: Settings) {
             sample.b -= stepVal
         }
 
+        if (abs(sample.b) > abs(maxB)) {
+            return
+        }
+
         Logger.info("b: ${sample.b}").
                 info("step: $stepVal").
                 info("i: $stepIndex").
@@ -179,7 +183,7 @@ fun hysteresisRun(settings: Settings) {
         sample.processModel()
         sample.saveState(
                 outFolder.canonicalPath,
-                "momenta_${stepIndex.format(digitsOfIndex)}_${direction}_${sample.b.x.format(2)}_${sample.b.y.format(2)}_${sample.b.z.format(2)}.txt")
+                "momenta_${stepIndex.format(digitsOfIndex)}_${direction}_${sample.b.x.format(3)}_${sample.b.y.format(3)}_${sample.b.z.format(3)}.txt")
         stepIndex += 1
     }
 
