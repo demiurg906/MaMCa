@@ -33,3 +33,5 @@ const val S_TO_NS = 1e9
 
 // постоянная больцмана
 const val K = 1.3806485279e-23
+
+const val M3_TO_NM3 = 10e27

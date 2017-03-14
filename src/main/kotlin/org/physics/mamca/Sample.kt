@@ -61,7 +61,8 @@ class Sample : Serializable {
 
         // перевод констант в единицы с Дж
         this.momentaValue = settings.m * MU_B
-        settings.kan *= EV_TO_DJ
+        settings.kan /= EV_TO_DJ
+        settings.kan /= M3_TO_NM3
         settings.jex /= EV_TO_DJ
         settings.time *= S_TO_NS
 
@@ -181,9 +182,16 @@ class Sample : Serializable {
             }
 
             // проверка, что кольца на досточном расстоянии друг от друга
-            listOf(offset_x, offset_y, offset_z).forEach { offset ->
+            listOf(offset_x, offset_y, offset_z).forEachIndexed { i, offset ->
+                val axis: String
+                when (i) {
+                    0 -> axis = "x"
+                    1 -> axis = "y"
+                    2 -> axis = "z"
+                    else -> axis = "ERROR"
+                }
                 if ((r * 2 > offset) and (x * y * z > 1)) {
-                    println("WARNNIG: rings overlap")
+                    println("WARNING: rings overlap on axis $axis")
                 }
             }
 
@@ -218,12 +226,12 @@ class Sample : Serializable {
         saveStateAfterJump(0)
         val startEnergy = res.first
 
-                if (settings.t > 0) {
+        if (settings.t > 0) {
             Logger.addDelimiter()
 //            Logger.info("times of jumps [s]:\n")
             for (t in 0..settings.time.toInt() step settings.timeStep) {
                 if (twoMinimums.isEmpty()) {
-//                    Logger.info("oops, no minimums, t = ${(t / S_TO_NS).format(9)} s")
+                    Logger.info("oops, no minimums, t = ${(t / S_TO_NS).format(9)} s, number of jumps is $nJumps")
                     break
                 }
                 if (energyJumps()) {
