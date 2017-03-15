@@ -16,4 +16,4 @@ if __name__ == '__main__':
         draw_points=False
     )
     create_momenta_gif(settings_fname=settings_fname)
-    play_notification()
+    play_success_notification()
