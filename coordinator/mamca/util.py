@@ -10,9 +10,9 @@ def which(program):
     import os
     import sys
     if 'win' in sys.platform:
-        extension = ['', 'exe', 'msi', 'bat']
+        extension = ['', '.exe', '.msi', '.bat']
     else:
-        extension = ['', 'sh']
+        extension = ['', '.sh']
 
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
@@ -26,7 +26,7 @@ def which(program):
             path = path.strip('"')
             exe_file = os.path.join(path, program)
             for exe in extension:
-                exe_fpath = '{}.{}'.format(exe_file, exe)
+                exe_fpath = '{}{}'.format(exe_file, exe)
                 if is_exe(exe_fpath):
                     return exe_fpath
 
