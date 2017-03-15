@@ -33,8 +33,18 @@ def which(program):
     return None
 
 
-def play_notification():
-    notification = './resources/notifications/office-2.wav'
+def play_notification(notification):
     wave_obj = sa.WaveObject.from_wave_file(notification)
     play_obj = wave_obj.play()
     play_obj.wait_done()
+
+
+def play_success_notification():
+    notification = './resources/notifications/office-2.wav'
+    play_notification(notification)
+
+
+def play_failure_notification():
+    notification = './resources/notifications/may-i-have-your-attention.wav'
+    play_notification(notification)
+
