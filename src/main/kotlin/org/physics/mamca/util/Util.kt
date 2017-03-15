@@ -54,3 +54,11 @@ fun formatEnergies(energies: Triple<Double, Double, Double>, k: Double = 1 / EV_
 }
 
 fun Int.format(digits: Int = DIGITS): String = java.lang.String.format(Locale.US, "%0${digits}d", this)
+
+fun playSuccessNotification() {
+    try {
+        Sound.playSound("./resources/notifications/arpeggio.wav").join()
+    } catch (e: Exception) {
+        println("playing notification failed")
+    }
+}

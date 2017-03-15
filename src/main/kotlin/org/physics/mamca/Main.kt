@@ -59,7 +59,7 @@ fun main(args: Array<String>) {
         out.write(Logger.toString())
     }
 
-    Sound.playSound("./resources/notifications/arpeggio.wav").join()
+    playSuccessNotification()
 }
 
 
