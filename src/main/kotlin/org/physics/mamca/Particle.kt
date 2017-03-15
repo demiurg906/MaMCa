@@ -93,9 +93,19 @@ class Particle {
     fun optimizeEnergy() {
         val theta: Double
 
+        // если поля нет (частица одна)
+        if (equalsDouble(abs(bEff), 0.0)) {
+            eZ = norm(m, lma)
+            val phi = m.angleTo(lma, eZ)
+            rotateMomentaToAngle(phi)
+            return
+        }
+
         if (isKollinear(bEff, lma)) {
             // поле параллельно оси анизотропии
             if (isKollinear(lma, m)) {
+                // TODO: тут по идее надо делать два минимума, если поле не сонарправлено с моментом
+                // с другой стороны до сих пор такой ситуации не бывало
                 TODO()
             }
             eZ = norm(m, lma)
