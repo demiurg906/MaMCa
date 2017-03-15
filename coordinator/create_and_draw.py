@@ -17,5 +17,3 @@ if __name__ == '__main__':
     )
     create_momenta_gif(settings_fname=settings_fname)
     play_notification()
-
-#  0.03
