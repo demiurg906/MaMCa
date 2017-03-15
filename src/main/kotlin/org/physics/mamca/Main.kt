@@ -44,14 +44,16 @@ fun main(args: Array<String>) {
     createSettingsJson("${settings.dataFolder}/${settings.name}/settings.json", settings)
 
     val startTime = System.currentTimeMillis()
+    val midTime: Long
     if (!settings.hysteresis) {
-        singleRun(settings)
+        midTime = singleRun(settings)
     } else {
-        hysteresisRun(settings)
+        midTime = hysteresisRun(settings)
     }
     val endTime = System.currentTimeMillis()
     Logger.addDelimiter().
             info("time of working is ${(endTime - startTime) / 1000.0} seconds").
+            info("time of computation is ${(endTime - midTime) / 1000.0} seconds").
             addDelimiter()
     File("${settings.dataFolder}/${settings.name}/log.log").printWriter().use { out ->
         out.write(Logger.toString())
@@ -91,13 +93,14 @@ fun prepareFolders(settings: Settings) {
 /**
  * Запускает один цикл симуляции
  */
-fun singleRun(settings: Settings) {
+fun singleRun(settings: Settings): Long {
 
 
     val dataFolder ="${settings.dataFolder}/${settings.name}"
     val outFolder = File("$dataFolder/out")
 
     val sample = Sample(settings)
+    val midTime = System.currentTimeMillis()
     sample.dumpToJsonFile(outFolder.canonicalPath, "sample.json")
     sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta_00_1_${0.0.format(9)}.txt")
 
@@ -125,9 +128,10 @@ fun singleRun(settings: Settings) {
         Logger.info("\nWOOOOOOOOOOW\n")
     }
     Logger.addDelimiter()
+    return midTime
 }
 
-fun hysteresisRun(settings: Settings) {
+fun hysteresisRun(settings: Settings): Long {
     val startTime = System.currentTimeMillis()
 
     val dataFolder ="${settings.dataFolder}/${settings.name}"
@@ -155,6 +159,8 @@ fun hysteresisRun(settings: Settings) {
     val sample = Sample(settings)
     sample.dumpToJsonFile(outFolder.canonicalPath, "sample.json")
     sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta_${0.format(digitsOfIndex)}_fst_0.0_0.0_0.0.txt")
+
+    val midTime = System.currentTimeMillis()
 
     fun step(inc: Boolean, direction: String) {
         val stepVal: Vector
@@ -223,4 +229,6 @@ fun hysteresisRun(settings: Settings) {
     println("Generation of hysteresis cycle complete")
     val endTime = System.currentTimeMillis()
     println("time of working is ${(endTime - startTime) / 1000.0} seconds")
+
+    return midTime
 }

@@ -52,5 +52,6 @@
 
   "dataFolder":"./resources/data",
 
+  "isParallel":false,
   "memory":2048
 }

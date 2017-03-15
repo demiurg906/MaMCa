@@ -264,7 +264,11 @@ class Sample : Serializable {
             Pair<Double, Triple<Double, Double, Double>>,
             Pair<Double, Triple<Double, Double, Double>>,
             Int> {
-        particles.forEach { it.computeEffectiveField() }
+        if (settings.isParallel) {
+            particles.parallelStream().forEach { it.computeEffectiveField() }
+        } else {
+            particles.forEach { it.computeEffectiveField() }
+        }
         // energies on start
         val startEnergy = computeEnergies()
 
@@ -322,8 +326,13 @@ class Sample : Serializable {
         } else {
             oldEnergy = computedOldEnergy
         }
-        particles.forEach { it.optimizeEnergy() }
-        particles.forEach { it.computeEffectiveField() }
+        if (settings.isParallel) {
+            particles.parallelStream().forEach { it.optimizeEnergy() }
+            particles.parallelStream().forEach { it.computeEffectiveField() }
+        } else {
+            particles.forEach { it.optimizeEnergy() }
+            particles.forEach { it.computeEffectiveField() }
+        }
         val newEnergy = computeEnergy()
         return oldEnergy to newEnergy
     }

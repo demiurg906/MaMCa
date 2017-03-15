@@ -48,6 +48,7 @@ class Settings:
         self._d['xAxis'] = 'x'
         self._d['yAxis'] = 'y'
         self._d['dataFolder'] = './resources/data'
+        self._d['isParallel'] = False
         self._d['memory'] = 2048
         if filename is not None:
             with open(filename) as f:
@@ -366,6 +367,14 @@ class Settings:
     @dataFolder.setter
     def dataFolder(self, value):
         self._d['dataFolder'] = value
+
+    @property
+    def isParallel(self):
+        return self._d['isParallel']
+
+    @isParallel.setter
+    def isParallel(self, value):
+        self._d['isParallel'] = value
 
     @property
     def memory(self):

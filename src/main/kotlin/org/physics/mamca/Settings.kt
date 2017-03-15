@@ -61,17 +61,18 @@ data class Settings(val x: Int = 1, // количество клеток по x
 
                     val dataFolder: String = "./resources/data", // путь к папке для выходных данных
 
+                    val isParallel: Boolean = false, // использовать ли параллельные вычисления
                     val memory: Int = 2048 // количество памяти, выделяемой для java-машины
 )
 
 // списки с полями типа string и boolean
 // костыль
 val stringFields = setOf("name", "jsonPath", "dataFolder", "outFolder", "picFolder", "logFolder", "xAxis", "yAxis")
-val booleanFields = setOf("load", "hysteresis", "is2dPlot")
+val booleanFields = setOf("load", "hysteresis", "is2dPlot", "isParallel")
 
 // количество полей в блоке, отделенном от остальных новой строкой
 // нужен, чтобы поля были логически разделены пустыми строками
-val newLines = listOf(4, 5, 3, 2, 2, 3, 3, 3, 2, 1, 3, 4, 3, 1, 2)
+val newLines = listOf(4, 5, 3, 2, 2, 3, 3, 3, 2, 1, 3, 4, 3, 1, 3)
 
 fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()
