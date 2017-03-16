@@ -62,7 +62,7 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val dataFolder: String = "./resources/data", // путь к папке для выходных данных
 
                     val isParallel: Boolean = false, // использовать ли параллельные вычисления
-                    val memory: Int = 2048 // количество памяти, выделяемой для java-машины
+                    val memory: Int = 2048 // количество памяти, выделяемой для java-машины, Мбайт
 )
 
 // списки с полями типа string и boolean
