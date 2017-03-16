@@ -87,29 +87,4 @@ fun main(args: Array<String>) {
     File("coordinator/mamca/settings.py").printWriter().use { out ->
         out.write(code.toString())
     }
-//    println(code.toString())
-
 }
-
-/*
-    def __str__(self):
-        anisotropy = ''
-        if self.ot == 0:
-            anisotropy += 'random in 3D'
-        elif self.ot == 1:
-            anisotropy += 'random in 2D'
-        else:
-            anisotropy += 'theta={:.2f}, phi={:.2f}'.format(self.ot_theta, self.ot_phi)
-
-        return 'n = {}\noff = {}\n' \
-               'B = ({:.1e}, {:.1e}, {:.1e})\n\n' \
-               'dipol (m) = {:.2e}\nanisotropy (kan) = {:.2e}\n' \
-               'exchange (jex) = {:.2e}\n' \
-               '\nanisotropy: {}'.format(self.n,
-                                         self.offset, self.b_x,
-                                         self.b_y, self.b_z,
-                                         self.m,
-                                         self.kan, self.jex,
-                                         anisotropy
-                                         )
- */
