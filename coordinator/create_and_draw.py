@@ -1,9 +1,17 @@
+import sys
+
+from json.decoder import JSONDecodeError
 from mamca import *
 
 if __name__ == '__main__':
     settings_fname = './resources/settings.json'
+    try:
+        settings = Settings(settings_fname)
+    except JSONDecodeError:
+        print('settings file is incorrect')
+        play_failure_notification()
+        sys.exit(1)
     single_run(settings_fname=settings_fname)
-    settings = Settings(settings_fname)
     if settings.hysteresis:
         draw_all_hyst_plots(
             settings_fname=settings_fname,
