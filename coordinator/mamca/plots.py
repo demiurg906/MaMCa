@@ -213,8 +213,9 @@ def create_momenta_gif(*, settings_fname: str):
         print('You need install ImageMagick (http://www.imagemagick.org) for creating gifs')
         print('magick must be in your classpath')
         return
+    # TODO: Issue #5. без exe.split() не работает на убунте, с ним не работает convert
     exe += ' -delay 60 -loop 0 "{}" "{}/momenta.gif"'.format(momenta_template, data_folder)
-    subprocess.run(exe.split(), stdout=sys.stdout, stderr=sys.stderr, )
+    subprocess.run(exe, stdout=sys.stdout, stderr=sys.stderr, )
 
 
 def draw_all_vectors_plots(*, settings_fname: str = None, borders: list = None,
