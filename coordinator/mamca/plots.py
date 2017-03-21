@@ -269,7 +269,7 @@ def draw_all_vectors_plots(*, settings: Settings = None, borders: list = None,
                 _, _, _, t = file[:-4].split('_')
                 text = 't = {} s'.format(t)
 
-            kwargs = {'settings_fname': settings,
+            kwargs = {'settings': settings,
                       'borders': borders,
                       'negative_borders': negative_borders,
                       'label': label,
