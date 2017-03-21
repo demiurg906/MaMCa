@@ -1,5 +1,7 @@
 package org.physics.mamca
 
+import java.math.BigDecimal
+
 const val PI = Math.PI
 const val PI2 = 2 * PI
 
@@ -34,4 +36,8 @@ const val S_TO_NS = 1e9
 // постоянная больцмана
 const val K = 1.3806485279e-23
 
+// перевод м^3 в нм^3
 const val M3_TO_NM3 = 10e27
+
+// отношение мнимой части к действительной, при котором мнимой можно пренебречь
+val COMPLEX_PRECISION = BigDecimal(1e-10)

@@ -5,23 +5,19 @@ from mamca import *
 
 if __name__ == '__main__':
     settings_fname = './resources/settings.json'
-    try:
-        settings = Settings(settings_fname)
-    except JSONDecodeError:
-        print('settings file is incorrect')
-        play_failure_notification()
-        sys.exit(1)
     single_run(settings_fname=settings_fname)
+    settings = Settings(settings_fname)
+    check_borders(settings)
     if settings.hysteresis:
         draw_all_hyst_plots(
-            settings_fname=settings_fname,
+            settings=settings,
             b_axis='x',
             m_axis='x'
         )
     draw_all_vectors_plots(
-        settings_fname=settings_fname,
+        settings=settings,
         scale=4,
         draw_points=False
     )
-    create_momenta_gif(settings_fname=settings_fname)
+    create_momenta_gif(settings=settings)
     play_success_notification()

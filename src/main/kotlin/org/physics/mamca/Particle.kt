@@ -3,6 +3,7 @@ package org.physics.mamca
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import org.physics.mamca.math.*
+import org.physics.mamca.util.Mathematica
 import org.physics.mamca.util.equalsDouble
 import java.lang.Math.*
 import java.lang.reflect.Type
@@ -16,6 +17,8 @@ class Particle {
 
     // ось анизотропии
     val lma: Vector
+
+    val cell: Triple<Int, Int, Int>
 
     // нормаль к плоскости, в которой вращается момент
     var eZ: Vector = Vector()
@@ -33,11 +36,12 @@ class Particle {
     private var dipolParticles: Set<Particle> = setOf()
     private var exchangeParticles: Set<Particle> = setOf()
 
-    constructor(loc: Vector, m: Vector, lma: Vector, sample: Sample) {
+    constructor(loc: Vector, m: Vector, lma: Vector, cell: Triple<Int, Int, Int>, sample: Sample) {
         this.loc = loc
         this.m = m
         this.lma = lma
         this.sample = sample
+        this.cell = cell
     }
 
     constructor(json: String, sample: Sample = Sample()) {
@@ -49,6 +53,7 @@ class Particle {
         this.loc = particle.loc
         this.m = particle.m
         this.lma = particle.lma
+        this.cell = particle.cell
         this.sample = sample
     }
 
@@ -131,7 +136,7 @@ class Particle {
         val c = 2 * abs(bEff) * cos(theta)
 
         // корни уравнения (с переходом от x к phi)
-        val roots = solveEquation(a, b, c).map { 2 * atan(it) }
+        val roots = Mathematica.solveEquation(a, b, c).map { 2 * atan(it) }
 
         // энергия в экстремумах
         val energies = roots.map { computeEnergyInPlane(it, theta)}
@@ -146,7 +151,9 @@ class Particle {
 
         // итоговое значение phi, на которое будет повернут момент после поворота
         val phi: Double
-        if (mins.size == 1) {
+        if (mins.isEmpty()) {
+            TODO()
+        } else if (mins.size == 1) {
             phi = mins[0].second
         } else {
             // два минимума, падаем в ближайший
@@ -194,6 +201,9 @@ class Particle {
      * @param minPhi положение минимума
      */
     fun rotateMomentaToAngle(minPhi: Double) {
+        if (equalsDouble(minPhi, 0.0)) {
+            return
+        }
         val currentPhi = lma.angleTo(m, eZ)
         val deltaPhi = (currentPhi - minPhi) * sample.settings.viscosity
         m = Matrix(eZ, deltaPhi) * m

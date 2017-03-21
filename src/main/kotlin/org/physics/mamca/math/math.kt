@@ -4,6 +4,8 @@ import org.physics.mamca.util.equalsDouble
 
 fun sqr(x: Double): Double = x * x
 
+fun cub(x: Double): Double = x * x * x
+
 fun log(a: Double, b: Double) = Math.log(a) / Math.log(b)
 
 fun abs(vector: Vector): Double = vector.r

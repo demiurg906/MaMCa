@@ -8,7 +8,9 @@ import org.physics.mamca.math.rank
 import org.physics.mamca.util.*
 import java.io.File
 import java.io.IOException
+import java.util.*
 
+val prop = Properties()
 
 fun main(args: Array<String>) {
     val options = Options()
@@ -20,6 +22,15 @@ fun main(args: Array<String>) {
             required().
             longOpt("settings").
             desc("path to json settings file").
+            build()
+    )
+    //Mathematica path
+    options.addOption(Option.
+            builder("m").
+            hasArg().
+            required().
+            longOpt("mathematica").
+            desc("path to Mathematica executable").
             build()
     )
 
@@ -36,6 +47,8 @@ fun main(args: Array<String>) {
         System.exit(1)
         return
     }
+
+    prop.setProperty("MATHEMATICA_PATH", cmd.getOptionValue("mathematica"))
 
     val settingsFile = cmd.getOptionValue("settings")
     val settings = loadSettingsFromJson(settingsFile)

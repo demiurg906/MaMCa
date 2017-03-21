@@ -149,7 +149,7 @@ class Sample : Serializable {
                             "ot in settings must be 0..2, but ${s.ot} given "
                     )
                 }
-                val p = Particle(loc, m, lma, this)
+                val p = Particle(loc, m, lma, Triple(x, y, z), this)
                 particles.add(p)
             }
 
@@ -363,7 +363,11 @@ class Sample : Serializable {
                 val y2 = y + my
                 val z1 = z - mz
                 val z2 = z + mz
-                out.write("$x1 $y1 $z1 $x2 $y2 $z2 $x $y $z\n")
+
+                val cellX = p.cell.first
+                val cellY = p.cell.second
+                val cellZ = p.cell.third
+                out.write("$x1 $y1 $z1 $x2 $y2 $z2 $x $y $z $cellX $cellY $cellZ\n")
             }
         }
     }

@@ -12,6 +12,9 @@ class ParticleSerializer : JsonSerializer<Particle> {
         jsonObject.addProperty("m", m)
         val lma = src.lma.toJsonString()
         jsonObject.addProperty("lma", lma)
+        jsonObject.addProperty("x", src.cell.first)
+        jsonObject.addProperty("y", src.cell.second)
+        jsonObject.addProperty("z", src.cell.third)
         return jsonObject
     }
 }
@@ -23,9 +26,13 @@ class ParticleDeserialiser : JsonDeserializer<Particle> {
         val loc = Vector(jsonObject.get("loc").asString)
         val m = Vector(jsonObject.get("m").asString)
         val lma = Vector(jsonObject.get("lma").asString)
+
+        fun getInt(axis: String): Int = jsonObject.get(axis).asInt
+
+        val cell = Triple(getInt("x"), getInt("y"), getInt("z"))
         val sample = Sample()
 
-        val particle = Particle(loc, m, lma, sample)
+        val particle = Particle(loc, m, lma, cell, sample)
         return particle
     }
 }

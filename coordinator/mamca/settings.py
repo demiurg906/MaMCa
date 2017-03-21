@@ -36,6 +36,7 @@ class Settings:
         self._d['b_z'] = 0.0
         self._d['time'] = 1.0
         self._d['timeStep'] = 100
+        self._d['cyclicBoundaries'] = False
         self._d['name'] = 'default'
         self._d['precision'] = 7
         self._d['load'] = False
@@ -47,6 +48,11 @@ class Settings:
         self._d['is2dPlot'] = True
         self._d['xAxis'] = 'x'
         self._d['yAxis'] = 'y'
+        self._d['borders'] = False
+        self._d['leftX'] = 10
+        self._d['rightX'] = 20
+        self._d['leftY'] = 10
+        self._d['rightY'] = 20
         self._d['dataFolder'] = './resources/data'
         self._d['isParallel'] = False
         self._d['memory'] = 2048
@@ -273,6 +279,14 @@ class Settings:
         self._d['timeStep'] = value
 
     @property
+    def cyclicBoundaries(self):
+        return self._d['cyclicBoundaries']
+
+    @cyclicBoundaries.setter
+    def cyclicBoundaries(self, value):
+        self._d['cyclicBoundaries'] = value
+
+    @property
     def name(self):
         return self._d['name']
 
@@ -359,6 +373,46 @@ class Settings:
     @yAxis.setter
     def yAxis(self, value):
         self._d['yAxis'] = value
+
+    @property
+    def borders(self):
+        return self._d['borders']
+
+    @borders.setter
+    def borders(self, value):
+        self._d['borders'] = value
+
+    @property
+    def leftX(self):
+        return self._d['leftX']
+
+    @leftX.setter
+    def leftX(self, value):
+        self._d['leftX'] = value
+
+    @property
+    def rightX(self):
+        return self._d['rightX']
+
+    @rightX.setter
+    def rightX(self, value):
+        self._d['rightX'] = value
+
+    @property
+    def leftY(self):
+        return self._d['leftY']
+
+    @leftY.setter
+    def leftY(self, value):
+        self._d['leftY'] = value
+
+    @property
+    def rightY(self):
+        return self._d['rightY']
+
+    @rightY.setter
+    def rightY(self, value):
+        self._d['rightY'] = value
 
     @property
     def dataFolder(self):

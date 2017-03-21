@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 from .settings import Settings
-from .util import which
+from .util import which, play_failure_notification
 
 # греческая mu в utf-8 кодировке
 MU = '\u03BC'
@@ -28,6 +28,18 @@ if use_tex:
     plt.rc('text', usetex=True)
 
 
+def check_borders(settings: Settings):
+    if settings.borders:
+        if settings.x < settings.leftX or settings.y < settings.leftY:
+            print("The sample does not lie within the boundaries")
+            play_failure_notification()
+            sys.exit(1)
+        if settings.leftX >= settings.rightX or settings.leftY >= settings.rightY:
+            print("Boundaries are overlaps")
+            play_failure_notification()
+            sys.exit(1)
+
+
 def _get_lines(filename, skip=0):
     """
     :param filename: путь к файлу
@@ -46,16 +58,40 @@ def _read_vectors(filename):
     Читает содержимое файла
     :param filename: путь к файлу
     :return:
-        два numpy массива --- массив векторов в
-        формате (x1, y1, z1, x2, y2, z2) и массив координат (x, y, z)
+        три numpy массива --- массив векторов в
+        формате (x1, y1, z1, x2, y2, z2), массив координат (x, y, z) и массив с номером ячейки (x, y, z)
     """
     temp = np.array(
         [tuple(map(lambda s: float(s), line)) for line in
          list(map(lambda s: s.split(), _get_lines(filename)))])
-    return temp[:, :6], temp[:, 6:]
+    return temp[:, :6], temp[:, 6:9], temp[:, 9:]
 
 
-def draw_all_hyst_plots(*, settings_fname, b_axis, m_axis, label=None, borders=None,
+def _read_data(settings, filename):
+    """
+    Читает содержимое файла и фильтрует его в соответствии с границами в настройках
+    :param settings:
+    :param filename:
+    :return: два numpy массива --- массив векторов в
+        формате (x1, y1, z1, x2, y2, z2) и массив координат (x, y, z)
+    """
+    raw_vectors, raw_points, cells = _read_vectors(filename)
+    if settings.borders:
+        vectors, points = [], []
+        for (vector, point, cell) in zip(raw_vectors, raw_points, cells):
+            (xCell, yCell, zCell) = map(lambda x: int(x), cell)
+            if settings.leftX <= xCell < settings.rightX and (settings.leftY <= yCell < settings.rightY):
+                vectors.append(np.asarray(vector))
+                points.append(np.asarray(point))
+        vectors = np.array(vectors)
+        points = np.array(points)
+    else:
+        vectors = raw_vectors
+        points = raw_points
+    return vectors, points
+
+
+def draw_all_hyst_plots(*, settings, b_axis, m_axis, label=None, borders=None,
                         area=None):
     """
     Рисует три графика гистерезиса -- по одному на каждую ветвь и общий
@@ -68,7 +104,7 @@ def draw_all_hyst_plots(*, settings_fname, b_axis, m_axis, label=None, borders=N
     )
     for direction, name in data:
         draw_hyst_plot(
-            settings_fname=settings_fname,
+            settings=settings,
             b_axis=b_axis, m_axis=m_axis,
             label=label, borders=borders,
             area=area,
@@ -77,11 +113,11 @@ def draw_all_hyst_plots(*, settings_fname, b_axis, m_axis, label=None, borders=N
         )
 
 
-def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
+def draw_hyst_plot(*, settings, b_axis, m_axis, label=None, borders=None,
                    direction=None, area=None, name=None):
     """
     Рисует петлю гистерезиса
-    :param settings_fname: путь к файлу с настройками, для отображения
+    :param settings: путь к файлу с настройками, для отображения
         их на графике
     :param b_axis: проекция поля ('x', 'y', 'z')
     :param m_axis: проекиця момента ('x', 'y', 'z')
@@ -95,7 +131,6 @@ def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
         отрезать с обеих сторон, n_x и n_y -- сколько частиц всего
     :param name: имя для скриншота
     """
-    settings = Settings(settings_fname)
     data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
     out_folder = '{}/out'.format(data_folder)
     pic_dir = data_folder + '/pictures'
@@ -108,7 +143,7 @@ def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
         """
         читает моменты частиц образца из файла и суммирует их
         """
-        vs, points = _read_vectors(file)
+        vs, points = _read_data(settings, file)
         # суммировать все моменты
         if area is None:
             return sum(vs[:, 3] - vs[:, 0]), \
@@ -191,13 +226,12 @@ def draw_hyst_plot(*, settings_fname, b_axis, m_axis, label=None, borders=None,
     plt.clf()
 
 
-def create_momenta_gif(*, settings_fname: str):
+def create_momenta_gif(*, settings: Settings):
     """
     Создает гифку из состояний образца между скачками моментов
-    :param settings_fname: путь к файлу с настройками
+    :param settings: путь к файлу с настройками
     :return:
     """
-    settings = Settings(settings_fname)
     data_folder = '{}/{}/pictures'.format(settings.dataFolder, settings.name)
     momenta_template = '{}/moments/momenta*.png'.format(data_folder)
     # поиск утилиты convert
@@ -218,13 +252,12 @@ def create_momenta_gif(*, settings_fname: str):
     subprocess.run(exe, stdout=sys.stdout, stderr=sys.stderr, )
 
 
-def draw_all_vectors_plots(*, settings_fname: str = None, borders: list = None,
+def draw_all_vectors_plots(*, settings: Settings = None, borders: list = None,
                            negative_borders: bool = True, label: str = None,
                            scale: float = 1, draw_points: bool = True):
     """
     Рисует графики состояний до и после оптимизации
     """
-    settings = Settings(settings_fname)
     data_folder = '{}/{}/out'.format(settings.dataFolder, settings.name)
 
     for file in os.listdir(data_folder):
@@ -236,7 +269,7 @@ def draw_all_vectors_plots(*, settings_fname: str = None, borders: list = None,
                 _, _, _, t = file[:-4].split('_')
                 text = 't = {} s'.format(t)
 
-            kwargs = {'settings_fname': settings_fname,
+            kwargs = {'settings_fname': settings,
                       'borders': borders,
                       'negative_borders': negative_borders,
                       'label': label,
@@ -251,7 +284,7 @@ def draw_all_vectors_plots(*, settings_fname: str = None, borders: list = None,
                 draw_3d_vectors_plot(**kwargs)
 
 
-def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
+def draw_3d_vectors_plot(*, settings: Settings = None, borders: list = None,
                          negative_borders: bool = True, label: str = None,
                          text: str = None, scale: float = 1,
                          momenta_filename: str, draw_points: bool = True
@@ -259,7 +292,7 @@ def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
     """
     Рисует трехмерный график веторов
     :param draw_points: рисовать ли сами частицы (точками)
-    :param settings_fname: путь к файлу с настройками, для отображения
+    :param settings: путь к файлу с настройками, для отображения
         их на графике
     :param borders: массив границ графика.
         формат: либо [x, y, z] либо [x1, x2, y1, y2, z1, z2]
@@ -272,7 +305,6 @@ def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
     :param(float) scale: масштаб стрелочек
     :param(str) momenta_filename: путь к файлу с данными
     """
-    settings = Settings(settings_fname)
     data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
     filename = '{}/out/{}'.format(data_folder, momenta_filename)
     name = momenta_filename[:-4]
@@ -283,7 +315,7 @@ def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
     _counter += 1
     if label is not None:
         fig.canvas.set_window_title(str(label))
-    vectors, points = _read_vectors(filename)
+    vectors, points = _read_data(settings, filename)
     ax = fig.add_subplot(111, projection='3d')
     if borders is None:
         # минимумы и максимумы координат
@@ -359,11 +391,10 @@ def draw_3d_vectors_plot(*, settings_fname: str = None, borders: list = None,
     plt.clf()
 
 
-def draw_2d_vectors_plot(*, settings_fname: str = None, borders: list = None,
+def draw_2d_vectors_plot(*, settings: Settings = None, borders: list = None,
                          negative_borders: bool = True, label: str = None,
                          text: str = None, scale: float = 1,
                          momenta_filename: str, draw_points: bool = True):
-    settings = Settings(settings_fname)
     data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
     filename = '{}/out/{}'.format(data_folder, momenta_filename)
     name = momenta_filename[:-4]
@@ -380,7 +411,7 @@ def draw_2d_vectors_plot(*, settings_fname: str = None, borders: list = None,
 
     # индексы с нужными осями
     x1, y1, x2, y2 = axes[x], axes[y], axes[x] + 3, axes[y] + 3
-    vectors, points = _read_vectors(filename)
+    vectors, points = _read_data(settings, filename)
 
     if borders is None:
         # минимумы и максимумы координат

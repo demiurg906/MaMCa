@@ -1,7 +1,7 @@
 import simpleaudio as sa
 
 
-def which(program):
+def which(program, extension=None):
     """
     Функция ищет путь к программе в системном PATH
     :param program:
@@ -9,10 +9,13 @@ def which(program):
     """
     import os
     import sys
-    if 'win' in sys.platform:
-        extension = ['', '.exe', '.msi', '.bat']
-    else:
-        extension = ['', '.sh']
+    if extension is None:
+        if 'win' in sys.platform:
+            extension = ['', '.exe', '.msi', '.bat']
+        else:
+            extension = ['', '.sh']
+    elif not (type(extension) is list):
+        extension = [extension]
 
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)

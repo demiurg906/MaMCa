@@ -35,6 +35,8 @@
   "time":1.0,
   "timeStep":100,
 
+  "cyclicBoundaries":false,
+
   "name":"default",
 
   "precision":7,
@@ -49,6 +51,12 @@
   "is2dPlot":true,
   "xAxis":"x",
   "yAxis":"y",
+
+  "borders":false,
+  "leftX":10,
+  "rightX":20,
+  "leftY":10,
+  "rightY":20,
 
   "dataFolder":"./resources/data",
 

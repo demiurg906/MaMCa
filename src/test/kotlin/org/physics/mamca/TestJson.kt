@@ -19,6 +19,7 @@ class TestJson {
                 Vector(0.0, 0.0, 0.0),
                 Vector(1.0, 1.0, 1.0),
                 Vector(2.0, 2.0, 2.0),
+                Triple(1, 1, 1),
                 Sample()
         )
         val json = particle.toJsonString()
@@ -52,12 +53,14 @@ class TestJson {
                 2, 15.0, 16.0,
                 15.0, 16.0, 17.0,
                 18.0, 6,
+                true,
                 "name",
                 6, true, "json_path",
                 true, 8, 9, 10,
                 false, "y", "z",
-                "data_path"
-
+                true, 11, 12, 13, 14,
+                "data_path",
+                true, 15
         )
         val filename = "src/test/resources/settings.json"
         createSettingsJson(filename, settings)

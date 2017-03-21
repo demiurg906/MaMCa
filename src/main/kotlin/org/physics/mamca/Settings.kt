@@ -4,7 +4,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
 
-
+// при добавлении-удалении полей в класс настроек необходимо запустить скрипт
+// `mamca.util.SettingsGenerator.kt` (генератор python кода) для обновления класса настроек в координаторе
 data class Settings(val x: Int = 1, // количество клеток по x
                     val y: Int = 1, // количество клеток по y
                     val z: Int = 1, // количество клеток по z
@@ -44,6 +45,8 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     var time: Double = 1.0, // время релаксации [с]
                     val timeStep: Int = 100, // временной шаг [нс]
 
+                    val cyclicBoundaries: Boolean = false, // использовать ли граничные цикличиские условия по x и y
+
                     val name: String = "default", // имя модели (используется для графиков и логов)
 
                     val precision: Int = 7, // точность (количество шагов симуляции)
@@ -59,6 +62,12 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val xAxis: String = "x", // координата по оси абсциис (2D график)
                     val yAxis: String = "y", // координата по оси ординат (2D график)
 
+                    val borders: Boolean = false, // отсекать ли часть клеток при рисовании графиков
+                    val leftX: Int = 10,  //       ...|.......|...
+                    val rightX: Int = 20, //        leftX   rightX
+                    val leftY: Int = 10,  // с Y координатой аналогично
+                    val rightY: Int = 20, //
+
                     val dataFolder: String = "./resources/data", // путь к папке для выходных данных
 
                     val isParallel: Boolean = false, // использовать ли параллельные вычисления
@@ -68,11 +77,11 @@ data class Settings(val x: Int = 1, // количество клеток по x
 // списки с полями типа string и boolean
 // костыль
 val stringFields = setOf("name", "jsonPath", "dataFolder", "outFolder", "picFolder", "logFolder", "xAxis", "yAxis")
-val booleanFields = setOf("load", "hysteresis", "is2dPlot", "isParallel")
+val booleanFields = setOf("load", "hysteresis", "is2dPlot", "isParallel", "borders", "cyclicBoundaries")
 
 // количество полей в блоке, отделенном от остальных новой строкой
 // нужен, чтобы поля были логически разделены пустыми строками
-val newLines = listOf(4, 5, 3, 2, 2, 3, 3, 3, 2, 1, 3, 4, 3, 1, 3)
+val newLines = listOf(4, 5, 3, 2, 2, 3, 3, 3, 2, 1, 1, 3, 4, 3, 5, 1, 3)
 
 fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()
