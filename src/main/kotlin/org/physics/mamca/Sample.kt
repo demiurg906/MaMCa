@@ -328,11 +328,10 @@ class Sample : Serializable {
         }
         if (settings.isParallel) {
             particles.parallelStream().forEach { it.optimizeEnergy() }
-            particles.parallelStream().forEach { it.computeEffectiveField() }
         } else {
             particles.forEach { it.optimizeEnergy() }
-            particles.forEach { it.computeEffectiveField() }
         }
+        particles.forEach { it.computeEffectiveField() }
         val newEnergy = computeEnergy()
         return oldEnergy to newEnergy
     }
