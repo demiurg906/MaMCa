@@ -12,10 +12,11 @@
  1. Клонировать из репозитория
  2. Инициализировать проект с помощью *Gradle*, конфигурационный файл -- `gradlew init` 
  3. Собрать используемый проектом интерпретатор питона: `gradlew build_envs`
- 4. Установить Wolfram Mathematica, добавить папки `$MATHEMATICA_DIR` и 
+ 4. Установить [jdk8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) и добавить его в `PATH`
+ 5. Установить Wolfram Mathematica, добавить папки `$MATHEMATICA_DIR` и 
  `$MATHEMATICA_DIR/SystemFiles/Links/JLink/SystemFiles/Libraries/$YOUR_SYSTEM$` в `PATH`, 
  скопировать `$MATHEMATICA_DIR/SystemFiles/Links/JLink/JLink.jar` в `$MAMCA$/libs`
- 5. Уставноить и добавить в `PATH` TeX (опционально, тех нужен для красивых подписей к графикам) 
+ 6. Уставноить и добавить в `PATH` TeX (опционально, тех нужен для красивых подписей к графикам) 
 
 ### Запуск
 
