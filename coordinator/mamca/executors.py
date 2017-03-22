@@ -13,13 +13,6 @@ def single_run(settings_fname, mamca_path=MAMCA_PATH):
     :param settings_fname: путь к файлу с настройками
     :param mamca_path: путь к исполняемому файлу моделирующей программы
     """
-    try:
-        settings = Settings(settings_fname)
-    except JSONDecodeError:
-        print('settings file is incorrect')
-        play_failure_notification()
-        sys.exit(1)
-
     java_path = which('java')
     if java_path is None:
         print('Can\'t find java. Check that java is installed and put in PATH')
@@ -34,6 +27,8 @@ def single_run(settings_fname, mamca_path=MAMCA_PATH):
         extension = '.dll'
     else:
         extension = '.so'
+
+    settings = Settings(settings_fname)
     mathematica_native_library = which('JLinkNativeLibrary', extension)
     if mathematica_native_library is None:
         print('Can\'t find JLinkNativeLibrary.{}. Check that Mathematica is installed and put in PATH'.format(

@@ -71,7 +71,14 @@ task create_and_draw(type: Exec, dependsOn: 'jar') {
     group = 'python tasks'
     workingDir './'
 
-    commandLine pythonPath, 'coordinator/create_and_draw.py'
+    commandLine pythonPath, 'coordinator/create_and_draw.py', 'single', './resources/settings.json'
+}
+
+task run_multiple_tasks(type: Exec, dependsOn: 'jar') {
+    group = 'python tasks'
+    workingDir './'
+
+    commandLine pythonPath, 'coordinator/create_and_draw.py', 'multiple', './resources/settings/'
 }
 
 jar {
