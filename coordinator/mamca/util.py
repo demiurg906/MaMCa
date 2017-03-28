@@ -37,9 +37,13 @@ def which(program, extension=None):
 
 
 def play_notification(notification):
-    wave_obj = sa.WaveObject.from_wave_file(notification)
-    play_obj = wave_obj.play()
-    play_obj.wait_done()
+    try:
+        wave_obj = sa.WaveObject.from_wave_file(notification)
+        play_obj = wave_obj.play()
+        play_obj.wait_done()
+    except Exception:
+        print('unable to play notification')
+
 
 
 def play_success_notification():
