@@ -271,13 +271,8 @@ class Sample : Serializable {
 
         var energies = optimizeEnergy()
 
-        val computeDelta: () -> Double = {
-            val delta = (energies.first - energies.second) / energies.first
-            if (delta < 0)
-                1 - delta
-            else
-                delta
-        }
+        fun computeDelta(): Double =
+            Math.abs((energies.first - energies.second) / energies.first)
 
         var relativeDeltaEnergy = computeDelta()
         var numberOfSteps = 1
@@ -298,6 +293,8 @@ class Sample : Serializable {
 
         // energies on end
         val endEnergy = computeEnergies()
+        Logger.info("start energy: ${startEnergy.first.eFormat(3)}")
+        Logger.info("  end energy: ${endEnergy.first.eFormat(3)}")
         return Triple(startEnergy, endEnergy, numberOfSteps)
     }
 
