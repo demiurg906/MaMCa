@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils
 import org.physics.mamca.math.Vector
 import org.physics.mamca.math.abs
 import org.physics.mamca.util.*
+import sun.rmi.runtime.Log
 import java.io.File
 import java.io.Serializable
 import java.lang.Math.cos
@@ -284,13 +285,19 @@ class Sample : Serializable {
 
         var relativeDeltaEnergy = computeDelta()
         var numberOfSteps = 1
+        var endedWithPrecision = true
         for (i in 1 until settings.precision) {
             if (relativeDeltaEnergy < RELATIVE_ENERGY_PRECISION) {
+                endedWithPrecision = false
                 break
             }
             energies = optimizeEnergy(energies.second)
             relativeDeltaEnergy = computeDelta()
             numberOfSteps += 1
+        }
+
+        if (endedWithPrecision) {
+            Logger.info("Processing ended with precision. Relative delta energy is $relativeDeltaEnergy")
         }
 
         // energies on end

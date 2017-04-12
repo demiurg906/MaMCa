@@ -1,4 +1,4 @@
-package org.physics.mamca
+﻿package org.physics.mamca
 
 import java.math.BigDecimal
 
@@ -10,7 +10,7 @@ const val DELTA = 1e-20
 
 // отночительная точность, при которой считаем, что изменение энергии системы несущественно
 // считается, как отношение разности энергий до и после к энергии до
-const val RELATIVE_ENERGY_PRECISION = 0.01
+const val RELATIVE_ENERGY_PRECISION = 0.001
 
 // число символов после запятой для вывода
 const val DIGITS = 2

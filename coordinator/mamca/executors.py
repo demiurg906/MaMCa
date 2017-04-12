@@ -35,10 +35,15 @@ def single_run(settings_fname, mamca_path=MAMCA_PATH):
             extension)
         )
         exit_program()
-
+    
+    if 'win' in sys.platform:
+        exe = '{0} -Xms{1}m -Xmx{1}m -jar "{2}" -s "{3}" -m "{4}"'.format(
+            java_path, settings.memory, mamca_path, settings_fname, mathematica_path)
+    else:
+        exe = '{0}@-Xms{1}m@-Xmx{1}m@-jar@"{2}"@-s@"{3}"@-m@"{4}"'.format(
+            java_path, settings.memory, mamca_path, settings_fname, mathematica_path).split('@')
     completed = subprocess.run(
-        '{0} -Xms{1}m -Xmx{1}m -jar {2} -s {3} -m{4}'.format(
-            java_path, settings.memory, mamca_path, settings_fname, mathematica_path).split(),
+        exe,
         stdout=sys.stdout, stderr=sys.stderr, )
     if completed.returncode != 0:
         exit_program()

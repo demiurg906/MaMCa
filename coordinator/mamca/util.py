@@ -1,6 +1,5 @@
 import simpleaudio as sa
 
-
 def which(program, extension=None):
     """
     Функция ищет путь к программе в системном PATH

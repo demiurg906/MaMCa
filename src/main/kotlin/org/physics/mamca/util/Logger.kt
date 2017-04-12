@@ -16,7 +16,7 @@ object Logger {
     }
 
     fun addDelimiter(): Logger {
-        _info(DELIMITER + "\n")
+        _info(DELIMITER + "\r\n")
         return this
     }
 

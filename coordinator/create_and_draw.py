@@ -24,7 +24,7 @@ def single_simulation(settings_fname: str = None):
         scale=4,
         draw_points=False
     )
-    create_momenta_gif(settings=settings)
+    # create_momenta_gif(settings=settings)
     play_success_notification()
 
 
@@ -41,7 +41,10 @@ def multiple_simulations():
         if not check_settings(settings_fname):
             print('{} is not valid settings file'.format(settings_fname))
             continue
-        single_simulation(settings_fname)
+        try:
+            single_simulation(settings_fname)
+        except Exception as e:
+            print(e)
 
 
 def check_settings(settings_fname: str):
