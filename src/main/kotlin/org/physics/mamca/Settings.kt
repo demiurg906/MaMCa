@@ -38,9 +38,9 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val ot_theta: Double = 90.0, // [градус]
                     val ot_phi: Double = 0.0, // [градус]
 
-                    val b_x: Double = 0.0, // поле по x [Тл]
-                    val b_y: Double = 0.0, // поле по y [Тл]
-                    val b_z: Double = 0.0, // поле по z [Тл]
+                    var b_x: Double = 0.0, // поле по x [Гаусс]
+                    var b_y: Double = 0.0, // поле по y [Гаусс]
+                    var b_z: Double = 0.0, // поле по z [Гаусс]
 
                     var time: Double = 1.0, // время релаксации [с]
                     val timeStep: Int = 100, // временной шаг [нс]
@@ -68,7 +68,7 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val leftY: Int = 10,  // с Y координатой аналогично
                     val rightY: Int = 20, //
 
-                    val dataFolder: String = "./resources/data", // путь к папке для выходных данных
+                    val dataFolder: String = "../data", // путь к папке для выходных данных
 
                     val isParallel: Boolean = false, // использовать ли параллельные вычисления
                     val memory: Int = 2048 // количество памяти, выделяемой для java-машины, Мбайт

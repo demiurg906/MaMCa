@@ -39,5 +39,4 @@ const val K = 1.3806485279e-23
 // перевод м^3 в нм^3
 const val M3_TO_NM3 = 10e27
 
-// отношение мнимой части к действительной, при котором мнимой можно пренебречь
-val COMPLEX_PRECISION = BigDecimal(1e-10)
+const val OE_TO_TESLA = 1e-4

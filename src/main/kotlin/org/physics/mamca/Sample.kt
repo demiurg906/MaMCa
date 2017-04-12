@@ -62,10 +62,6 @@ class Sample : Serializable {
 
         // перевод констант в единицы с Дж
         this.momentaValue = settings.m * MU_B
-        settings.kan /= EV_TO_DJ
-        settings.kan /= M3_TO_NM3
-        settings.jex /= EV_TO_DJ
-        settings.time *= S_TO_NS
 
         this.KT = settings.t * K
         this.vKan = settings.kan * 4 * PI * Math.pow(settings.r, 3.0)

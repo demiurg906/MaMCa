@@ -58,7 +58,7 @@
   "leftY":10,
   "rightY":20,
 
-  "dataFolder":"./resources/data",
+  "dataFolder":"../data",
 
   "isParallel":false,
   "memory":2048

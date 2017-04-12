@@ -53,6 +53,7 @@ fun main(args: Array<String>) {
     val settingsFile = cmd.getOptionValue("settings")
     val settings = loadSettingsFromJson(settingsFile)
 
+    rescaleSettingsFields(settings)
     prepareFolders(settings)
     createSettingsJson("${settings.dataFolder}/${settings.name}/settings.json", settings)
 
@@ -75,6 +76,18 @@ fun main(args: Array<String>) {
     playSuccessNotification()
 }
 
+/**
+ * переводит поля настроек в единицы измерения, используемые в модели
+ */
+fun rescaleSettingsFields(settings: Settings) {
+    settings.kan /= EV_TO_DJ
+    settings.kan /= M3_TO_NM3
+    settings.jex /= EV_TO_DJ
+    settings.time *= S_TO_NS
+    settings.b_x *= OE_TO_TESLA
+    settings.b_y *= OE_TO_TESLA
+    settings.b_z *= OE_TO_TESLA
+}
 
 /**
  * создает все выходные папки, если их нет
@@ -230,9 +243,10 @@ fun hysteresisRun(settings: Settings): Long {
                 info("i: $stepIndex").
                 addDelimiter()
         sample.processModel()
+        val field = listOf(sample.b.x, sample.b.y, sample.b.z).map { it / OE_TO_TESLA }.map { it.format(3) }
         sample.saveState(
                 outFolder.canonicalPath,
-                "momenta_${stepIndex.format(digitsOfIndex)}_${direction}_${sample.b.x.format(3)}_${sample.b.y.format(3)}_${sample.b.z.format(3)}.txt")
+                "momenta_${stepIndex.format(digitsOfIndex)}_${direction}_${field[0]}_${field[1]}_${field[2]}.txt")
         stepIndex += 1
     }
 

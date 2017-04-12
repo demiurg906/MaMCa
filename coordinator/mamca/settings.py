@@ -53,7 +53,7 @@ class Settings:
         self._d['rightX'] = 20
         self._d['leftY'] = 10
         self._d['rightY'] = 20
-        self._d['dataFolder'] = './resources/data'
+        self._d['dataFolder'] = '../data'
         self._d['isParallel'] = False
         self._d['memory'] = 2048
         if filename is not None:

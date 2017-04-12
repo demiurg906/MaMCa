@@ -174,12 +174,12 @@ def draw_hyst_plot(*, settings, b_axis, m_axis, label=None, borders=None,
     if use_tex:
         if label is None:
             label = r'$M_{}(B_{})$'.format(m_axis, b_axis)
-        plt.xlabel(r'$B_{}, T$'.format(b_axis))
+        plt.xlabel(r'$B_{}, $'.format(b_axis))
         plt.ylabel(r'$M_{}, \mu_B$'.format(m_axis))
     else:
         if label is None:
             label = 'M_{}(B_{})'.format(m_axis, b_axis)
-        plt.xlabel('B_{}, T'.format(b_axis))
+        plt.xlabel('B_{}, Oe'.format(b_axis))
         plt.ylabel('M_{}, {}_B'.format(m_axis, MU))
     fig.canvas.set_window_title(label)
 
