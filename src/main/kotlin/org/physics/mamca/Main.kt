@@ -53,9 +53,9 @@ fun main(args: Array<String>) {
     val settingsFile = cmd.getOptionValue("settings")
     val settings = loadSettingsFromJson(settingsFile)
 
-    rescaleSettingsFields(settings)
     prepareFolders(settings)
     createSettingsJson("${settings.dataFolder}/${settings.name}/settings.json", settings)
+    rescaleSettingsFields(settings)
 
     val startTime = System.currentTimeMillis()
     val midTime: Long

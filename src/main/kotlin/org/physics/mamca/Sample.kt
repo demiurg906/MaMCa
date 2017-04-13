@@ -224,7 +224,7 @@ class Sample : Serializable {
         val startEnergy = res.first
 
         if (settings.t > 0) {
-            Logger.addDelimiter()
+//            Logger.addDelimiter()
 //            Logger.info("times of jumps [s]:\n")
             for (t in 0..settings.time.toInt() step settings.timeStep) {
                 if (twoMinimums.isEmpty()) {
