@@ -91,6 +91,37 @@ def _read_data(settings, filename):
     return vectors, points
 
 
+def draw_plot_from_hyst_series(*, settings: Settings, borders: list = None,
+                               negative_borders: bool = True, label: str = None,
+                               scale: float = 1, draw_points: bool = True,
+                               numbers: list, show: bool = False):
+    if not settings.hysteresis:
+        print('switch hysteresis in settings to "true"')
+        return
+    data_folder = '{}/{}/out'.format(settings.dataFolder, settings.name)
+    for file in os.listdir(data_folder):
+        if file.startswith('momenta'):
+            _, n, _, bx, by, bz = file[:-4].split('_')
+            n = int(n)
+            text = 'B({}, {}, {})'.format(bx, by, bz)
+            if n in numbers:
+                kwargs = {'settings': settings,
+                          'borders': borders,
+                          'negative_borders': negative_borders,
+                          'label': label,
+                          'text': text,
+                          'scale': scale,
+                          'momenta_filename': file,
+                          'draw_points': draw_points,
+                          'show': show,
+                          'label': 'number {}'.format(n)
+                          }
+                if settings.is2dPlot:
+                    draw_2d_vectors_plot(**kwargs)
+                else:
+                    draw_3d_vectors_plot(**kwargs)
+
+
 def draw_all_hyst_plots(*, settings, b_axis, m_axis, label=None, borders=None,
                         area=None):
     """
@@ -287,8 +318,8 @@ def draw_all_vectors_plots(*, settings: Settings = None, borders: list = None,
 def draw_3d_vectors_plot(*, settings: Settings = None, borders: list = None,
                          negative_borders: bool = True, label: str = None,
                          text: str = None, scale: float = 1,
-                         momenta_filename: str, draw_points: bool = True
-                         ):
+                         momenta_filename: str, draw_points: bool = True,
+                         show: bool = False):
     """
     Рисует трехмерный график веторов
     :param draw_points: рисовать ли сами частицы (точками)
@@ -311,7 +342,10 @@ def draw_3d_vectors_plot(*, settings: Settings = None, borders: list = None,
     pic_dir = '{}/pictures/moments'.format(data_folder)
 
     global _counter
-    fig = plt.figure(0, figsize=figsize)
+    if show:
+        fig = plt.figure(_counter, figsize=figsize)
+    else:
+        fig = plt.figure(0, figsize=figsize)
     _counter += 1
     if label is not None:
         fig.canvas.set_window_title(str(label))
@@ -387,20 +421,25 @@ def draw_3d_vectors_plot(*, settings: Settings = None, borders: list = None,
 
     if name is None:
         name = 'fig_{}'.format(_counter)
-    plt.savefig('{}/{}.png'.format(pic_dir, name), format='png')
-    plt.clf()
+    if not show:
+        plt.savefig('{}/{}.png'.format(pic_dir, name), format='png')
+        plt.clf()
 
 
 def draw_2d_vectors_plot(*, settings: Settings = None, borders: list = None,
                          negative_borders: bool = True, label: str = None,
                          text: str = None, scale: float = 1,
-                         momenta_filename: str, draw_points: bool = True):
+                         momenta_filename: str, draw_points: bool = True,
+                         show: bool = False):
     data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
     filename = '{}/out/{}'.format(data_folder, momenta_filename)
     name = momenta_filename[:-4]
     pic_dir = '{}/pictures/moments'.format(data_folder)
     global _counter
-    fig = plt.figure(0, figsize=figsize)
+    if show:
+        fig = plt.figure(_counter, figsize=figsize)
+    else:
+        fig = plt.figure(0, figsize=figsize)
     _counter += 1
     if label is not None:
         fig.canvas.set_window_title(label)
@@ -476,5 +515,15 @@ def draw_2d_vectors_plot(*, settings: Settings = None, borders: list = None,
 
     if name is None:
         name = 'fig_{}'.format(_counter)
-    plt.savefig('{}/{}.png'.format(pic_dir, name), format='png')
-    plt.clf()
+    if not show:
+        plt.savefig('{}/{}.png'.format(pic_dir, name), format='png')
+        plt.clf()
+
+
+# Используется для рисования всех созданных графиков
+def end_of_drawing():
+    """
+    Необходимо вызывать после вызова всех процедур рисования для отображения
+        нарисованных графиков (если не был выбран режим сохранения в файл)
+    """
+    plt.show()
