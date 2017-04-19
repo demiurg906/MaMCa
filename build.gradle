@@ -8,7 +8,7 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'gradle.plugin.com.jetbrains.python:gradle-python-envs:0.0.8'
+        classpath 'gradle.plugin.com.jetbrains.python:gradle-python-envs:0.0.10'
     }
 }
 
