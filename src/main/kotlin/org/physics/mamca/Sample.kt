@@ -232,7 +232,7 @@ class Sample : Serializable {
                     break
                 }
                 if (energyJumps()) {
-//                    Logger.info((t / S_TO_NS).format(9))
+                    Logger.info("jump time: ${(t / S_TO_NS).format(9)}")
                     nJumps += 1
                     saveStateAfterJump(t, true)
                     res = processRelaxation()

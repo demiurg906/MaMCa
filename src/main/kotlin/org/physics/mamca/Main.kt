@@ -240,9 +240,9 @@ fun hysteresisRun(settings: Settings): Long {
 
         Logger.info("b: ${sample.b}").
                 info("step: $stepVal").
-                info("i: $stepIndex").
-                addDelimiter()
+                info("i: $stepIndex")
         sample.processModel()
+        Logger.addDelimiter()
         val field = listOf(sample.b.x, sample.b.y, sample.b.z).map { it / OE_TO_TESLA }.map { it.format(3) }
         sample.saveState(
                 outFolder.canonicalPath,
