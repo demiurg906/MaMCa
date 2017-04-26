@@ -200,8 +200,8 @@ class Sample : Serializable {
      * @return (энергия до оптимизации, энергия после оптимизации, количество шагов оптимизации)
      */
     fun processModel(outFolder: String? = null): Triple<
-            Pair<Double, Triple<Double, Double, Double>>,
-            Pair<Double, Triple<Double, Double, Double>>,
+            Pair<Double, List<Double>>,
+            Pair<Double, List<Double>>,
             Int> {
         if ((outFolder == null) and !settings.hysteresis) {
             throw IllegalStateException("outFolder can be null only in hysteresis run")
@@ -258,8 +258,8 @@ class Sample : Serializable {
      * @return (энергия до оптимизации, энергия после оптимизации, количество шагов оптимизации)
      */
     fun processRelaxation(): Triple<
-            Pair<Double, Triple<Double, Double, Double>>,
-            Pair<Double, Triple<Double, Double, Double>>,
+            Pair<Double, List<Double>>,
+            Pair<Double, List<Double>>,
             Int> {
         if (settings.isParallel) {
             particles.parallelStream().forEach { it.computeEffectiveField() }
@@ -293,18 +293,18 @@ class Sample : Serializable {
 
         // energies on end
         val endEnergy = computeEnergies()
-        Logger.info("start energy: ${startEnergy.first.eFormat(3)}")
-        Logger.info("  end energy: ${endEnergy.first.eFormat(3)}")
+        Logger.info("start energy: ${(startEnergy.first / EV_TO_DJ).eFormat(DIGITS)}, ${formatEnergies(startEnergy.second)}")
+        Logger.info("  end energy: ${(endEnergy.first / EV_TO_DJ).eFormat(DIGITS)}, ${formatEnergies(endEnergy.second)}")
         return Triple(startEnergy, endEnergy, numberOfSteps)
     }
 
     /**
      * @return суммарная энергию образца (пара из полной энергии и тройки энергий по взаимодействиям)
      */
-    fun computeEnergies(): Pair<Double, Triple<Double, Double, Double>> {
-        var partE = Triple(0.0, 0.0, 0.0)
-        particles.map { it.computeEnergies() }.forEach { partE += it }
-        val fullE = partE.first + partE.second + partE.third
+    fun computeEnergies(): Pair<Double, List<Double>> {
+        val partE = mutableListOf(0.0, 0.0, 0.0, 0.0)
+        particles.map { it.computeEnergies() }.forEach { for (i in 0..3) partE[i] += it[i]}
+        val fullE = partE.sum()
         return fullE to partE
     }
 

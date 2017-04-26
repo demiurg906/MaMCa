@@ -46,11 +46,15 @@ fun Double.eFormat(digits: Int = DIGITS): String = java.lang.String.format(Local
 infix operator fun Triple<Double, Double, Double>.plus(it: Triple<Double, Double, Double>): Triple<Double, Double, Double> =
         Triple(this.first + it.first, this.second + it.second, this.third + it.third)
 
-fun formatEnergies(energies: Triple<Double, Double, Double>, k: Double = 1 / EV_TO_DJ, digits: Int = DIGITS): String {
-    val an = energies.first * k
-    val int = energies.second * k
-    val b = energies.third * k
-    return "(an: ${an.eFormat(digits)}, int: ${int.eFormat(digits)}, B: ${b.eFormat(digits)})"
+fun formatEnergies(energies: List<Double>, k: Double = 1 / EV_TO_DJ, digits: Int = DIGITS): String {
+    val dipol = energies[1] * k
+    val exchange = energies[2] * k
+    val b = energies[0] * k
+    val an = energies[3] * k
+    return "(an: ${an.eFormat(digits)}, " +
+            "dipol: ${dipol.eFormat(digits)}, " +
+            "ex: ${exchange.eFormat(digits)}, " +
+            "B: ${b.eFormat(digits)})"
 }
 
 fun Int.format(digits: Int = DIGITS): String = java.lang.String.format(Locale.US, "%0${digits}d", this)

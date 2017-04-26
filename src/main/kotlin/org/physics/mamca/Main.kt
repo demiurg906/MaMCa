@@ -150,8 +150,6 @@ fun prepareFolders(settings: Settings) {
  * Запускает один цикл симуляции
  */
 fun singleRun(settings: Settings): Long {
-
-
     val dataFolder ="${settings.dataFolder}/${settings.name}"
     val outFolder = File("$dataFolder/out")
 

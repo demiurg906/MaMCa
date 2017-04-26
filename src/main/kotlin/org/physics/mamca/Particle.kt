@@ -31,6 +31,9 @@ class Particle {
     var energy: Double = 0.0
 
     private var bEff: Vector = Vector()
+    private var bEffDipol: Vector = Vector()
+    private var bEffExchange: Vector = Vector()
+    private var bEffExternal: Vector = Vector()
 
     private var neighborsInitialized = false
     private var dipolParticles: Set<Particle> = setOf()
@@ -71,10 +74,9 @@ class Particle {
      * расчет эффективного магнитного поля
      */
     fun computeEffectiveField() {
-        bEff = Vector()
-
         // фоновое магнитное поле
-        bEff += sample.b
+        bEffExternal = sample.b
+
 
         // вклад диполь-дипольного взаимодействия
         var dipols = Vector()
@@ -83,12 +85,14 @@ class Particle {
             val n = r.direction()
             dipols += (3 *(n * it.m) * n - it.m) / pow(abs(r), 3.0)
         }
-        bEff += dipols * sample.momentaValue * DIPOL_CONST
+        bEffDipol = dipols * sample.momentaValue * DIPOL_CONST
 
         // вклад обменного взаимодействия
         var exchange = Vector()
         exchangeParticles.forEach { exchange += it.m }
-        bEff += exchange * sample.settings.jex * sample.momentaValue
+        bEffExchange = exchange * sample.settings.jex * sample.momentaValue
+
+        bEff = bEffDipol + bEffExchange + bEffExternal
     }
 
     /**
@@ -217,13 +221,14 @@ class Particle {
 
     /**
      * расчитывает энергии анизотропии, внешнего поля и взаимодействий
-     * @return (eAnisotropy, eInteraction, eField)
+     * @return (E_field, E_dipol, E_exchange, E_anisotropy)
      */
-    fun computeEnergies(): Triple<Double, Double, Double>{
+    fun computeEnergies(): List<Double> {
+        fun energy(b: Vector): Double =
+                (- (m * b) + (abs(m) * abs(b))) * sample.momentaValue
+
         val eAn = sample.vKan * sqr(abs(m % lma)) * sample.momentaValue
-        val eBeff = (- (m * bEff) + (abs(m) * abs(bEff))) * sample.momentaValue
-        val eB = (- m * sample.b + (abs(m) * abs(sample.b))) * sample.momentaValue
-        return Triple(eAn, eBeff - eB, eB)
+        return listOf(energy(bEffExternal), energy(bEffDipol), energy(bEffExchange), eAn)
     }
 
     /**
