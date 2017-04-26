@@ -6,19 +6,19 @@ import java.io.File
 
 // при добавлении-удалении полей в класс настроек необходимо запустить скрипт
 // `mamca.util.SettingsGenerator.kt` (генератор python кода) для обновления класса настроек в координаторе
-data class Settings(val x: Int = 1, // количество клеток по x
-                    val y: Int = 1, // количество клеток по y
+data class Settings(val x: Int = 60, // количество клеток по x
+                    val y: Int = 60, // количество клеток по y
                     val z: Int = 1, // количество клеток по z
-                    val n: Int = 50, // число частиц в кольце
+                    val n: Int = 1, // число частиц в кольце
 
                     val r: Double = 1.25, // радиус частицы
-                    val d: Double = 60.0, // диаметр кольца [нм]
+                    val d: Double = 0.0, // диаметр кольца [нм]
                     val offset_x: Double = 4.0, // расстояние между клетками  по оси x [нм]
                     val offset_y: Double = 4.0, // расстояние между клетками  по оси y [нм]
                     val offset_z: Double = 4.0, // расстояние между клетками  по оси z [нм]
 
                     val m: Double = 800.0, // значение момента [магнетон бора, шт]
-                    var kan: Double = 8000.0, // константа анизотропии [Дж/м^3]
+                    var kan: Double = 8000.0, // константа анизотропии [эВ/нм^3]
                     var jex: Double = 5.0e0, // константа обмена [Тл^2 / эВ]
 
                     // расстояния, на которых чувтствуются взаимодействия:
@@ -49,7 +49,7 @@ data class Settings(val x: Int = 1, // количество клеток по x
 
                     val name: String = "default", // имя модели (используется для графиков и логов)
 
-                    val precision: Int = 7, // точность (количество шагов симуляции)
+                    val precision: Int = 1000, // точность (количество шагов симуляции)
                     var load: Boolean = false, // загружать ли предыдущее состояние
                     var jsonPath: String = "./resources/data/default/out/sample.json", // путь к сохраненному состоянию
 
@@ -62,16 +62,16 @@ data class Settings(val x: Int = 1, // количество клеток по x
                     val xAxis: String = "x", // координата по оси абсциис (2D график)
                     val yAxis: String = "y", // координата по оси ординат (2D график)
 
-                    val borders: Boolean = false, // отсекать ли часть клеток при рисовании графиков
-                    val leftX: Int = 10,  //       ...|.......|...
-                    val rightX: Int = 20, //        leftX   rightX
-                    val leftY: Int = 10,  // с Y координатой аналогично
-                    val rightY: Int = 20, //
+                    val borders: Boolean = true, // отсекать ли часть клеток при рисовании графиков
+                    val leftX: Int = 20,  //       ...|.......|...
+                    val rightX: Int = 40, //        leftX   rightX
+                    val leftY: Int = 20,  // с Y координатой аналогично
+                    val rightY: Int = 40, //
 
                     val dataFolder: String = "../data", // путь к папке для выходных данных
 
                     val isParallel: Boolean = false, // использовать ли параллельные вычисления
-                    val memory: Int = 2048 // количество памяти, выделяемой для java-машины, Мбайт
+                    val memory: Int = 6144 // количество памяти, выделяемой для java-машины, Мбайт
 )
 
 // списки с полями типа string и boolean

@@ -1,11 +1,11 @@
 {
-  "x":1,
-  "y":1,
+  "x":60,
+  "y":60,
   "z":1,
-  "n":50,
+  "n":1,
 
   "r":1.25,
-  "d":60.0,
+  "d":0.0,
   "offset_x":4.0,
   "offset_y":4.0,
   "offset_z":4.0,
@@ -39,7 +39,7 @@
 
   "name":"default",
 
-  "precision":7,
+  "precision":1000,
   "load":false,
   "jsonPath":"./resources/data/default/out/sample.json",
 
@@ -52,14 +52,14 @@
   "xAxis":"x",
   "yAxis":"y",
 
-  "borders":false,
-  "leftX":10,
-  "rightX":20,
-  "leftY":10,
-  "rightY":20,
+  "borders":true,
+  "leftX":20,
+  "rightX":40,
+  "leftY":20,
+  "rightY":40,
 
   "dataFolder":"../data",
 
   "isParallel":false,
-  "memory":2048
+  "memory":6144
 }
