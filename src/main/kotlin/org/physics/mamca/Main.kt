@@ -5,7 +5,10 @@ import org.apache.commons.io.FileUtils
 import org.physics.mamca.math.Vector
 import org.physics.mamca.math.abs
 import org.physics.mamca.math.rank
-import org.physics.mamca.util.*
+import org.physics.mamca.util.Logger
+import org.physics.mamca.util.eFormat
+import org.physics.mamca.util.format
+import org.physics.mamca.util.playSuccessNotification
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -65,9 +68,21 @@ fun main(args: Array<String>) {
         midTime = hysteresisRun(settings)
     }
     val endTime = System.currentTimeMillis()
+
+    fun timeFormat(time: Long): String {
+        val seconds = time / 1000.0
+        if (seconds < 60)
+            return "${seconds.format(2)} seconds"
+        val minutes = seconds / 60.0
+        if (seconds < 60)
+            return "${minutes.format(2)} minutes"
+        val hours = minutes / 60.0
+        return "${hours.format(2)} hours"
+    }
+
     Logger.addDelimiter().
-            info("time of working is ${(endTime - startTime) / 1000.0} seconds").
-            info("time of computation is ${(endTime - midTime) / 1000.0} seconds").
+            info("time of computation is ${timeFormat(endTime - midTime)}").
+            info("time of working is ${timeFormat(endTime - startTime)}").
             addDelimiter()
     File("${settings.dataFolder}/${settings.name}/log.log").printWriter().use { out ->
         out.write(Logger.toString())
@@ -80,8 +95,9 @@ fun main(args: Array<String>) {
  * переводит поля настроек в единицы измерения, используемые в модели
  */
 fun rescaleSettingsFields(settings: Settings) {
-    settings.kan /= EV_TO_DJ
-    settings.kan /= M3_TO_NM3
+//    settings.kan /= EV_TO_DJ
+//    settings.kan /= NM3_TO_M3
+    settings.relative_precision *= PERCENT_COEFFICIENT
     settings.jex /= EV_TO_DJ
     settings.time *= S_TO_NS
     settings.b_x *= OE_TO_TESLA
@@ -143,7 +159,6 @@ fun prepareFolders(settings: Settings) {
         println("Creation of out directories failed.")
         System.exit(1)
     }
-
 }
 
 /**
@@ -159,24 +174,13 @@ fun singleRun(settings: Settings): Long {
     sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta_00_1_${0.0.format(9)}.txt")
 
     val (startEnergies, endEnergies, numberOfSteps) = sample.processModel(outFolder.canonicalPath)
-    val startEnergy = startEnergies.first / EV_TO_DJ
-    val endEnergy = endEnergies.first / EV_TO_DJ
-//    sample.saveState(outFolder = outFolder.canonicalPath, filename = settings.momentaFileName)
+    val startEnergy = startEnergies.first * DJ_TO_EV
+    val endEnergy = endEnergies.first * DJ_TO_EV
 
-
-    Logger.addLineBreak().addDelimiter()
-    Logger.info("sample size is ${settings.x}x${settings.y}x${settings.z} with ${settings.n} particles per ring")
-    Logger.info("total number of particles is ${settings.x * settings.y * settings.z * settings.n}")
-    Logger.info("")
-    Logger.info("full energy on start is ${startEnergy.eFormat()} eV")
-    Logger.info("energies on start is ${formatEnergies(startEnergies.second)} eV")
-    Logger.info("full energy on end is ${endEnergy.eFormat()} eV")
-    Logger.info("energies on end is ${formatEnergies(endEnergies.second)} eV")
     Logger.info("diff between enerfies is ${(startEnergy - endEnergy).eFormat()}")
-    Logger.info("")
-    Logger.info("number of simulation steps is $numberOfSteps")
-    Logger.info("")
-    Logger.info("number of jumps is ${sample.nJumps}")
+            .addLineBreak()
+            .info("number of simulation steps is $numberOfSteps")
+            .info("number of jumps is ${sample.nJumps}")
 
     if (endEnergy > startEnergy) {
         Logger.info("\nWOOOOOOOOOOW\n")
@@ -186,8 +190,6 @@ fun singleRun(settings: Settings): Long {
 }
 
 fun hysteresisRun(settings: Settings): Long {
-    val startTime = System.currentTimeMillis()
-
     val dataFolder ="${settings.dataFolder}/${settings.name}"
     val outFolder = File("$dataFolder/out")
     FileUtils.cleanDirectory(outFolder)
@@ -241,7 +243,7 @@ fun hysteresisRun(settings: Settings): Long {
                 info("i: $stepIndex")
         sample.processModel()
         Logger.addDelimiter()
-        val field = listOf(sample.b.x, sample.b.y, sample.b.z).map { it / OE_TO_TESLA }.map { it.format(3) }
+        val field = listOf(sample.b.x, sample.b.y, sample.b.z).map { it * TESLA_TO_OE }.map { it.format(3) }
         sample.saveState(
                 outFolder.canonicalPath,
                 "momenta_${stepIndex.format(digitsOfIndex)}_${direction}_${field[0]}_${field[1]}_${field[2]}.txt")
@@ -282,8 +284,6 @@ fun hysteresisRun(settings: Settings): Long {
     }
 
     println("Generation of hysteresis cycle complete")
-    val endTime = System.currentTimeMillis()
-    println("time of working is ${(endTime - startTime) / 1000.0} seconds")
 
     return midTime
 }

@@ -9,20 +9,20 @@ from collections import OrderedDict
 class Settings:
     def __init__(self, filename=None):
         self._d = OrderedDict()
-        self._d['x'] = 1
-        self._d['y'] = 1
+        self._d['x'] = 60
+        self._d['y'] = 60
         self._d['z'] = 1
-        self._d['n'] = 50
+        self._d['n'] = 1
         self._d['r'] = 1.25
-        self._d['d'] = 60.0
+        self._d['d'] = 0.0
         self._d['offset_x'] = 4.0
         self._d['offset_y'] = 4.0
         self._d['offset_z'] = 4.0
         self._d['m'] = 800.0
-        self._d['kan'] = 8000.0
+        self._d['kan'] = 80000.0
         self._d['jex'] = 5.0
         self._d['dipolDistance'] = 30.0
-        self._d['exchangeDistance'] = 4.0
+        self._d['exchangeDistance'] = 4.1
         self._d['viscosity'] = 0.9
         self._d['t'] = 0.0
         self._d['loc'] = 0
@@ -38,7 +38,8 @@ class Settings:
         self._d['timeStep'] = 100
         self._d['cyclicBoundaries'] = False
         self._d['name'] = 'default'
-        self._d['precision'] = 7
+        self._d['precision'] = 10000
+        self._d['relative_precision'] = 0.01
         self._d['load'] = False
         self._d['jsonPath'] = './resources/data/default/out/sample.json'
         self._d['hysteresis'] = False
@@ -48,14 +49,14 @@ class Settings:
         self._d['is2dPlot'] = True
         self._d['xAxis'] = 'x'
         self._d['yAxis'] = 'y'
-        self._d['borders'] = False
-        self._d['leftX'] = 10
-        self._d['rightX'] = 20
-        self._d['leftY'] = 10
-        self._d['rightY'] = 20
+        self._d['borders'] = True
+        self._d['leftX'] = 20
+        self._d['rightX'] = 40
+        self._d['leftY'] = 20
+        self._d['rightY'] = 40
         self._d['dataFolder'] = '../data'
         self._d['isParallel'] = False
-        self._d['memory'] = 2048
+        self._d['memory'] = 6144
         if filename is not None:
             with open(filename) as f:
                 d = json.load(f)
@@ -301,6 +302,14 @@ class Settings:
     @precision.setter
     def precision(self, value):
         self._d['precision'] = value
+
+    @property
+    def relative_precision(self):
+        return self._d['relative_precision']
+
+    @relative_precision.setter
+    def relative_precision(self, value):
+        self._d['relative_precision'] = value
 
     @property
     def load(self):

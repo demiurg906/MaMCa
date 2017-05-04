@@ -6,7 +6,6 @@ import org.apache.commons.io.FileUtils
 import org.physics.mamca.math.Vector
 import org.physics.mamca.math.abs
 import org.physics.mamca.util.*
-import sun.rmi.runtime.Log
 import java.io.File
 import java.io.Serializable
 import java.lang.Math.cos
@@ -64,7 +63,7 @@ class Sample : Serializable {
         this.momentaValue = settings.m * MU_B
 
         this.KT = settings.t * K
-        this.vKan = settings.kan * 4 * PI * Math.pow(settings.r, 3.0)
+        this.vKan = settings.kan * 4 * PI * Math.pow(settings.r, 3.0) * NM3_TO_M3
 
         b = Vector(settings.b_x, settings.b_y, settings.b_z)
 
@@ -215,7 +214,7 @@ class Sample : Serializable {
             val id = if (exactlyAfter) 1 else 2
 
             if (!settings.hysteresis) {
-                saveState(outFolder!!, "momenta_${nJumps.format()}_${id}_${(t / S_TO_NS).format(9)}.txt")
+                saveState(outFolder!!, "momenta_${nJumps.format()}_${id}_${(t * NS_TO_S).format(9)}.txt")
             }
         }
 
@@ -228,11 +227,11 @@ class Sample : Serializable {
 //            Logger.info("times of jumps [s]:\n")
             for (t in 0..settings.time.toInt() step settings.timeStep) {
                 if (twoMinimums.isEmpty()) {
-                    Logger.info("oops, no minimums, t = ${(t / S_TO_NS).format(9)} s, number of jumps is $nJumps")
+                    Logger.info("oops, no minimums, t = ${(t * NS_TO_S).format(9)} s, number of jumps is $nJumps")
                     break
                 }
                 if (energyJumps()) {
-                    Logger.info("jump time: ${(t / S_TO_NS).format(9)}")
+                    Logger.info("jump time: ${(t * NS_TO_S).format(9)}")
                     nJumps += 1
                     saveStateAfterJump(t, true)
                     res = processRelaxation()
@@ -278,7 +277,7 @@ class Sample : Serializable {
         var numberOfSteps = 1
         var endedWithPrecision = true
         for (i in 1 until settings.precision) {
-            if (relativeDeltaEnergy < RELATIVE_ENERGY_PRECISION) {
+            if (relativeDeltaEnergy < settings.relative_precision) {
                 endedWithPrecision = false
                 break
             }
@@ -293,8 +292,8 @@ class Sample : Serializable {
 
         // energies on end
         val endEnergy = computeEnergies()
-        Logger.info("start energy: ${(startEnergy.first / EV_TO_DJ).eFormat(DIGITS)}, ${formatEnergies(startEnergy.second)}")
-        Logger.info("  end energy: ${(endEnergy.first / EV_TO_DJ).eFormat(DIGITS)}, ${formatEnergies(endEnergy.second)}")
+        Logger.info("start energy: ${(startEnergy.first * DJ_TO_EV).eFormat(DIGITS)}, ${formatEnergies(startEnergy.second)}")
+        Logger.info("  end energy: ${(endEnergy.first * DJ_TO_EV).eFormat(DIGITS)}, ${formatEnergies(endEnergy.second)}")
         return Triple(startEnergy, endEnergy, numberOfSteps)
     }
 

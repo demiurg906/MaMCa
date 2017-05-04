@@ -48,6 +48,7 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.8.6'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
@@ -67,14 +68,14 @@ task wrapper(type: Wrapper) {
     gradleVersion = '3.1'
 }
 
-task create_and_draw(type: Exec, dependsOn: 'jar') {
+task single_task(type: Exec, dependsOn: 'jar') {
     group = 'python tasks'
     workingDir './'
 
     commandLine pythonPath, 'coordinator/create_and_draw.py', 'single', './resources/settings.json'
 }
 
-task run_multiple_tasks(type: Exec, dependsOn: 'jar') {
+task multiple_tasks(type: Exec, dependsOn: 'jar') {
     group = 'python tasks'
     workingDir './'
 

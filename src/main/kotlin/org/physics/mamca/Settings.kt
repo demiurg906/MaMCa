@@ -18,12 +18,12 @@ data class Settings(val x: Int = 60, // количество клеток по x
                     val offset_z: Double = 4.0, // расстояние между клетками  по оси z [нм]
 
                     val m: Double = 800.0, // значение момента [магнетон бора, шт]
-                    var kan: Double = 8000.0, // константа анизотропии [эВ/нм^3]
+                    var kan: Double = 80000.0, // константа анизотропии [Дж/м^3]
                     var jex: Double = 5.0e0, // константа обмена [Тл^2 / эВ]
 
                     // расстояния, на которых чувтствуются взаимодействия:
                     val dipolDistance: Double = 30.0, // диполь-дипольное, [нм]
-                    val exchangeDistance: Double = 4.0, // обменное, [нм]
+                    val exchangeDistance: Double = 4.1, // обменное, [нм]
 
                     var viscosity: Double = 0.9, // коэффициент вязкости, 0 <= viscosity <= 1
                     var t: Double = 0.0, // температура [К]
@@ -49,7 +49,9 @@ data class Settings(val x: Int = 60, // количество клеток по x
 
                     val name: String = "default", // имя модели (используется для графиков и логов)
 
-                    val precision: Int = 1000, // точность (количество шагов симуляции)
+                    val precision: Int = 10000, // точность (количество шагов симуляции)
+                    var relative_precision: Double = 0.01, // точность (отношение энергий для остановки моделирования) [доли %]
+                    // т.о. значение 0.1 означает, что моделирование остановится, если delta / start < 0.001 (0.1%)
                     var load: Boolean = false, // загружать ли предыдущее состояние
                     var jsonPath: String = "./resources/data/default/out/sample.json", // путь к сохраненному состоянию
 
@@ -81,7 +83,7 @@ val booleanFields = setOf("load", "hysteresis", "is2dPlot", "isParallel", "borde
 
 // количество полей в блоке, отделенном от остальных новой строкой
 // нужен, чтобы поля были логически разделены пустыми строками
-val newLines = listOf(4, 5, 3, 2, 2, 3, 3, 3, 2, 1, 1, 3, 4, 3, 5, 1, 3)
+val newLines = listOf(4, 5, 3, 2, 2, 3, 3, 3, 2, 1, 1, 4, 4, 3, 5, 1, 3)
 
 fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()

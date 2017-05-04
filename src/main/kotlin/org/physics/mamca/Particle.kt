@@ -135,9 +135,10 @@ class Particle {
 
         // минимумы -- корни уравнения b*x^4 + (c-a)x^3 + (c+a)x-b = 0
         // параметры уравнения
+        val t = abs(bEff) * sample.momentaValue
         val a = 4 * sample.vKan
-        val b = abs(bEff) * sin(theta)
-        val c = 2 * abs(bEff) * cos(theta)
+        val b = t * sin(theta)
+        val c = 2 * t * cos(theta)
 
         // корни уравнения (с переходом от x к phi)
         val roots = Mathematica.solveEquation(a, b, c).map { 2 * atan(it) }
@@ -217,7 +218,7 @@ class Particle {
      * расчитывает энергию момента
      */
     fun computeEnergy(): Double =
-            sample.momentaValue * (sample.vKan * sqr(abs(m % lma)) + (m * bEff) - (abs(m) * abs(bEff)))
+            sample.vKan * sqr(abs(m % lma)) + sample.momentaValue * ((m * bEff) - (abs(m) * abs(bEff)))
 
     /**
      * расчитывает энергии анизотропии, внешнего поля и взаимодействий
@@ -227,7 +228,7 @@ class Particle {
         fun energy(b: Vector): Double =
                 (- (m * b) + (abs(m) * abs(b))) * sample.momentaValue
 
-        val eAn = sample.vKan * sqr(abs(m % lma)) * sample.momentaValue
+        val eAn = sample.vKan * sqr(abs(m % lma))
         return listOf(energy(bEffExternal), energy(bEffDipol), energy(bEffExchange), eAn)
     }
 
@@ -237,7 +238,7 @@ class Particle {
      * @param theta угол между осью анизотропии и эффективным полем
      */
     fun computeEnergyInPlane(phi: Double, theta: Double): Double =
-            (sample.vKan * sqr(sin(phi)) - abs(bEff) * (cos(phi - theta) - 1)) * sample.momentaValue
+            sample.vKan * sqr(sin(phi)) - (abs(bEff) * (cos(phi - theta) + 1)) * sample.momentaValue
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

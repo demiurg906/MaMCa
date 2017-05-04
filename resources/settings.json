@@ -11,11 +11,11 @@
   "offset_z":4.0,
 
   "m":800.0,
-  "kan":8000.0,
+  "kan":80000.0,
   "jex":5.0,
 
   "dipolDistance":30.0,
-  "exchangeDistance":4.0,
+  "exchangeDistance":4.1,
 
   "viscosity":0.9,
   "t":0.0,
@@ -39,7 +39,8 @@
 
   "name":"default",
 
-  "precision":1000,
+  "precision":10000,
+  "relative_precision":0.01,
   "load":false,
   "jsonPath":"./resources/data/default/out/sample.json",
 
