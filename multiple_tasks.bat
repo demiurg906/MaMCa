@@ -1,0 +1,2 @@
+gradlew.bat multiple_tasks
+pause
