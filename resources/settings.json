@@ -1,23 +1,23 @@
 {
-  "x":60,
-  "y":60,
+  "x":70,
+  "y":70,
   "z":1,
   "n":1,
 
   "r":1.25,
   "d":0.0,
-  "offset_x":4.0,
-  "offset_y":4.0,
-  "offset_z":4.0,
+  "offset_x":3.0,
+  "offset_y":3.0,
+  "offset_z":3.0,
 
-  "m":800.0,
+  "m":456.0,
   "kan":80000.0,
   "jex":5.0,
 
   "dipolDistance":30.0,
-  "exchangeDistance":4.1,
+  "exchangeDistance":3.1,
 
-  "viscosity":0.9,
+  "viscosity":0.5,
   "t":0.0,
 
   "loc":0,

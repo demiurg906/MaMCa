@@ -6,26 +6,26 @@ import java.io.File
 
 // при добавлении-удалении полей в класс настроек необходимо запустить скрипт
 // `mamca.util.SettingsGenerator.kt` (генератор python кода) для обновления класса настроек в координаторе
-data class Settings(val x: Int = 60, // количество клеток по x
-                    val y: Int = 60, // количество клеток по y
+data class Settings(val x: Int = 70, // количество клеток по x
+                    val y: Int = 70, // количество клеток по y
                     val z: Int = 1, // количество клеток по z
                     val n: Int = 1, // число частиц в кольце
 
                     val r: Double = 1.25, // радиус частицы
                     val d: Double = 0.0, // диаметр кольца [нм]
-                    val offset_x: Double = 4.0, // расстояние между клетками  по оси x [нм]
-                    val offset_y: Double = 4.0, // расстояние между клетками  по оси y [нм]
-                    val offset_z: Double = 4.0, // расстояние между клетками  по оси z [нм]
+                    val offset_x: Double = 3.0, // расстояние между клетками  по оси x [нм]
+                    val offset_y: Double = 3.0, // расстояние между клетками  по оси y [нм]
+                    val offset_z: Double = 3.0, // расстояние между клетками  по оси z [нм]
 
-                    val m: Double = 800.0, // значение момента [магнетон бора, шт]
+                    val m: Double = 456.0, // значение момента [магнетон бора, шт]
                     var kan: Double = 80000.0, // константа анизотропии [Дж/м^3]
                     var jex: Double = 5.0e0, // константа обмена [Тл^2 / эВ]
 
                     // расстояния, на которых чувтствуются взаимодействия:
                     val dipolDistance: Double = 30.0, // диполь-дипольное, [нм]
-                    val exchangeDistance: Double = 4.1, // обменное, [нм]
+                    val exchangeDistance: Double = 3.1, // обменное, [нм]
 
-                    var viscosity: Double = 0.9, // коэффициент вязкости, 0 <= viscosity <= 1
+                    var viscosity: Double = 0.5, // коэффициент вязкости, 0 <= viscosity <= 1
                     var t: Double = 0.0, // температура [К]
 
                     val loc: Int = 0, // начальное расположение моментов
