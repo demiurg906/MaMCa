@@ -238,12 +238,12 @@ fun hysteresisRun(settings: Settings): Long {
             return
         }
         println("__________${settings.name}__________")
-        Logger.info("b: ${sample.b}").
+        val field = listOf(sample.b.x, sample.b.y, sample.b.z).map { it * TESLA_TO_OE }.map { it.format(3) }
+        Logger.info("b: ${Vector(field)}").
                 info("step: $stepVal").
                 info("i: $stepIndex")
         sample.processModel()
         Logger.addDelimiter()
-        val field = listOf(sample.b.x, sample.b.y, sample.b.z).map { it * TESLA_TO_OE }.map { it.format(3) }
         sample.saveState(
                 outFolder.canonicalPath,
                 "momenta_${stepIndex.format(digitsOfIndex)}_${direction}_${field[0]}_${field[1]}_${field[2]}.txt")
