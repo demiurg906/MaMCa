@@ -237,7 +237,7 @@ fun hysteresisRun(settings: Settings): Long {
         if (abs(sample.b) > abs(maxB)) {
             return
         }
-
+        println("__________${settings.name}__________")
         Logger.info("b: ${sample.b}").
                 info("step: $stepVal").
                 info("i: $stepIndex")

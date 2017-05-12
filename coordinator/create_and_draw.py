@@ -34,7 +34,7 @@ def multiple_simulations():
         exit_on_fail('"{}" directory does not exist'.format(resource_folder))
     if not os.path.isdir(resource_folder):
         exit_on_fail('"{}" is not directory'.format(resource_folder))
-    for file in os.listdir(resource_folder):
+    for file in sorted(os.listdir(resource_folder)):
         settings_fname = '{}/{}'.format(resource_folder, file)
         if not settings_fname.endswith('.json'):
             continue
