@@ -238,7 +238,7 @@ class Particle {
      * @param theta угол между осью анизотропии и эффективным полем
      */
     fun computeEnergyInPlane(phi: Double, theta: Double): Double =
-            sample.vKan * sqr(sin(phi)) - (abs(bEff) * (cos(phi - theta) + 1)) * sample.momentaValue
+            sample.vKan * sqr(sin(phi)) - abs(bEff) * (cos(phi - theta) - 1) * sample.momentaValue
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
