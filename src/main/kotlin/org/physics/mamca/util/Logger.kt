@@ -11,7 +11,7 @@ object Logger {
         return this
     }
 
-    private  fun _info(s: String) {
+    private fun _info(s: String) {
         print(s)
         builder.append(s)
     }
