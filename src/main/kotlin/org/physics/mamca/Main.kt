@@ -74,7 +74,7 @@ fun main(args: Array<String>) {
         if (seconds < 60)
             return "${seconds.format(2)} seconds"
         val minutes = seconds / 60.0
-        if (seconds < 60)
+        if (minutes < 60)
             return "${minutes.format(2)} minutes"
         val hours = minutes / 60.0
         return "${hours.format(2)} hours"
