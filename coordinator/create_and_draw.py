@@ -10,7 +10,7 @@ def single_simulation(settings_fname: str = None):
         settings_fname = sys.argv[2]
     if not check_settings(settings_fname):
         exit_on_fail('settings file is incorrect')
-    # single_run(settings_fname=settings_fname)
+    single_run(settings_fname=settings_fname)
     settings = Settings(settings_fname)
     check_borders(settings)
     if settings.hysteresis:
