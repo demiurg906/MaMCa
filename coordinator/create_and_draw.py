@@ -10,20 +10,20 @@ def single_simulation(settings_fname: str = None):
         settings_fname = sys.argv[2]
     if not check_settings(settings_fname):
         exit_on_fail('settings file is incorrect')
-    single_run(settings_fname=settings_fname)
+    # single_run(settings_fname=settings_fname)
     settings = Settings(settings_fname)
     check_borders(settings)
     if settings.hysteresis:
-        draw_all_hyst_plots(
+        draw_hyst_plot(
             settings=settings,
             b_axis='x',
             m_axis='x'
         )
-    draw_all_vectors_plots(
-        settings=settings,
-        scale=4,
-        draw_points=False
-    )
+    # draw_all_vectors_plots(
+    #     settings=settings,
+    #     scale=4,
+    #     draw_points=False
+    # )
     # create_momenta_gif(settings=settings)
     play_success_notification()
 

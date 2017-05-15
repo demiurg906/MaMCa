@@ -126,7 +126,7 @@ fun prepareFolders(settings: Settings) {
     val dataFolder = File("${settings.dataFolder}/${settings.name}")
     val outFolders = mutableListOf(
             "${settings.dataFolder}/${settings.name}/out",
-            "${settings.dataFolder}/${settings.name}/pictures/moments"
+            "${settings.dataFolder}/${settings.name}/moments"
     ).map(::File)
 
     fun clearFolders() {
@@ -223,6 +223,8 @@ fun hysteresisRun(settings: Settings): Long {
         totalNumberOfSteps = 5 * numberOfSteps / 2
     } else if (fst) {
         totalNumberOfSteps = (numberOfSteps + 1) / 2
+    } else if (two) {
+        totalNumberOfSteps = numberOfSteps * 2
     } else {
         totalNumberOfSteps = numberOfSteps
     }

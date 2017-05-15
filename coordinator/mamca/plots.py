@@ -4,6 +4,7 @@ import sys
 import subprocess
 
 from matplotlib import pyplot as plt
+from matplotlib.ticker import AutoMinorLocator
 from mpl_toolkits.mplot3d import Axes3D
 
 from .settings import Settings
@@ -92,7 +93,7 @@ def _read_data(settings, filename):
 
 
 def draw_plot_from_hyst_series(*, settings: Settings, borders: list = None,
-                               negative_borders: bool = True, label: str = None,
+                               negative_borders: bool = True,
                                scale: float = 1, draw_points: bool = True,
                                numbers: list, show: bool = False):
     if not settings.hysteresis:
@@ -108,7 +109,6 @@ def draw_plot_from_hyst_series(*, settings: Settings, borders: list = None,
                 kwargs = {'settings': settings,
                           'borders': borders,
                           'negative_borders': negative_borders,
-                          'label': label,
                           'text': text,
                           'scale': scale,
                           'momenta_filename': file,
@@ -128,10 +128,10 @@ def draw_all_hyst_plots(*, settings, b_axis, m_axis, label=None, borders=None,
     Рисует три графика гистерезиса -- по одному на каждую ветвь и общий
     """
     data = (
-        (None, '0_hyst_plot'),
-        ('fst', '1_hyst_plot_fst'),
-        ('neg', '2_hyst_plot_neg'),
-        ('pos', '3_hyst_plot_pos')
+        (None, '0_hyst_' + settings.name),
+        ('fst', '1_hyst_fst_' + settings.name),
+        ('neg', '2_hyst_neg_' + settings.name),
+        ('pos', '3_hyst_pos_' + settings.name)
     )
     for direction, name in data:
         draw_hyst_plot(
@@ -164,7 +164,7 @@ def draw_hyst_plot(*, settings, b_axis, m_axis, label=None, borders=None,
     """
     data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
     out_folder = '{}/out'.format(data_folder)
-    pic_dir = data_folder + '/pictures'
+    pic_dir = data_folder
 
     if direction is None:
         direction = {'fst', 'pos', 'neg'}
@@ -235,7 +235,7 @@ def draw_hyst_plot(*, settings, b_axis, m_axis, label=None, borders=None,
         min_m, max_m = min(min_m, m), max(max_m, m)
 
         color = {'pos': 'r', 'neg': 'b', 'fst': 'g'}
-        plt.scatter(b, m, color=color[sign])
+        plt.scatter(b, m, color=color[sign], linewidths=4)
 
     # выравнивание границ поля и момента, чтобы график был симметричным по обоим осям
     max_b = max(abs(min_b), abs(max_b))
@@ -249,10 +249,16 @@ def draw_hyst_plot(*, settings, b_axis, m_axis, label=None, borders=None,
     axis = [min_b, max_b, min_m, max_m]
     plt.axis(list(map(lambda x: x * 1.1, axis)))
 
+    plt.axes().xaxis.set_minor_locator(AutoMinorLocator(5))
+    plt.axes().yaxis.set_minor_locator(AutoMinorLocator(5))
+
+    plt.grid(True, which='major', linestyle='solid')
+    plt.grid(True, which='minor')
+
     # if settings_fname is not None:
     #     plt.text(min_b, max_m / 3, str(Settings(settings_fname)))
     if name is None:
-        name = 'fig_{}'.format(_counter)
+        name = 'hyst_{}'.format(settings.name)
     plt.savefig('{}/{}.png'.format(pic_dir, name), format='png')
     plt.clf()
 
@@ -263,7 +269,7 @@ def create_momenta_gif(*, settings: Settings):
     :param settings: путь к файлу с настройками
     :return:
     """
-    data_folder = '{}/{}/pictures'.format(settings.dataFolder, settings.name)
+    data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
     momenta_template = '{}/moments/momenta*.png'.format(data_folder)
     # поиск утилиты convert
     # под windows есть системная утилита convert,
@@ -339,7 +345,7 @@ def draw_3d_vectors_plot(*, settings: Settings = None, borders: list = None,
     data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
     filename = '{}/out/{}'.format(data_folder, momenta_filename)
     name = momenta_filename[:-4]
-    pic_dir = '{}/pictures/moments'.format(data_folder)
+    pic_dir = '{}/moments'.format(data_folder)
 
     global _counter
     if show:
@@ -434,7 +440,7 @@ def draw_2d_vectors_plot(*, settings: Settings = None, borders: list = None,
     data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
     filename = '{}/out/{}'.format(data_folder, momenta_filename)
     name = momenta_filename[:-4]
-    pic_dir = '{}/pictures/moments'.format(data_folder)
+    pic_dir = '{}/moments'.format(data_folder)
     global _counter
     if show:
         fig = plt.figure(_counter, figsize=figsize)
