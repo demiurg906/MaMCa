@@ -209,6 +209,7 @@ fun hysteresisRun(settings: Settings): Long {
     FileUtils.cleanDirectory(outFolder)
 
     val all = settings.hysteresisBranch == ALL
+    val two = settings.hysteresisBranch == TWO
     val fst = settings.hysteresisBranch == FST
     val neg = settings.hysteresisBranch == NEG
     val pos = settings.hysteresisBranch == POS
@@ -297,7 +298,7 @@ fun hysteresisRun(settings: Settings): Long {
     }
 
     // __________neg__________
-    if (all or neg) {
+    if (all or two or neg) {
         sample.b = maxB
         while (true) {
             val stop = step(false, NEG)
@@ -308,7 +309,7 @@ fun hysteresisRun(settings: Settings): Long {
     }
 
     // __________pos__________
-    if (all or pos) {
+    if (all or two or pos) {
         sample.b = -maxB
         while (true) {
             val stop = step(true, POS)

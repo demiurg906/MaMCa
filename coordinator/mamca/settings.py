@@ -46,7 +46,7 @@ class Settings:
         self._d['hysteresisSteps'] = 6
         self._d['hysteresisDenseSteps'] = 3
         self._d['hysteresisDenseMultiplier'] = 2
-        self._d['hysteresisBranch'] = 'neg'
+        self._d['hysteresisBranch'] = 'two'
         self._d['is2dPlot'] = True
         self._d['xAxis'] = 'x'
         self._d['yAxis'] = 'y'

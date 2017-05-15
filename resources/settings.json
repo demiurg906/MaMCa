@@ -45,10 +45,10 @@
   "jsonPath":"./resources/data/default/out/sample.json",
 
   "hysteresis":true,
-  "hysteresisSteps":6,
+  "hysteresisSteps":4,
   "hysteresisDenseSteps":3,
   "hysteresisDenseMultiplier":2,
-  "hysteresisBranch":"neg",
+  "hysteresisBranch":"two",
 
   "is2dPlot":true,
   "xAxis":"x",

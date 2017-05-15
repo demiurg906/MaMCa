@@ -56,13 +56,14 @@ data class Settings(val x: Int = 70, // количество клеток по x
                     var jsonPath: String = "./resources/data/default/out/sample.json", // путь к сохраненному состоянию
 
                     val hysteresis: Boolean = true, // нужно ли запускать в режиме гистерезиса
-                    val hysteresisSteps: Int = 6, // количество шагов гистерезиса в ветке от нуля до края
+                    val hysteresisSteps: Int = 4, // количество шагов гистерезиса в ветке от нуля до края
                     val hysteresisDenseSteps: Int = 3, // количество больших шагов в частой области
                     val hysteresisDenseMultiplier: Int = 2, // отношение шага в обычной области к шагу в частой области
-                    val hysteresisBranch: String = NEG, // какие ветки ветви гистерезиса считать
+                    val hysteresisBranch: String = TWO, // какие ветки ветви гистерезиса считать
                     // fst: 0 -> B
                     // neg: B -> -B
                     // pos: -B -> B
+                    // two: B -> -B -> {}
                     // all: все ветви
 
                     val is2dPlot: Boolean = true, // рисовать трехмерные графики или двумерные
@@ -82,10 +83,11 @@ data class Settings(val x: Int = 70, // количество клеток по x
 )
 
 const val ALL = "all"
+const val TWO = "two"
 const val FST = "fst"
 const val NEG = "neg"
 const val POS = "pos"
-val BRANCHES = setOf(ALL, FST, NEG, POS)
+val BRANCHES = setOf(ALL, TWO, FST, NEG, POS)
 
 // списки с полями типа string и boolean
 // костыль
