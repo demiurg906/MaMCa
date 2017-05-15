@@ -77,7 +77,6 @@ class Particle {
         // фоновое магнитное поле
         bEffExternal = sample.b
 
-
         // вклад диполь-дипольного взаимодействия
         var dipols = Vector()
         dipolParticles.forEach {
@@ -171,6 +170,11 @@ class Particle {
             if (deltaPhi < 0) {
                 deltaPhi += PI2
             }
+//            println("max: ${maxs.map { "angle: ${it.second.format(4)}, energy: ${it.first.eFormat(2)} " }}")
+//            println("min: ${mins.map { "angle: ${it.second.format(4)}, energy: ${it.first.eFormat(2)} " }}")
+//            println("cur: ${currentPhi.format(4)}")
+//            println("del: ${deltaPhi.format(4)}")
+
             // углы от текущего до максимумов
             val phiMaxes = maxs.map { it.second - currentPhi }.map { if (it < 0) it + PI2 else it }
 
@@ -206,11 +210,12 @@ class Particle {
      * @param minPhi положение минимума
      */
     fun rotateMomentaToAngle(minPhi: Double) {
-        if (equalsDouble(minPhi, 0.0)) {
-            return
-        }
+//        if (equalsDouble(minPhi, 0.0)) {
+//            return
+//        }
         val currentPhi = lma.angleTo(m, eZ)
         val deltaPhi = (currentPhi - minPhi) * sample.settings.viscosity
+//        println("delta: ${deltaPhi.eFormat(2)}")
         m = Matrix(eZ, deltaPhi) * m
     }
 
