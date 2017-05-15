@@ -63,7 +63,9 @@ class Sample : Serializable {
         this.momentaValue = settings.m * MU_B
 
         this.KT = settings.t * K
-        this.vKan = settings.kan * 4 * PI * Math.pow(settings.r, 3.0) * NM3_TO_M3
+
+        fun v(r: Double): Double = 4 * PI * Math.pow(r, 3.0) / 3
+        this.vKan = settings.kan * v(settings.r * NM_TO_M)
 
         b = Vector(settings.b_x, settings.b_y, settings.b_z)
 
@@ -173,7 +175,7 @@ class Sample : Serializable {
 
         with(settings) {
             // проверка, что все частицы помещаются на кольце
-            if (n * r * 2 > d * PI) {
+            if ((d != 0.0) and (n * r * 2 > d * PI)) {
                 println("WARNING: boundaries of ring particles overlap")
             }
 
@@ -195,7 +197,7 @@ class Sample : Serializable {
     }
 
     /**
-     * основная функция, оптимизируящая энергию
+     * функция, оптимизируящая энергию
      * @return (энергия до оптимизации, энергия после оптимизации, количество шагов оптимизации)
      */
     fun processModel(outFolder: String? = null): Triple<
@@ -279,6 +281,7 @@ class Sample : Serializable {
         for (i in 1 until settings.precision) {
             if (relativeDeltaEnergy < settings.relative_precision) {
                 endedWithPrecision = false
+                Logger.info("precision = $i, relative delta = $relativeDeltaEnergy")
                 break
             }
             energies = optimizeEnergy(energies.second)

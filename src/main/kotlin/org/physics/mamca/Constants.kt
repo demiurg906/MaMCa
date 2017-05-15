@@ -36,8 +36,8 @@ const val S_TO_NS = 1e9
 //  нc -> с
 const val NS_TO_S = 1 / S_TO_NS
 
-//  нм^3 -> м^3
-const val NM3_TO_M3 = 10e-27
+//  нм -> м
+const val NM_TO_M = 1e-9
 
 //  Гс -> Тл
 const val OE_TO_TESLA = 1e-4
