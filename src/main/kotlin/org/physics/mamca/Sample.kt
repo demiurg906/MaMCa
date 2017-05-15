@@ -72,7 +72,7 @@ class Sample : Serializable {
         fun v(r: Double): Double = 4 * PI * Math.pow(r, 3.0) / 3
         this.vKan = settings.kan * v(settings.r * NM_TO_M)
 
-        this.DELTA_DIGITS = (-Math.log10(settings.relative_precision * 100)).toInt()
+        this.DELTA_DIGITS = (-Math.log10(settings.relative_precision)).toInt() - 1
 
         b = Vector(settings.b_x, settings.b_y, settings.b_z)
 

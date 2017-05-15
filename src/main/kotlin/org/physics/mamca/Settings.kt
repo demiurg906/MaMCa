@@ -18,7 +18,7 @@ data class Settings(val x: Int = 70, // количество клеток по x
                     val offset_z: Double = 3.0, // расстояние между клетками  по оси z [нм]
 
                     val m: Double = 456.0, // значение момента [магнетон бора, шт]
-                    var kan: Double = 80000.0, // константа анизотропии [Дж/м^3]
+                    var kan: Double = 1.3e4, // константа анизотропии [Дж/м^3]
                     var jex: Double = 5.0e0, // константа обмена [Тл^2 / эВ]
 
                     // расстояния, на которых чувтствуются взаимодействия:
@@ -38,7 +38,7 @@ data class Settings(val x: Int = 70, // количество клеток по x
                     val ot_theta: Double = 90.0, // [градус]
                     val ot_phi: Double = 0.0, // [градус]
 
-                    var b_x: Double = 0.0, // поле по x [Гаусс]
+                    var b_x: Double = 500.0, // поле по x [Гаусс]
                     var b_y: Double = 0.0, // поле по y [Гаусс]
                     var b_z: Double = 0.0, // поле по z [Гаусс]
 
@@ -55,10 +55,15 @@ data class Settings(val x: Int = 70, // количество клеток по x
                     var load: Boolean = false, // загружать ли предыдущее состояние
                     var jsonPath: String = "./resources/data/default/out/sample.json", // путь к сохраненному состоянию
 
-                    val hysteresis: Boolean = false, // нужно ли запускать в режиме гистерезиса
-                    val hysteresisSteps: Int = 7, // количество шагов гистерезиса в ветке от нуля до края
-                    val hysteresisDenseSteps: Int = 2, // количество больших шагов в частой области
+                    val hysteresis: Boolean = true, // нужно ли запускать в режиме гистерезиса
+                    val hysteresisSteps: Int = 6, // количество шагов гистерезиса в ветке от нуля до края
+                    val hysteresisDenseSteps: Int = 3, // количество больших шагов в частой области
                     val hysteresisDenseMultiplier: Int = 2, // отношение шага в обычной области к шагу в частой области
+                    val hysteresisBranch: String = NEG, // какие ветки ветви гистерезиса считать
+                    // fst: 0 -> B
+                    // neg: B -> -B
+                    // pos: -B -> B
+                    // all: все ветви
 
                     val is2dPlot: Boolean = true, // рисовать трехмерные графики или двумерные
                     val xAxis: String = "x", // координата по оси абсциис (2D график)
@@ -66,9 +71,9 @@ data class Settings(val x: Int = 70, // количество клеток по x
 
                     val borders: Boolean = true, // отсекать ли часть клеток при рисовании графиков
                     val leftX: Int = 20,  //       ...|.......|...
-                    val rightX: Int = 40, //        leftX   rightX
+                    val rightX: Int = 50, //        leftX   rightX
                     val leftY: Int = 20,  // с Y координатой аналогично
-                    val rightY: Int = 40, //
+                    val rightY: Int = 50, //
 
                     val dataFolder: String = "../data", // путь к папке для выходных данных
 
@@ -76,14 +81,20 @@ data class Settings(val x: Int = 70, // количество клеток по x
                     val memory: Int = 6144 // количество памяти, выделяемой для java-машины, Мбайт
 )
 
+const val ALL = "all"
+const val FST = "fst"
+const val NEG = "neg"
+const val POS = "pos"
+val BRANCHES = setOf(ALL, FST, NEG, POS)
+
 // списки с полями типа string и boolean
 // костыль
-val stringFields = setOf("name", "jsonPath", "dataFolder", "outFolder", "picFolder", "logFolder", "xAxis", "yAxis")
+val stringFields = setOf("name", "jsonPath", "dataFolder", "outFolder", "picFolder", "logFolder", "xAxis", "yAxis", "hysteresisBranch")
 val booleanFields = setOf("load", "hysteresis", "is2dPlot", "isParallel", "borders", "cyclicBoundaries")
 
 // количество полей в блоке, отделенном от остальных новой строкой
 // нужен, чтобы поля были логически разделены пустыми строками
-val newLines = listOf(4, 5, 3, 2, 2, 3, 3, 3, 2, 1, 1, 4, 4, 3, 5, 1, 3)
+val newLines = listOf(4, 5, 3, 2, 2, 3, 3, 3, 2, 1, 1, 4, 5, 3, 5, 1, 3)
 
 fun loadSettingsFromJson(filename: String): Settings {
     val mapper = jacksonObjectMapper()

@@ -11,7 +11,7 @@
   "offset_z":3.0,
 
   "m":456.0,
-  "kan":80000.0,
+  "kan":13000.0,
   "jex":5.0,
 
   "dipolDistance":30.0,
@@ -28,7 +28,7 @@
   "ot_theta":90.0,
   "ot_phi":0.0,
 
-  "b_x":0.0,
+  "b_x":500.0,
   "b_y":0.0,
   "b_z":0.0,
 
@@ -44,10 +44,11 @@
   "load":false,
   "jsonPath":"./resources/data/default/out/sample.json",
 
-  "hysteresis":false,
-  "hysteresisSteps":7,
-  "hysteresisDenseSteps":2,
+  "hysteresis":true,
+  "hysteresisSteps":6,
+  "hysteresisDenseSteps":3,
   "hysteresisDenseMultiplier":2,
+  "hysteresisBranch":"neg",
 
   "is2dPlot":true,
   "xAxis":"x",
@@ -55,9 +56,9 @@
 
   "borders":true,
   "leftX":20,
-  "rightX":40,
+  "rightX":50,
   "leftY":20,
-  "rightY":40,
+  "rightY":50,
 
   "dataFolder":"../data",
 

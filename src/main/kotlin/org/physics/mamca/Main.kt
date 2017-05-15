@@ -56,6 +56,10 @@ fun main(args: Array<String>) {
     val settingsFile = cmd.getOptionValue("settings")
     val settings = loadSettingsFromJson(settingsFile)
 
+    if (checkSettings(settings)) {
+        System.exit(1)
+    }
+
     prepareFolders(settings)
     createSettingsJson("${settings.dataFolder}/${settings.name}/settings.json", settings)
     rescaleSettingsFields(settings)
@@ -89,6 +93,18 @@ fun main(args: Array<String>) {
     }
 
     playSuccessNotification()
+}
+
+/**
+ * проверяет, правильно ли введены настройки
+ * возвращает true, если найден брак
+ */
+fun checkSettings(settings: Settings): Boolean {
+    if (settings.hysteresis and !BRANCHES.contains(settings.hysteresisBranch)) {
+        Logger.info("`hysteresisBranch` property can only be only `fst`, `neg`, `pos` or `all`")
+        return true
+    }
+    return false
 }
 
 /**
@@ -192,11 +208,23 @@ fun hysteresisRun(settings: Settings): Long {
     val outFolder = File("$dataFolder/out")
     FileUtils.cleanDirectory(outFolder)
 
+    val all = settings.hysteresisBranch == ALL
+    val fst = settings.hysteresisBranch == FST
+    val neg = settings.hysteresisBranch == NEG
+    val pos = settings.hysteresisBranch == POS
+
     val k = settings.hysteresisSteps
     val n = settings.hysteresisDenseSteps * settings.hysteresisDenseMultiplier
 
-    val numberOfSteps = 2 * (n + k) - 1
-    val totalNumberOfSteps = 5 * numberOfSteps / 2
+    val numberOfSteps = 2 * (n + k - settings.hysteresisDenseSteps) + 1
+    val totalNumberOfSteps: Int
+    if (all) {
+        totalNumberOfSteps = 5 * numberOfSteps / 2
+    } else if (fst) {
+        totalNumberOfSteps = (numberOfSteps + 1) / 2
+    } else {
+        totalNumberOfSteps = numberOfSteps
+    }
 
     val maxB = Vector(settings.b_x, settings.b_y, settings.b_z)
     val borderB = maxB * settings.hysteresisDenseSteps / settings.hysteresisSteps
@@ -212,7 +240,7 @@ fun hysteresisRun(settings: Settings): Long {
 
     val sample = Sample(settings)
     sample.dumpToJsonFile(outFolder.canonicalPath, "sample.json")
-    sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta_${0.format(digitsOfIndex)}_fst_0.0_0.0_0.0.txt")
+//    sample.saveState(outFolder = outFolder.canonicalPath, filename = "momenta_${0.format(digitsOfIndex)}_fst_0.0_0.0_0.0.txt")
 
     val midTime = System.currentTimeMillis()
 
@@ -233,6 +261,7 @@ fun hysteresisRun(settings: Settings): Long {
          * функция, занимающаяся изменением поля и релаксацией системы
          * возвращает true, если пора менять направление движения
          */
+        processAndSave(direction)
         stepIndex += 1
         val stepVal: Vector
         if (abs(sample.b) < abs(borderB)) {
@@ -249,47 +278,46 @@ fun hysteresisRun(settings: Settings): Long {
             sample.b -= stepVal
         }
 
-        if (abs(sample.b) > abs(maxB)) {
-            return true
+        if (all and (direction != POS)) {
+            return abs(sample.b) >= abs(maxB)
+        } else {
+            return abs(sample.b) > abs(maxB)
         }
-        processAndSave(direction)
-        return false
     }
 
-    println("Hysteresis cycle started")
-    println("There will be $totalNumberOfSteps steps")
-    println("")
-
-    sample.b = Vector()
-    processAndSave("fst")
-
-    println("Magnetic field began to increase")
-    println("Wait ${numberOfSteps / 2} steps")
-    println("")
-
-    for (i in numberOfSteps / 2 until numberOfSteps) {
-        step(true, "fst")
+    // __________fst__________
+    if (all or fst) {
+        sample.b = Vector()
+        while (true) {
+            val stop = step(true, FST)
+            if (stop) {
+                break
+            }
+        }
     }
 
-    sample.b = maxB
-    println("Magnetic field began to decline")
-    println("Wait $numberOfSteps steps")
-    println("")
-
-    for (i in 1..numberOfSteps) {
-        step(false, "neg")
+    // __________neg__________
+    if (all or neg) {
+        sample.b = maxB
+        while (true) {
+            val stop = step(false, NEG)
+            if (stop) {
+                break
+            }
+        }
     }
 
-    sample.b = -maxB
-    println("Magnetic field began to increase")
-    println("Wait $numberOfSteps steps")
-    println("")
-
-    for (i in 1..numberOfSteps) {
-        step(true, "pos")
+    // __________pos__________
+    if (all or pos) {
+        sample.b = -maxB
+        while (true) {
+            val stop = step(true, POS)
+            if (stop) {
+                break
+            }
+        }
     }
-
-    println("Generation of hysteresis cycle complete")
 
     return midTime
 }
+
