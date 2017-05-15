@@ -95,8 +95,6 @@ fun main(args: Array<String>) {
  * переводит поля настроек в единицы измерения, используемые в модели
  */
 fun rescaleSettingsFields(settings: Settings) {
-//    settings.kan /= EV_TO_DJ
-//    settings.kan /= NM3_TO_M3
     settings.relative_precision *= PERCENT_COEFFICIENT
     settings.jex /= EV_TO_DJ
     settings.time *= S_TO_NS
@@ -194,11 +192,11 @@ fun hysteresisRun(settings: Settings): Long {
     val outFolder = File("$dataFolder/out")
     FileUtils.cleanDirectory(outFolder)
 
-
     val k = settings.hysteresisSteps
     val n = settings.hysteresisDenseSteps * settings.hysteresisDenseMultiplier
 
     val numberOfSteps = 2 * (n + k) - 1
+    val totalNumberOfSteps = 5 * numberOfSteps / 2
 
     val maxB = Vector(settings.b_x, settings.b_y, settings.b_z)
     val borderB = maxB * settings.hysteresisDenseSteps / settings.hysteresisSteps
@@ -218,7 +216,24 @@ fun hysteresisRun(settings: Settings): Long {
 
     val midTime = System.currentTimeMillis()
 
-    fun step(inc: Boolean, direction: String) {
+    fun processAndSave(direction: String) {
+        println("__________${settings.name}__________")
+        val field = listOf(sample.b.x, sample.b.y, sample.b.z).map { it * TESLA_TO_OE }.map { it.format(3) }
+        Logger.info("b: ${Vector(field)}")
+                .info("step: $stepIndex of $totalNumberOfSteps")
+        sample.processModel()
+        Logger.addDelimiter()
+        sample.saveState(
+                outFolder.canonicalPath,
+                "momenta_${stepIndex.format(digitsOfIndex)}_${direction}_${field[0]}_${field[1]}_${field[2]}.txt")
+    }
+
+    fun step(inc: Boolean, direction: String): Boolean {
+        /**
+         * функция, занимающаяся изменением поля и релаксацией системы
+         * возвращает true, если пора менять направление движения
+         */
+        stepIndex += 1
         val stepVal: Vector
         if (abs(sample.b) < abs(borderB)) {
             stepVal = bDenseStep
@@ -235,27 +250,18 @@ fun hysteresisRun(settings: Settings): Long {
         }
 
         if (abs(sample.b) > abs(maxB)) {
-            return
+            return true
         }
-        println("__________${settings.name}__________")
-        val field = listOf(sample.b.x, sample.b.y, sample.b.z).map { it * TESLA_TO_OE }.map { it.format(3) }
-        Logger.info("b: ${Vector(field)}").
-                info("step: $stepVal").
-                info("i: $stepIndex")
-        sample.processModel()
-        Logger.addDelimiter()
-        sample.saveState(
-                outFolder.canonicalPath,
-                "momenta_${stepIndex.format(digitsOfIndex)}_${direction}_${field[0]}_${field[1]}_${field[2]}.txt")
-        stepIndex += 1
+        processAndSave(direction)
+        return false
     }
 
     println("Hysteresis cycle started")
-    println("There will be ${5 * numberOfSteps / 2} steps")
+    println("There will be $totalNumberOfSteps steps")
     println("")
 
     sample.b = Vector()
-    sample.processModel()
+    processAndSave("fst")
 
     println("Magnetic field began to increase")
     println("Wait ${numberOfSteps / 2} steps")

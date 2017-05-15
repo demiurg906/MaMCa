@@ -29,6 +29,9 @@ class Sample : Serializable {
 
     var nJumps = 0
 
+    // кол-во знаков после запятой для форматированного вывода процентов
+    val DELTA_DIGITS: Int
+
     /**
      * пустой конструктор-заглушка
      */
@@ -39,6 +42,7 @@ class Sample : Serializable {
         this.momentaValue = 0.0
         this.KT = 1.0
         this.vKan = 1.0
+        this.DELTA_DIGITS = 0
     }
 
     /**
@@ -51,6 +55,7 @@ class Sample : Serializable {
         this.momentaValue = 0.0
         this.KT = 1.0
         this.vKan = 1.0
+        this.DELTA_DIGITS = 0
     }
 
     /**
@@ -66,6 +71,8 @@ class Sample : Serializable {
 
         fun v(r: Double): Double = 4 * PI * Math.pow(r, 3.0) / 3
         this.vKan = settings.kan * v(settings.r * NM_TO_M)
+
+        this.DELTA_DIGITS = (-Math.log10(settings.relative_precision * 100)).toInt()
 
         b = Vector(settings.b_x, settings.b_y, settings.b_z)
 
@@ -276,12 +283,16 @@ class Sample : Serializable {
             Math.abs((energies.first - energies.second) / energies.first)
 
         var relativeDeltaEnergy = computeDelta()
+
+        fun formatDelta(): String =
+                (relativeDeltaEnergy * 100).format(DELTA_DIGITS) + "%"
+
         var numberOfSteps = 1
         var endedWithPrecision = true
         for (i in 1 until settings.precision) {
             if (relativeDeltaEnergy < settings.relative_precision) {
                 endedWithPrecision = false
-                Logger.info("precision = $i, relative delta = $relativeDeltaEnergy")
+                Logger.info("precision = $i, relative delta = ${formatDelta()}")
                 break
             }
             energies = optimizeEnergy(energies.second)
@@ -290,7 +301,7 @@ class Sample : Serializable {
         }
 
         if (endedWithPrecision) {
-            Logger.info("Processing ended with precision. Relative delta energy is $relativeDeltaEnergy")
+            Logger.info("Processing ended with precision. Relative delta energy is ${formatDelta()}")
         }
 
         // energies on end
