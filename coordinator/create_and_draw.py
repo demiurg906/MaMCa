@@ -20,11 +20,11 @@ def single_simulation(settings_fname: str = None):
             b_axis='x',
             m_axis='x'
         )
-    # draw_all_vectors_plots(
-    #     settings=settings,
-    #     scale=4,
-    #     draw_points=False
-    # )
+    draw_all_vectors_plots(
+        settings=settings,
+        scale=4,
+        draw_points=False
+    )
     # create_momenta_gif(settings=settings)
     play_success_notification()
 
