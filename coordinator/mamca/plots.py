@@ -10,6 +10,9 @@ from mpl_toolkits.mplot3d import Axes3D
 from .settings import Settings
 from .util import which, play_failure_notification
 
+# шаблон для имени графика гистерезиса
+HYST_PLOT_TEMPLATE = 'hyst_{}'
+
 # греческая mu в utf-8 кодировке
 MU = '\u03BC'
 
@@ -258,7 +261,7 @@ def draw_hyst_plot(*, settings, b_axis, m_axis, label=None, borders=None,
     # if settings_fname is not None:
     #     plt.text(min_b, max_m / 3, str(Settings(settings_fname)))
     if name is None:
-        name = 'hyst_{}'.format(settings.name)
+        name = HYST_PLOT_TEMPLATE.format(settings.name)
     plt.savefig('{}/{}.png'.format(pic_dir, name), format='png')
     plt.clf()
 
