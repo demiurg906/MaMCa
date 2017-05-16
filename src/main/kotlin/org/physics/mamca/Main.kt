@@ -61,7 +61,7 @@ fun main(args: Array<String>) {
     }
 
     prepareFolders(settings)
-    createSettingsJson("${settings.dataFolder}/${settings.name}/settings.json", settings)
+    createSettingsJson("${settings.dataFolder}/${settings.name}/settings_${settings.name}.json", settings)
     rescaleSettingsFields(settings)
 
     val startTime = System.currentTimeMillis()
