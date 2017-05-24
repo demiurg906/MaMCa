@@ -37,7 +37,7 @@ def multiple_simulations():
         exit_on_fail('"{}" is not directory'.format(resource_folder))
     settings_files = list(sorted(os.listdir(resource_folder)))
     settings_path_template = resource_folder + '/{}'
-    create_out_hysteresis_folder(Settings(settings_path_template.format(settings_files[0])))
+    create_out_folders(Settings(settings_path_template.format(settings_files[0])))
     for file in settings_files:
         settings_fname = settings_path_template.format(file)
         if not settings_fname.endswith('.json'):
@@ -47,24 +47,32 @@ def multiple_simulations():
             continue
         try:
             single_simulation(settings_fname)
-            copy_hyst_plot(Settings(settings_fname))
+            copy_settings_and_hyst_plot(Settings(settings_fname))
         except Exception as e:
             print(e)
 
 
-def copy_hyst_plot(settings: Settings):
-    if not settings.hysteresis:
-        return
-    plot_name = HYST_PLOT_TEMPLATE.format(settings.name) + '.png'
-    src_plot_path = '{}/{}/{}'.format(settings.dataFolder, settings.name, plot_name)
-    dst_plot_path = '{}/plots/{}'.format(settings.dataFolder, plot_name)
-    shutil.copyfile(src_plot_path, dst_plot_path)
+def copy_settings_and_hyst_plot(settings: Settings):
+    data_folder = '{}/{}'.format(settings.dataFolder, settings.name)
+
+    settings_fname = 'settings_{}.json'.format(settings.name)
+    settings_src_path = '{}/{}'.format(data_folder, settings_fname)
+    settings_dst_path = '{}/settings/{}'.format(data_folder, settings_fname)
+    shutil.copyfile(settings_src_path, settings_dst_path)
+
+    if settings.hysteresis:
+        plot_name = HYST_PLOT_TEMPLATE.format(settings.name) + '.png'
+        plot_src_path = '{}/{}'.format(data_folder, plot_name)
+        plot_dst_path = '{}/plots/{}'.format(settings.dataFolder, plot_name)
+        shutil.copyfile(plot_src_path, plot_dst_path)
 
 
-def create_out_hysteresis_folder(settings: Settings):
-    data_folder = '{}/plots'.format(settings.dataFolder)
-    if not os.path.exists(data_folder):
-        os.mkdir(data_folder)
+def create_out_folders(settings: Settings):
+    folders = ['{}/plots'.format(settings.dataFolder),
+               '{}/settings'.format(settings.dataFolder)]
+    for folder in folders:
+        if not os.path.exists(folder):
+            os.mkdir(folder)
 
 
 def check_settings(settings_fname: str):
