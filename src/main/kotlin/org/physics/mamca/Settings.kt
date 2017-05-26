@@ -63,7 +63,7 @@ data class Settings(val x: Int = 70, // количество клеток по x
                     // fst: 0 -> B
                     // neg: B -> -B
                     // pos: -B -> B
-                    // two: B -> -B -> {}
+                    // two: B -> -B
                     // all: все ветви
 
                     val is2dPlot: Boolean = true, // рисовать трехмерные графики или двумерные
