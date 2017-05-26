@@ -5,10 +5,7 @@ import org.apache.commons.io.FileUtils
 import org.physics.mamca.math.Vector
 import org.physics.mamca.math.abs
 import org.physics.mamca.math.rank
-import org.physics.mamca.util.Logger
-import org.physics.mamca.util.eFormat
-import org.physics.mamca.util.format
-import org.physics.mamca.util.playSuccessNotification
+import org.physics.mamca.util.*
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -280,12 +277,7 @@ fun hysteresisRun(settings: Settings): Long {
         } else {
             sample.b -= stepVal
         }
-
-        if (all and (direction != POS)) {
-            return abs(sample.b) >= abs(maxB)
-        } else {
-            return abs(sample.b) > abs(maxB)
-        }
+        return abs(sample.b) > abs(maxB)
     }
 
     // __________fst__________
@@ -294,6 +286,7 @@ fun hysteresisRun(settings: Settings): Long {
         while (true) {
             val stop = step(true, FST)
             if (stop) {
+                step(true, FST)
                 break
             }
         }
@@ -305,6 +298,7 @@ fun hysteresisRun(settings: Settings): Long {
         while (true) {
             val stop = step(false, NEG)
             if (stop) {
+                step(false, NEG)
                 break
             }
         }
@@ -316,6 +310,7 @@ fun hysteresisRun(settings: Settings): Long {
         while (true) {
             val stop = step(true, POS)
             if (stop) {
+                step(false, POS)
                 break
             }
         }
