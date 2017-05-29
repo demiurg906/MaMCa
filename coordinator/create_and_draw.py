@@ -22,8 +22,10 @@ def single_simulation(settings_fname: str = None):
         )
     draw_all_vectors_plots(
         settings=settings,
-        scale=4,
-        draw_points=False
+        # scale=4,
+        # scale=0.5,
+        draw_points=False,
+        # borders=[-3, 15, -3, 15, -9, 9]
     )
     # create_momenta_gif(settings=settings)
     play_success_notification()
@@ -57,7 +59,7 @@ def copy_settings_and_hyst_plot(settings: Settings):
 
     settings_fname = 'settings_{}.json'.format(settings.name)
     settings_src_path = '{}/{}'.format(data_folder, settings_fname)
-    settings_dst_path = '{}/settings/{}'.format(data_folder, settings_fname)
+    settings_dst_path = '{}/settings/{}'.format(settings.dataFolder, settings_fname)
     shutil.copyfile(settings_src_path, settings_dst_path)
 
     if settings.hysteresis:
